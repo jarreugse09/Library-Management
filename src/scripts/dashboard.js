@@ -163,81 +163,72 @@ async function updateUserRole(username, role) {
 }
 
 // Create Post Functionality
-let selectedImage = null;
+document.addEventListener("DOMContentLoaded", () => {
+    const submitPostButton = document.getElementById("submitPost");
+    if (submitPostButton) {
+        submitPostButton.addEventListener("click", async () => {
+            const title = document.getElementById("postTitle").value;
+            const description = document.getElementById("postDescription").value;
+            const image = document.getElementById("postImage").files[0];
+            console.log(title);
+            console.log(description);
 
-document.addEventListener("DOMContentLoaded", async () => {
-    const user = await getUserData();
+            // Validate title and description
+            if (!title || !description) {
+                alert("Title and description are required!");
+                return;
+            }
 
-    if (!user || (user.role !== "poster" && user.role !== "admin")) {
-        document.getElementById("createPostSection").style.display = "none";
-        return;
-    }
+            console.log("Title:", title);
+            console.log("Description:", description);
+            console.log("Image:", image);
 
-    document.getElementById("postImage").addEventListener("change", (event) => {
-        const file = event.target.files[0];
-
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                selectedImage = e.target.result;
-                document.getElementById("imagePreview").src = selectedImage;
-                document.getElementById("imagePreview").style.display = "block";
+            // Prepare form data as a JSON object
+            const postData = {
+                title,
+                description,
+                image: image ? await convertToBase64(image) : null  // Convert image to base64 if present
             };
+            console.log(postData);
 
-            reader.readAsDataURL(file);
-        } else {
-            selectedImage = null;
-            document.getElementById("imagePreview").style.display = "none";
-        }
-    });
+            const token = localStorage.getItem("token");
+            try {
+                const response = await fetch("/api/posts", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json", // Set content type to JSON
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(postData), // Send the JSON object as string
+                });
 
-    document.getElementById("discardPost").addEventListener("click", () => {
-        document.getElementById("postTitle").value = "";
-        document.getElementById("postDescription").value = "";
-        document.getElementById("postImage").value = "";
-        selectedImage = null;
-        document.getElementById("imagePreview").style.display = "none";
-    });
-
-    document.getElementById("submitPost").addEventListener("click", async () => {
-        const title = document.getElementById("postTitle").value.trim();
-        const description = document.getElementById("postDescription").value.trim();
-        const user = await getUserData();
-
-        if (!user || (user.role !== "poster" && user.role !== "admin")) {
-            alert("You are not authorized to create posts!");
-            return;
-        }
-
-        if (!title || !description) {
-            alert("Title and description are required!");
-            return;
-        }
-
-        const posts = JSON.parse(localStorage.getItem("posts")) || [];
-
-        const newPost = {
-            id: Date.now(),
-            username: user.username,
-            title,
-            description,
-            image: selectedImage,
-            likes: 0,
-        };
-
-        posts.unshift(newPost);
-        localStorage.setItem("posts", JSON.stringify(posts));
-
-        document.getElementById("postTitle").value = "";
-        document.getElementById("postDescription").value = "";
-        document.getElementById("postImage").value = "";
-        selectedImage = null;
-        document.getElementById("imagePreview").style.display = "none";
-
-        fetchPosts();
-    });
+                if (response.ok) {
+                    const newPost = await response.json();
+                    displayPost(newPost);  // Assuming you have a function to display posts
+                    alert("Post created successfully!");
+                } else {
+                    const error = await response.json();
+                    alert(error.error || "Error creating post");
+                }
+            } catch (error) {
+                console.error("Error posting data:", error);
+            }
+        });
+    } else {
+        console.error("Submit post button not found.");
+    }
 });
+
+// Function to convert an image to base64
+async function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
 
 
 // Fetch and Display Posts

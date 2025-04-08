@@ -9,7 +9,7 @@ const checkReferer = require("./middlewares/checkReferer");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const appRoutes = require("./routes/appRoutes");
-
+const postRoutes = require("./routes/postRoutes");
 
 const app = express();
 
@@ -24,11 +24,13 @@ app.use(
   checkReferer,
   express.static(join(__dirname, 'scripts'))
 );
+
 app.use('/', appRoutes);
 
 app.use(express.json());
 app.use(cors());
 
+app.use('/api/posts', postRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 

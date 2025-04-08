@@ -1,87 +1,185 @@
-const fs = require("fs");
-const path = require("path");
-const express = require("express");
-const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddleware");
+const Post = require("../models/postModel");
 
-const POSTS_FILE = path.join(__dirname, "../data/posts.json");
+const multer = require('multer');
 
-function readPosts() {
-    if (!fs.existsSync(POSTS_FILE)) return [];
-    const data = fs.readFileSync(POSTS_FILE, "utf-8");
-    return JSON.parse(data || "[]");
-}
+// Setup multer storage options
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');  // Store images in a folder called 'uploads'
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname); // Unique name for each file
+    }
+});
 
-function savePosts(posts) {
-    fs.writeFileSync(POSTS_FILE, JSON.stringify(posts, null, 2));
-}
+// Initialize multer with the storage settings
+const upload = multer({ storage: storage });
 
-router.post("/", authMiddleware, (req, res) => {
+exports.createPost = async (req, res) => {
     try {
-        const { title, description } = req.body;
-        const userId = req.user.id;
-        const username = req.user.username;
+        console.log(req.body);
+        const { title, description, image } = req.body;
+        const { id, username } = req.user;
 
+        
+        
         if (!title || !description) {
             return res.status(400).json({ error: "Title and description are required" });
         }
 
-        let posts = readPosts();
-        const newPost = {
-            id: Date.now().toString(),
+        const newPost = await Post.create({
             title,
             description,
+            image,
             username,
-            user: userId,
-            likes: 0,
-            dislikes: 0,
-            comments: [],
-        };
+            user: id
+        });
 
-        posts.push(newPost);
-        savePosts(posts);
         res.status(201).json(newPost);
     } catch (error) {
-        console.error("🔥 Error creating post:", error);
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-router.get("/", (req, res) => {
+exports.getAllPosts = async (req, res) => {
     try {
-        const posts = readPosts();
+        const posts = await Post.find().sort({ createdAt: -1 });
         res.json(posts);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-router.put("/:postId/like", (req, res) => {
+exports.getPostById = async (req, res) => {
     try {
-        let posts = readPosts();
-        const post = posts.find(p => p.id === req.params.postId);
+        const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: "Post not found" });
-
-        post.likes += 1;
-        savePosts(posts);
         res.json(post);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-router.put("/:postId/dislike", (req, res) => {
+exports.updatePost = async (req, res) => {
     try {
-        let posts = readPosts();
-        const post = posts.find(p => p.id === req.params.postId);
+        const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: "Post not found" });
 
-        post.dislikes += 1;
-        savePosts(posts);
+        if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        const { title, description, image } = req.body;
+        post.title = title || post.title;
+        post.description = description || post.description;
+        post.image = image || post.image;
+
+        await post.save();
         res.json(post);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-});
+};
 
-module.exports = router;
+exports.deletePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        if (post.user.toString() !== req.user.id && req.user.role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        await post.deleteOne();
+        res.json({ message: "Post deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.addComment = async (req, res) => {
+    try {
+        const { text } = req.body;
+        const post = await Post.findById(req.params.id);
+
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        post.comments.push({ username: req.user.username, text });
+        await post.save();
+
+        res.status(201).json(post.comments);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.deleteComment = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const commentIndex = post.comments.findIndex(
+            (c) => c._id.toString() === req.params.commentId
+        );
+
+        if (commentIndex === -1) {
+            return res.status(404).json({ error: "Comment not found" });
+        }
+
+        const comment = post.comments[commentIndex];
+        if (comment.username !== req.user.username && req.user.role !== "admin") {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        post.comments.splice(commentIndex, 1);
+        await post.save();
+
+        res.json(post.comments);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.likePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const userId = req.user.id;
+        const alreadyLiked = post.likes.includes(userId);
+
+        if (alreadyLiked) {
+            post.likes.pull(userId);
+        } else {
+            post.likes.push(userId);
+            post.dislikes.pull(userId);
+        }
+
+        await post.save();
+        res.json({ likes: post.likes.length });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.dislikePost = async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const userId = req.user.id;
+        const alreadyDisliked = post.dislikes.includes(userId);
+
+        if (alreadyDisliked) {
+            post.dislikes.pull(userId);
+        } else {
+            post.dislikes.push(userId);
+            post.likes.pull(userId);
+        }
+
+        await post.save();
+        res.json({ dislikes: post.dislikes.length });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
