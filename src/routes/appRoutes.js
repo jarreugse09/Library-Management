@@ -28,4 +28,10 @@ router.route('/dashboard').get(
   })
 );
 
+router.route('/userpage').get(
+  (async (req, res, next) => {
+    res.sendFile(join(__dirname, '..', 'pages', 'userPage.html'));
+  })
+);
+
 module.exports = router;
