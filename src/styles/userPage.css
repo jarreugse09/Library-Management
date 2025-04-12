@@ -80,7 +80,7 @@ nav ul li a:hover {
     border-radius: 8px;
     padding: 15px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    height: 100vh; 
+    height: 90vh; 
     overflow-y: auto;
 }
 
@@ -89,11 +89,24 @@ nav ul li a:hover {
 }
 
 .books {
-    max-width: 50%; 
+    max-width: 80%; 
+}
+
+.book-info{
+    max-width: 30%;
 }
 
 .book-info {
-    max-width: 30%; 
+    position: relative; /* To position the exit button inside this container */
+    display: none; /* Hidden by default */
+    flex: 1;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: auto; /* Adjust height dynamically */
+    overflow-y: auto;
 }
 
 .genre h2, .books h2, .book-info h2 {
@@ -209,4 +222,27 @@ nav ul li a:hover {
 
 .book-info .book-actions button:hover {
     background-color: #0056b3;
+}
+
+.exit-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.exit-button:hover {
+    background-color: #ff1a1a;
 }

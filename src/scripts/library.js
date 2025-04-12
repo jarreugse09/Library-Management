@@ -23,27 +23,6 @@ const books = [
     },
 ];
 
-// Function to display books
-function displayBooks() {
-    const bookList = document.getElementById("bookList");
-
-    books.forEach((book, index) => {
-        const bookItem = document.createElement("div");
-        bookItem.classList.add("book-item");
-
-        bookItem.innerHTML = `
-            <img src="${book.image}" alt="${book.title}">
-            <h3>${book.title}</h3>
-            <p>Author: ${book.author}</p>
-            <p>Genre: ${book.genre}</p>
-        `;
-
-        // Add click event to show book details
-        bookItem.addEventListener("click", () => showBookDetails(index));
-
-        bookList.appendChild(bookItem);
-    });
-}
 
 // Function to show book details
 function showBookDetails(index) {

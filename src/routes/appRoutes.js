@@ -34,4 +34,10 @@ router.route('/userpage').get(
   })
 );
 
+router.route('/userpage/library').get(
+  (async (req, res, next) => {
+    res.sendFile(join(__dirname, '..', 'pages', 'library.html'));
+  })
+);
+
 module.exports = router;
