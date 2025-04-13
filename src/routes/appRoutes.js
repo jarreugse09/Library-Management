@@ -40,4 +40,10 @@ router.route('/userpage/library').get(
   })
 );
 
+router.route('/userpage/settings').get(
+  (async (req, res, next) => {
+    res.sendFile(join(__dirname, '..', 'pages', 'userSettings.html'));
+  })
+);
+
 module.exports = router;
