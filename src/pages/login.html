@@ -34,7 +34,7 @@
             if (response.ok) {
                 localStorage.setItem("token", data.token);
                 alert("Login successful!");
-                window.location.href = "/dashboard"; 
+                window.location.href = "/userPage"; 
             } else {
                 alert(data.message);
             }

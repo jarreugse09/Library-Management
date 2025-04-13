@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="/styles/userPage.css">
+    <link rel="stylesheet" href="/styles/libraryPage.css">
 </head>
 <body>
     <nav>
@@ -17,13 +17,13 @@
         <ul>
             <li>
                 <a href="#Library">Library</a>
-                <a href="#Books">Books</a>
+                <a href="/userPage">Books</a>
                 <a href="#Settings">Settings</a>
             </li>
         </ul>
     </nav>
     <div class="container">
-        <div class="books">
+        <div class="library-books">
             <h2>Library</h2>
             <div class="book-list" id="bookList">
                 <!-- Library items will be dynamically added here -->
@@ -36,7 +36,7 @@
                 <!-- Book details will be dynamically added here -->
             </div>
             <div class="book-actions">
-                <button id="addToLibrary">Add to Library</button>
+                <button id="removeToLibrary">Remove to Library</button>
             </div>
         </div>
     </div>
