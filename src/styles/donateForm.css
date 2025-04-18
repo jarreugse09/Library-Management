@@ -1,0 +1,183 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+/* Navigation Bar */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+nav .logo img {
+  height: 30px;
+}
+
+nav .search-bar input {
+  padding: 10px;
+  border: none;
+  border-radius: 40px;
+  width: 700px;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  gap: 5px;
+  margin: 0 5px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-right: 20px;
+}
+
+nav ul li a:hover {
+  background-color: #45a049;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.logo img {
+  max-width: 100px;
+  height: auto;
+}
+
+.container {
+  margin-top: 60px; /* Add space equal to the height of the nav */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.donate-form {
+  height: 100vh;
+  width: 30%;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 70px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.donate-form h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+  align-self: center;
+  justify-self: center;
+  font-weight: 600;
+}
+
+.donate-form p {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.donate-form label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.donate-form input,
+.donate-form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.authors-container > div {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.author-container input {
+  flex: 1;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.btn-add {
+  background-color: #f0f0f0;
+  color: #333;
+  margin-bottom: 16px;
+}
+.btn-remove {
+  background-color: #ffdddd;
+  color: #a00;
+  margin-right: 10px;
+}
+.btn-submit {
+  background-color: green;
+  color: white;
+}
+
+/* Book type radio buttons */
+.book-type {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.book-type label {
+  font-weight: normal;
+}
+
+.book-type input[type='radio'] {
+  margin-right: 5px;
+  width: 30%;
+}
+
+.book-type input[type='radio']:checked + label {
+  font-weight: bold; /* Highlights the label of the selected radio button */
+}
+/* Conditional fields */
+.conditional-field {
+  display: none;
+}
+
+.conditional-field.active {
+  display: block;
+  margin-top: 10px;
+}

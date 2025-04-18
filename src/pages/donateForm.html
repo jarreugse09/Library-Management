@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donate Book</title>
+    <link rel="stylesheet" href="../styles/donateForm.css" />
+    <script src="../scripts/donateForm.js"></script>
+  </head>
+  <body>
+    <nav>
+      <div class="logo">
+        <img src="../images/OIP.jpg" alt="Logo" />
+      </div>
+      <div class="search-bar">
+        <input type="text" placeholder="Search..." />
+      </div>
+      <ul>
+        <li>
+          <a href="/userpage/library">Library</a>
+          <a href="#Books">Books</a>
+          <a href="#Donate">Donate</a>
+          <a href="#Borrow">Borrow</a>
+          <a href="#Settings">Settings</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="container">
+      <form class="donate-form" onsubmit="handleSubmit(event)">
+        <h2>Donate a Book</h2>
+
+        <label>Donor Name:</label
+        ><input name="donorName" value="username" readonly />
+
+        <label>Book Title:</label><input name="title" type="text" required />
+
+        <div class="authors-container" id="authors-container">
+          <label>Author(s)</label>
+          <div>
+            <input type="text" name="authors[]" required />
+            <button
+              type="button"
+              class="btn btn-remove"
+              onclick="removeAuthor(this)"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-add" onclick="addAuthor()">
+          + Add Another Author
+        </button>
+
+        <label for="year">Year Published: </label>
+        <input
+          type="number"
+          id="year"
+          min="1800"
+          max="2025"
+          name="publishedYear"
+        />
+
+        <label for="genre">Genre</label>
+        <select id="genre" name="genre" required>
+          <option value="" disabled selected>Select a genre</option>
+          <option value="Fiction">Fiction</option>
+          <option value="Non-fiction">Non-fiction</option>
+          <option value="Science">Science</option>
+          <option value="Biography">Biography</option>
+          <option value="Mystery">Mystery</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Romance">Romance</option>
+          <option value="History">History</option>
+          <option value="Self-Help">Self-Help</option>
+          <option value="Children">Children</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <!-- Book Type Selection -->
+
+        <label for="bookType">Book Type</label>
+        <div class="book-type">
+          <label>Physical Book</label>
+          <input
+            type="radio"
+            name="bookType"
+            value="physical"
+            onchange="toggleFields()"
+            checked
+          />
+          <label> E-Book</label>
+          <input
+            type="radio"
+            name="bookType"
+            value="ebook"
+            onchange="toggleFields()"
+          />
+        </div>
+
+        <!-- Quantity input, shown only for Physical Books -->
+        <div id="quantityField" style="display: none">
+          <label for="quantity">Quantity:</label>
+          <input type="number" name="quantity" min="1" id="quantityInput" />
+        </div>
+
+        <!-- E-book file input, shown only for E-Books -->
+        <div id="ebookFileInput" style="display: none">
+          <label for="ebookFile">Upload E-Book File:</label>
+          <input
+            type="file"
+            name="ebookFile"
+            id="ebookFileField"
+            accept=".epub,.pdf,.mobi"
+          />
+        </div>
+
+        <button class="btn btn-remove">Cancel</button>
+        <button type="submit" class="btn btn-submit">Donate Book</button>
+      </form>
+    </div>
+  </body>
+</html>
