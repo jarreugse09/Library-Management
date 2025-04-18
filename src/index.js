@@ -5,6 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const checkReferer = require("./middlewares/checkReferer");
+const mongoSanitize = require('./middlewares/mongoSanitize');
 
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -25,9 +26,16 @@ app.use(
   express.static(join(__dirname, 'scripts'))
 );
 
+app.use(
+  '/images', 
+  express.static(join(__dirname, 'images'))
+);
+
+
 app.use('/', appRoutes);
 
 app.use(express.json());
+app.use(mongoSanitize);
 app.use(cors());
 
 app.use('/api/posts', postRoutes);
