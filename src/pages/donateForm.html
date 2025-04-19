@@ -26,13 +26,20 @@
       </ul>
     </nav>
     <div class="container">
-      <form class="donate-form" onsubmit="handleSubmit(event)">
+      <form
+        entype="multipart/form-data"
+        class="donate-form"
+        onsubmit="handleSubmit(event)"
+      >
         <h2>Donate a Book</h2>
 
         <label>Donor Name:</label
         ><input name="donorName" value="username" readonly />
 
         <label>Book Title:</label><input name="title" type="text" required />
+
+        <label>Description:</label
+        ><input name="description" type="text" required />
 
         <div class="authors-container" id="authors-container">
           <label>Author(s)</label>
