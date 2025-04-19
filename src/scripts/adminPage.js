@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingDonations() {
     try {
       const response = await fetch(
-        'http://localhost:7001/api/donations/pending/'
+        'http://localhost:7001/api/donations/approve/'
       );
       if (!response.ok) throw new Error('Failed to fetch');
 
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const approveBtn = document.createElement('button');
         approveBtn.textContent = 'Approve';
         approveBtn.addEventListener('click', () =>
-          handleAction(donation._id, 'approve')
+          handleAction(donation._id, 'done')
         );
 
         // Create reject button and attach event listener
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleAction(donationId, action) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:7001/api/donations/${donationId}/${action}`,
+        `http://localhost:7001/api/donations/${donationId}/${action}/`,
         {
           method: 'PATCH',
         }
@@ -145,89 +145,39 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(`Error trying to ${action} donation:`, err);
     }
   }
-
-  async function fetchPendingBorrows() {
-    try {
-      const response = await fetch(
-        'http://127.0.0.1:7001/api/borrows/pending/'
-      );
-      if (!response.ok) throw new Error('Failed to fetch borrows');
-
-      const data = await response.json();
-
-      // Log the data to debug the structure
-      console.log(data);
-
-      // Ensure the data is an array
-      if (!Array.isArray(data)) {
-        throw new Error('Expected data to be an array');
-      }
-
-      borrowList.innerHTML = ''; // Clear any previous data
-
-      // Check if there are no pending borrow requests
-      if (data.length === 0) {
-        borrowList.innerHTML = '<li>No pending borrow requests found.</li>';
-        return;
-      }
-
-      data.forEach(borrow => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `
-          <strong>Book Title: ${borrow.bookTitle}</strong><br>
-          Borrowed by: ${borrow.borrowerName}<br>
-          Contact Info: ${borrow.contactInfo}<br>
-          Borrow Date: ${new Date(borrow.borrowDate).toLocaleDateString()}<br>
-          Expected Return Date: ${new Date(
-            borrow.returnDate
-          ).toLocaleDateString()}<br><br>
-          <button class="approve-btn">Approve</button>
-          <button class="reject-btn">Reject</button>
-        `;
-
-        // Attach handlers to buttons
-        listItem
-          .querySelector('.approve-btn')
-          .addEventListener('click', () =>
-            handleActionBorrow(borrow._id, 'approve')
-          );
-        listItem
-          .querySelector('.reject-btn')
-          .addEventListener('click', () =>
-            handleActionBorrow(borrow._id, 'reject')
-          );
-
-        borrowList.appendChild(listItem);
-      });
-    } catch (err) {
-      console.error('Error loading borrows:', err);
-      borrowList.innerHTML = '<li>Error loading borrow requests.</li>';
-    }
-  }
-
-  async function handleActionBorrow(_id, action) {
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:7001/api/borrows/${_id}/${action}`,
-        {
-          method: 'PATCH',
-        }
-      );
-      console.log(response);
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(result.message);
-        fetchPendingDonations(); // reload list
-      } else {
-        alert(`Error: ${result.message}`);
-      }
-    } catch (err) {
-      console.error(`Error trying to ${action} donation:`, err);
-    }
-  }
-
-  // Optional: Load default view
-  showSection('Inventory');
 });
+
+async function fetchBorrowedBooks() {
+  try {
+    const response = await fetch(
+      'http://127.0.0.1:7001/api/books/physical/borrowed'
+    ); // Replace with your actual endpoint
+    const borrowedBooks = await response.json();
+
+    const borrowLog = document.getElementById('borrowLog');
+    borrowLog.innerHTML = ''; // Clear the list before appending new items
+
+    if (!borrowedBooks.length) {
+      borrowLog.innerHTML = '<li>No borrowed books found.</li>';
+    } else {
+      borrowedBooks.forEach(book => {
+        const li = document.createElement('li');
+        li.textContent = `${book.bookTitle} - Borrower: ${
+          book.borrowerName
+        } | Borrowed: ${new Date(
+          book.borrowDate
+        ).toLocaleDateString()} | Return: ${new Date(
+          book.returnDate
+        ).toLocaleDateString()}`;
+        borrowLog.appendChild(li);
+      });
+    }
+
+    // Show the borrowed section
+    document.getElementById('borrow').style.display = 'block';
+    document.getElementById('borrowedLogs').style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching borrowed books:', error);
+    alert('Failed to fetch borrowed books. Please try again.');
+  }
+}

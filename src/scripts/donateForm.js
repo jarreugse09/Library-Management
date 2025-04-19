@@ -98,7 +98,7 @@ async function handleSubmit(event) {
 
   try {
     const response = await fetch(
-      'http://127.0.0.1:7001/clerkPage/donations/donate',
+      'http://127.0.0.1:7001/api/donations/donate/',
       {
         method: 'POST',
         body: formData, // ✅ Send FormData directly

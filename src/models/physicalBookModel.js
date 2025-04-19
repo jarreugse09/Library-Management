@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
+const { generateDonationId } = require('../utils/generateId'); // update path as needed
 
 const physicalBookSchema = new mongoose.Schema({
+  borrowId: {
+    type: String,
+    unique: true,
+    default: () => generateDonationId(),
+  },
   title: {
     type: String,
     required: true,
@@ -16,14 +22,13 @@ const physicalBookSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending',
-  },
+
   bookType: {
     type: String,
     default: 'physical',
+  },
+  genre: {
+    type: String,
   },
   quantity: {
     type: Number,
@@ -33,6 +38,11 @@ const physicalBookSchema = new mongoose.Schema({
     type: String,
     default: 'To be shelved',
   },
+  status: {
+    type: String,
+    enum: ['borrowed', 'lost', 'good'],
+    default: 'good',
+  },
   condition: {
     type: String,
     enum: ['new', 'good', 'fair', 'poor'],
@@ -41,10 +51,6 @@ const physicalBookSchema = new mongoose.Schema({
   donatedAt: {
     type: Date,
     default: Date.now,
-  },
-  approvedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
   },
 });
 

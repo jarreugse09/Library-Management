@@ -11,7 +11,9 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const appRoutes = require('./routes/appRoutes');
 const postRoutes = require('./routes/postRoutes');
+const borrowRoutes = require('./routes/borrowRoutes');
 const donationRoutes = require('./routes/donationRoutes');
+const physicalBookRoutes = require('./routes/physicalBookRoutes');
 
 const app = express();
 
@@ -31,6 +33,8 @@ app.use('/api/posts', postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/books/physical', physicalBookRoutes);
+app.use('/api/borrows', borrowRoutes);
 
 const PORT = process.env.PORT || 7002;
 

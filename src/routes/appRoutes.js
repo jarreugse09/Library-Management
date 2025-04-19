@@ -46,4 +46,9 @@ router.route('/clerkPage/*').get(async (req, res, next) => {
 router.route('/adminPage/*').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'adminPage.html'));
 });
+
+router.route('/borrowForm').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'borrowForm.html'));
+});
+
 module.exports = router;

@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
+const { generateDonationId } = require('../utils/generateId'); // update path as needed
 
 const donationSchema = new mongoose.Schema({
+  donationId: {
+    type: String,
+    unique: true,
+    default: () => generateDonationId(),
+  },
   donorName: { type: String, required: true },
   title: { type: String, required: true },
   authors: [{ type: String, required: true }],
@@ -12,7 +18,7 @@ const donationSchema = new mongoose.Schema({
   ebookFileUrl: { type: String }, // only for ebook
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['pending', 'approved', 'rejected', 'done'],
     default: 'pending',
   },
   createdAt: { type: Date, default: Date.now },

@@ -1,6 +1,6 @@
+const donationController = require('../controllers/donationControllers');
 const express = require('express');
 const router = express.Router();
-const donationController = require('../controllers/donationControllers');
 
 // Create donation with optional eBook upload
 router.post(
@@ -11,7 +11,8 @@ router.post(
 
 // View eBook by filename
 router.get('/pending/', donationController.getEbook);
+router.get('/approve/', donationController.getApproveEbook);
 
-router.patch('/:donationId/:action', donationController.updateDonationStatus);
+router.patch('/:_id/:action/', donationController.updateDonationStatus);
 
 module.exports = router;

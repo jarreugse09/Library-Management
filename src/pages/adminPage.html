@@ -29,7 +29,11 @@
         <ul>
           <li><a href="#inventory" id="inventoryLink">Inventory</a></li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
-          <li><a href="#borrowed" id="borrowedLink">Borrowed</a></li>
+          <li>
+            <a href="#borrowed" id="borrowedLink" onclick="fetchBorrowedBooks()"
+              >Borrowed</a
+            >
+          </li>
         </ul>
       </div>
       <div class="content">
@@ -63,16 +67,12 @@
         <!-- ... other HTML remains the same ... -->
         <div id="borrow" class="section" style="display: none">
           <h1>Borrowed Books</h1>
-          <button id="pendingBtn">Pending</button>
-          <button id="logsBtn">Logs</button>
-
-          <div id="pending-borrow"><ul id="borrowList"></ul></div>
           <div id="borrowedLogs" style="display: none">
             <ul id="borrowLog"></ul>
           </div>
         </div>
       </div>
     </div>
-    <script src="/scripts/clerkPage.js"></script>
+    <script src="/scripts/adminPage.js"></script>
   </body>
 </html>

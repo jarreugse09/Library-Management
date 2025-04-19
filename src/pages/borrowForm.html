@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Borrow a Book</title>
+    <link rel="stylesheet" href="/styles/borrowForm.css" />
+  </head>
+  <body>
+    <form onsubmit="handleSubmit(event)">
+      <h2>Borrow a Physical Book</h2>
+
+      <label for="bookTitle">Book Title</label>
+      <select id="bookTitle" name="bookTitle" required>
+        <option value="">Select book title</option>
+      </select>
+
+      <label for="borrowerName">Your Full Name</label>
+      <input type="text" id="borrowerName" name="borrowerName" required />
+
+      <label for="contactInfo">Contact Information</label>
+      <input
+        type="text"
+        id="contactInfo"
+        name="contactInfo"
+        placeholder="Email or Phone"
+        required
+      />
+
+      <label for="borrowDate">Borrow Date</label>
+      <input type="date" id="borrowDate" name="borrowDate" required />
+
+      <label for="returnDate">Expected Return Date</label>
+      <input type="date" id="returnDate" name="returnDate" required />
+
+      <label for="notes">Additional Notes (optional)</label>
+      <textarea
+        id="notes"
+        name="notes"
+        rows="4"
+        placeholder="Any special instructions or requests..."
+      ></textarea>
+
+      <button type="submit">Submit Request</button>
+    </form>
+    <script src="../scripts/borrowForm.js"></script>
+  </body>
+</html>
