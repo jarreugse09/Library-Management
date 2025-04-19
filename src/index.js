@@ -7,11 +7,11 @@ const cors = require('cors');
 const checkReferer = require('./middlewares/checkReferer');
 const mongoSanitize = require('./middlewares/mongoSanitize');
 
-const donationRoutes = require('./routes/donationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const appRoutes = require('./routes/appRoutes');
 const postRoutes = require('./routes/postRoutes');
+const donationRoutes = require('./routes/donationRoutes');
 
 const app = express();
 
@@ -27,10 +27,10 @@ app.use(express.json());
 app.use(mongoSanitize);
 app.use(cors());
 
-app.use('/api/donations', donationRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/donations', donationRoutes);
 
 const PORT = process.env.PORT || 7002;
 

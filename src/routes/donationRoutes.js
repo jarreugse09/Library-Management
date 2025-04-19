@@ -12,9 +12,6 @@ router.post(
 // View eBook by filename
 router.get('/pending/', donationController.getEbook);
 
-router.patch(
-  '/donations/:donationId/:action',
-  donationController.updateDonationStatus
-);
+router.patch('/:donationId/:action', donationController.updateDonationStatus);
 
 module.exports = router;
