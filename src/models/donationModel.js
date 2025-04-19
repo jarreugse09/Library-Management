@@ -4,6 +4,7 @@ const donationSchema = new mongoose.Schema({
   donorName: { type: String, required: true },
   title: { type: String, required: true },
   authors: [{ type: String, required: true }],
+  description: { type: String },
   publishedYear: { type: Number },
   genre: { type: String, required: true },
   bookType: { type: String, enum: ['physical', 'ebook'], required: true },

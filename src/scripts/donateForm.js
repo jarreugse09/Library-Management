@@ -87,47 +87,6 @@ document.addEventListener('DOMContentLoaded', toggleFields);
 async function handleSubmit(event) {
   event.preventDefault();
 
-  // const formData = new FormData(event.target);
-
-  // // Get authors as an array
-  // const author = formData.getAll('authors[]');
-
-  // const bookType = formData.get('bookType'); // Get the book type (physical or e-book)
-  // let ebookFileUrl = null;
-
-  // // If the book type is e-book, get the ebook file URL
-  // const ebookFile = formData.get('ebookFile');
-  // if (bookType === 'ebook' && ebookFile && ebookFile.name) {
-  //   ebookFileUrl = `/uploads/ebooks/${ebookFile.name}`;
-  // }
-
-  // // Create the donation object from form data
-  // const donationData = {
-  //   donorName: formData.get('donorName'),
-  //   title: formData.get('title'),
-  //   authors: formData.getAll('authors[]'),
-  //   publishedYear: formData.get('publishedYear'),
-  //   genre: formData.get('genre'),
-  //   bookType: formData.get('bookType'),
-  //   quantity: bookType === 'physical' ? formData.get('quantity') : undefined,
-  //   ebookFileUrl: ebookFileUrl ? ebookFileUrl : undefined,
-  // };
-
-  // // Append to FormData if ebookFileUrl exists (for e-book uploads)
-  // if (ebookFileUrl) {
-  //   formData.append('ebookFile', ebookFileUrl);
-  // }
-
-  // // Log the donationData for debugging (optional)
-  // console.log(donationData);
-
-  // // Send the FormData to the backend
-  // try {
-  //   const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
-  //     method: 'POST',
-  //     body: JSON.stringify(donationData), // FormData will automatically set the correct headers
-  //   });
-
   const formData = new FormData(event.target);
 
   const bookType = formData.get('bookType');

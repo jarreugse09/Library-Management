@@ -1,11 +1,13 @@
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+const mime = require('mime');
 const Donation = require('../models/donationModel');
 
-// Set up multer storage configuration
+// Multer storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, '../uploads/ebooks'); // Directory to store eBook files
+    cb(null, path.join(__dirname, '../uploads/ebooks')); // Store in /uploads/ebooks
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -16,7 +18,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// Filter for valid eBook file types (pdf, epub, etc.)
+// File type filter
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['application/pdf', 'application/epub+zip'];
   if (allowedTypes.includes(file.mimetype)) {
@@ -26,30 +28,32 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Initialize multer upload middleware
 const upload = multer({ storage, fileFilter });
 
-// Create a new donation (handle file upload)
+// Create donation
 const createDonation = async (req, res) => {
   try {
     const {
       donorName,
       title,
       authors,
+      description,
       publishedYear,
       genre,
       bookType,
       quantity,
     } = req.body;
 
+    if (!description)
+      return res
+        .status(400)
+        .json({ error: 'Description is required for  books' });
     let ebookFileUrl = null;
 
-    // Handle eBook file path if uploaded
     if (bookType === 'ebook' && req.file) {
-      ebookFileUrl = `/uploads/ebooks/${req.file.filename}`; // Make path usable in frontend
+      ebookFileUrl = `/uploads/ebooks/${req.file.filename}`;
     }
 
-    // Validation
     if (bookType === 'physical' && (!quantity || quantity <= 0)) {
       return res
         .status(400)
@@ -60,11 +64,11 @@ const createDonation = async (req, res) => {
       return res.status(400).json({ error: 'eBook file is required' });
     }
 
-    // Create donation document
     const donation = new Donation({
       donorName,
       title,
       authors,
+      description,
       publishedYear,
       genre,
       bookType,
@@ -83,8 +87,55 @@ const createDonation = async (req, res) => {
   }
 };
 
-// Export
+// View eBook file
+const getEbook = async (req, res) => {
+  try {
+    const pendingDonations = await Donation.find({ status: 'pending' }).select(
+      'donorName title authors bookType publishedYear'
+    ); // Only include these fields
+
+    if (!pendingDonations || pendingDonations.length === 0) {
+      return res.status(404).json({ message: 'No pending donations found' });
+    }
+
+    console.log(pendingDonations);
+
+    res.json(pendingDonations);
+  } catch (error) {
+    console.error('Error retrieving pending donations:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const updateDonationStatus = async (req, res) => {
+  const { donationId, action } = req.params;
+  const validActions = ['approve', 'reject'];
+
+  if (!validActions.includes(action)) {
+    return res.status(400).json({ message: 'Invalid action' });
+  }
+
+  try {
+    const donation = await Donation.findByIdAndUpdate(
+      donationId,
+      { status: action === 'approve' ? 'approved' : 'rejected' },
+      { new: true }
+    );
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    res.json({ message: `Donation ${action}d successfully` });
+  } catch (error) {
+    console.error(`Error updating donation:`, error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
-  upload, // multer middleware
+  upload,
   createDonation,
+  getEbook,
+  updateDonationStatus,
 };

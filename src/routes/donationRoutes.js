@@ -1,13 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const donationController = require('../controllers/donationControllers');
-const upload = require('../middlewares/upload'); // adjust path as needed
 
-// Post route to create a donation with eBook upload
+// Create donation with optional eBook upload
 router.post(
   '/donate',
   donationController.upload.single('ebookFile'),
   donationController.createDonation
+);
+
+// View eBook by filename
+router.get('/pending/', donationController.getEbook);
+
+router.patch(
+  '/donations/:donationId/:action',
+  donationController.updateDonationStatus
 );
 
 module.exports = router;
