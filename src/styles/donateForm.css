@@ -1,110 +1,148 @@
-.container {  
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+:root {
+  --bg: #1b1b1f;
+  --card-bg: #2c2c31;
+  --accent: #ff4655;
+  --text: #fff;
+  --text-light: #aaa;
+  --border: rgba(255, 255, 255, 0.1);
+  --input-bg: #242428;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-  padding: 20px;
-  background-color: #f9f9f9;
+  padding: 60px 20px;
 }
 
 .donate-form {
-  height: 100vh;
-  width: 30%;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 70px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: var(--card-bg);
+  width: 100%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
 }
 
 .donate-form h2 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  color: #333;
-  align-self: center;
-  justify-self: center;
+  font-size: 24px;
   font-weight: 600;
-}
-
-.donate-form p {
-  font-size: 1rem;
-  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: center;
+  color: var(--accent);
 }
 
 .donate-form label {
   font-weight: 600;
-  display: block;
+  font-size: 14px;
+  color: var(--text);
   margin-bottom: 6px;
+  display: block;
 }
 
 .donate-form input,
 .donate-form select {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255, 70, 85, 0.2);
 }
 
 .authors-container > div {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.author-container input {
-  flex: 1;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.btn {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.btn-add {
-  background-color: #f0f0f0;
-  color: #333;
-  margin-bottom: 16px;
-}
-.btn-remove {
-  background-color: #ffdddd;
-  color: #a00;
-  margin-right: 10px;
-}
-.btn-submit {
-  background-color: green;
-  color: white;
-}
-
-/* Book type radio buttons */
 .book-type {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .book-type label {
-  font-weight: normal;
+  font-weight: 500;
+  margin-right: 8px;
 }
 
-.book-type input[type='radio'] {
+.book-type input[type="radio"] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
   margin-right: 5px;
-  width: 30%;
 }
 
-.book-type input[type='radio']:checked + label {
-  font-weight: bold; /* Highlights the label of the selected radio button */
-}
-/* Conditional fields */
-.conditional-field {
-  display: none;
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.conditional-field.active {
-  display: block;
-  margin-top: 10px;
+.btn-add {
+  background-color: #36363b;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.btn-remove {
+  background-color: #402c2c;
+  color: #ff4e4e;
+}
+
+.btn-submit {
+  background-color: var(--accent);
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.btn-remove:hover,
+.btn-add:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-submit:hover {
+  background-color: #e03a4e;
+  transform: translateY(-1px);
+}
+
+#quantityField,
+#ebookFileInput {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .donate-form {
+    padding: 30px 20px;
+  }
 }

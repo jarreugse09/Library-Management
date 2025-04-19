@@ -1,42 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
-    <link rel="stylesheet" href="/styles/header.css">
-    <link rel="stylesheet" href="/styles/userAccount.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Account Settings</title>
+  <link rel="stylesheet" href="/styles/header.css" />
+  <link rel="stylesheet" href="/styles/userAccount.css" />
 </head>
 <body>
-    <div class="header">
-      <div class="logo">
-        <img src="../images/OIP.jpg" alt="Logo" />
-      </div>
-      <nav>
-        <ul>
-          <li><a href="/userpage/library">Library</a></li>
-          <li><a href="#Books">Books</a></li>
-          <li>
-            <a href="#" id="settingsLink">Settings</a>
-            <ul id="settingsDropdown" class="dropdown hidden">
-              <li><a href="/userpage/account">Account</a></li>
-              <li><a href="/userpage/donateForm">Donate</a></li>
-              <li><a href="#Borrow">Borrow</a></li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
+  <header class="header">
+    <div class="logo">
+      <img src="../images/OIP.jpg" alt="Logo" />
+      <h1>Name of Lib</h1>
     </div>
+    <nav>
+      <ul>
+        <li><a href="/userpage/library">Library</a></li>
+        <li><a href="/userpage">My Books</a></li>
+        <li class="dropdown">
+          <a href="#" id="settingsToggle">Settings ▾</a>
+          <ul class="dropdown-menu" id="settingsDropdown">
+            <li><a href="/userpage/account">Account</a></li>
+            <li><a href="/userpage/donateForm">Donate</a></li>
+            <li><a href="#">Borrow</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="account-wrapper">
     <div class="user-container">
-      <img src="../images/OIP.jpg" alt="User Avatar" class="user-avatar">
+      <img src="../images/OIP.jpg" alt="User Avatar" class="user-avatar" />
 
       <div class="user-info">
-          <h2>Hatdog</h2>
-          <p><span>Email:</span> hatdog@example.com</p>
-          <p><span>Account Created:</span> January 15, 2024</p>
-          <p><span>Status:</span> Active</p>
+        <h2>Hatdog</h2>
+        <p><span>Email:</span> hatdog@example.com</p>
+        <p><span>Account Created:</span> January 15, 2024</p>
+        <p><span>Status:</span> <span class="status-active">Active</span></p>
+      </div>
+
+      <div class="account-section">
+        <h3>Account Security</h3>
+        <p><span>Last Login:</span> 2 hours ago</p>
+        <p><span>Two-Factor Auth:</span> Not Enabled</p>
+      </div>
+
+      <div class="account-section">
+        <h3>Preferences</h3>
+        <p><span>Theme:</span> Dark Mode</p>
+        <p><span>Notifications:</span> Enabled</p>
+      </div>
+
+      <div class="account-actions">
+        <button class="primary-btn">Edit Profile</button>
+        <button class="secondary-btn">Change Password</button>
+        <button class="secondary-btn">Privacy Settings</button>
       </div>
     </div>
-    <script src="/scripts/header.js"></script>
+  </div>
+
+  <script src="/scripts/header.js"></script>
 </body>
 </html>
