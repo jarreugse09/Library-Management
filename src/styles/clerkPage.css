@@ -1,17 +1,155 @@
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  padding: 20px;
 }
-ul {
+/* Navigation Bar */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #333;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+nav .logo img {
+  height: 30px;
+}
+
+nav .search-bar input {
+  padding: 10px;
+  border: none;
+  border-radius: 40px;
+  width: 700px;
+}
+
+nav ul {
   list-style: none;
+  margin: 0;
   padding: 0;
 }
-li {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+
+nav ul li {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  gap: 5px;
+  margin: 0 5px;
 }
-button {
-  margin-right: 10px;
+
+nav ul li a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  font-size: 1.3rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  margin-right: 20px;
+}
+
+nav ul li a:hover {
+  background-color: #45a049;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.logo img {
+  max-width: 100px;
+  height: auto;
+}
+
+.container {
+  margin-top: 60px; /* Add space equal to the height of the nav */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.sidebar,
+.content {
+  flex: 1;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 90vh;
+  overflow-y: auto;
+}
+
+.sidebar {
+  max-width: 15%;
+}
+
+.books {
+  max-width: 80%;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.sidebar h2 {
+  justify-self: center;
+  margin: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar ul li {
+  margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 1.25rem;
+  font-weight: 500;
+  background-color: #f0f8ff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar ul li a:hover {
+  background-color: #dceeff;
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .book-item {
+    flex: 1 1 calc(50% - 15px);
+    max-width: calc(50% - 15px);
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex: 1 1 calc(100% - 15px);
+    max-width: calc(100% - 15px);
+  }
 }
