@@ -1,36 +1,35 @@
-
-/* User Container */
 .user-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
-}
-
-.user-settings {
+    max-width: 400px;
+    margin: 60px auto;
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
     text-align: center;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: 300px;
 }
 
-.user-settings .user-avatar {
-    width: 100px;
-    height: 100px;
+.user-avatar {
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
+    object-fit: cover;
     margin-bottom: 15px;
-    border: 2px solid #ddd;
+    border: 3px solid #4CAF50;
 }
 
-.user-settings h2 {
-    font-size: 1.5rem;
-    margin: 10px 0;
+.user-info h2 {
+    margin: 10px 0 5px;
+    font-size: 24px;
     color: #333;
 }
 
-.user-settings p {
-    font-size: 1rem;
+.user-info p {
+    font-size: 16px;
     color: #666;
+    margin: 5px 0;
+}
+
+.user-info span {
+    font-weight: bold;
+    color: #444;
 }
