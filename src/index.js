@@ -15,7 +15,11 @@ const donationRoutes = require('./routes/donationRoutes');
 
 const app = express();
 
-app.use('/styles', checkReferer, express.static(join(__dirname, 'styles')));
+app.use(
+  '/styles', 
+  checkReferer, 
+  express.static(join(__dirname, 'styles'))
+);
 
 app.use('/scripts', checkReferer, express.static(join(__dirname, 'scripts')));
 
