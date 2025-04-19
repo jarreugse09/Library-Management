@@ -4,27 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Donate Book</title>
-    <link rel="stylesheet" href="../styles/donateForm.css" />
-    <script src="../scripts/donateForm.js"></script>
+    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/donateForm.css" />
+    <script src="/scripts/header.js"></script>
+    <script src="/scripts/donateForm.js"></script>
   </head>
   <body>
-    <nav>
+    <div class="header">
       <div class="logo">
         <img src="../images/OIP.jpg" alt="Logo" />
       </div>
-      <div class="search-bar">
-        <input type="text" placeholder="Search..." />
-      </div>
-      <ul>
-        <li>
-          <a href="/userpage/library">Library</a>
-          <a href="#Books">Books</a>
-          <a href="#Donate">Donate</a>
-          <a href="#Borrow">Borrow</a>
-          <a href="#Settings">Settings</a>
-        </li>
-      </ul>
-    </nav>
+      <nav>
+        <ul>
+          <li><a href="/userpage/library">Library</a></li>
+          <li><a href="#Books">Books</a></li>
+          <li>
+            <a href="#" id="settingsLink">Settings</a>
+            <ul id="settingsDropdown" class="dropdown hidden">
+              <li><a href="/userpage/account">Account</a></li>
+              <li><a href="/userpage/donateForm">Donate</a></li>
+              <li><a href="#Borrow">Borrow</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </div>
     <div class="container">
       <form class="donate-form" onsubmit="handleSubmit(event)">
         <h2>Donate a Book</h2>

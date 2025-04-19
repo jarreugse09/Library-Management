@@ -1,76 +1,5 @@
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
-/* Navigation Bar */
-nav {
-    position: fixed; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    z-index: 1000; 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-nav .logo img {
-    height: 30px;
-}
-
-nav .search-bar input {
-    padding: 8px;
-    border: none;
-    border-radius: 40px;
-    width: 700px;
-}
-
-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-nav ul li {
-    display: flex;
-    justify-content: right; 
-    align-items: center; 
-    gap: 40%; 
-    margin: 0 50px; 
-}
-
-nav ul li a {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    font-size: 1.3rem;
-    padding: 8px 12px;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-nav ul li a:hover {
-    background-color: #45a049;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0;;
-}
-
-.logo img {
-    max-width: 100px; 
-    height: auto; 
-}
-
 /* Main Container */
 .container {
-    margin-top: 60px;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -82,7 +11,7 @@ nav ul li a:hover {
 
 /* Library Books Section */
 .library-books {
-    flex: 1 ;
+    flex: 2;
     background-color: white;
     padding: 20px;
     border-radius: 8px;

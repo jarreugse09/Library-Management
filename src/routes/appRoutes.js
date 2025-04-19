@@ -31,8 +31,8 @@ router.route('/userpage/donateForm').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'donateForm.html'));
 });
 
-router.route('/userpage/settings').get(async (req, res, next) => {
-  res.sendFile(join(__dirname, '..', 'pages', 'userSettings.html'));
+router.route('/userpage/account').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'userAccount.html'));
 });
 
 module.exports = router;
