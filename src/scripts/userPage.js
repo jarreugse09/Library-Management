@@ -25,28 +25,43 @@ const books = [
         title: "Book Title 4",
         author: "Author Name 4",
         genre: "Fiction",
-        description: "This is a brief description of Book Title 1.",
+        description: "This is a brief description of Book Title 4.",
         image: "/images/OIP.jpg",
     },
     {
         title: "Book Title 5",
         author: "Author Name 5",
         genre: "Non-Fiction",
-        description: "This is a brief description of Book Title 2.",
+        description: "This is a brief description of Book Title 5.",
         image: "/images/OIP.jpg",
     },
     {
-        title: "Book Title 5",
+        title: "Book Title 6",
         author: "Author Name 6",
         genre: "Mystery",
-        description: "This is a brief description of Book Title 3.",
+        description: "This is a brief description of Book Title 6.",
+        image: "/images/OIP.jpg",
+    },
+    {
+        title: "Book Title 7",
+        author: "Author Name 7",
+        genre: "Fantasy",
+        description: "This is a brief description of Book Title 5.",
+        image: "/images/OIP.jpg",
+    },
+    {
+        title: "Book Title 8",
+        author: "Author Name 8",
+        genre: "Science",
+        description: "This is a brief description of Book Title 6.",
         image: "/images/OIP.jpg",
     },
 ];
 
-// Function to display books
+// Function to display all books
 function displayBooks() {
     const bookList = document.getElementById("bookList");
+    bookList.innerHTML = "";
 
     books.forEach((book, index) => {
         const bookItem = document.createElement("div");
@@ -59,9 +74,36 @@ function displayBooks() {
             <p>Genre: ${book.genre}</p>
         `;
 
-        // Add click event to show book details
         bookItem.addEventListener("click", () => showBookDetails(index));
+        bookList.appendChild(bookItem);
+    });
+}
 
+// Function to display books by genre
+function displayBooksByGenre(genre) {
+    if (genre === "All") {
+        displayBooks();
+        return;
+    }
+
+    const bookList = document.getElementById("bookList");
+    bookList.innerHTML = "";
+
+    const filteredBooks = books.filter(book => book.genre === genre);
+
+    filteredBooks.forEach((book) => {
+        const bookItem = document.createElement("div");
+        bookItem.classList.add("book-item");
+
+        bookItem.innerHTML = `
+            <img src="${book.image}" alt="${book.title}">
+            <h3>${book.title}</h3>
+            <p>Author: ${book.author}</p>
+            <p>Genre: ${book.genre}</p>
+        `;
+
+        const index = books.indexOf(book);
+        bookItem.addEventListener("click", () => showBookDetails(index));
         bookList.appendChild(bookItem);
     });
 }
@@ -80,30 +122,28 @@ function showBookDetails(index) {
         <p>Description: ${book.description}</p>
     `;
 
-    // Make the book-info section visible
     bookInfo.style.display = "block";
 }
 
 // Function to hide the book-info section
 function hideBookInfo() {
-    console.log("Hiding book-info section");
     const bookInfo = document.querySelector(".book-info");
     bookInfo.style.display = "none";
 }
 
 // Function to query books by title
 function queryBookByTitle(title) {
-    const lowerCaseTitle = title.toLowerCase(); // Convert the title to lowercase for case-insensitive search
+    const lowerCaseTitle = title.toLowerCase();
     return books.filter((book) => book.title.toLowerCase().includes(lowerCaseTitle));
 }
 
-// Function to search books and display results
+// Function to search books
 function searchBooks() {
     const searchInput = document.querySelector(".search-bar input").value;
-    const results = queryBookByTitle(searchInput); // Query books by title
+    const results = queryBookByTitle(searchInput);
 
     const bookList = document.getElementById("bookList");
-    bookList.innerHTML = ""; // Clear the current book list
+    bookList.innerHTML = "";
 
     results.forEach((book, index) => {
         const bookItem = document.createElement("div");
@@ -116,28 +156,33 @@ function searchBooks() {
             <p>Genre: ${book.genre}</p>
         `;
 
-        // Add click event to show book details
         bookItem.addEventListener("click", () => showBookDetails(index));
-
         bookList.appendChild(bookItem);
     });
 }
 
-// Add event listener to the exit button
+// DOM ready logic
 document.addEventListener("DOMContentLoaded", () => {
     const exitButton = document.getElementById("closeBookInfo");
     if (exitButton) {
         exitButton.addEventListener("click", hideBookInfo);
     }
 
-    // Call the function to display books
-    displayBooks();
-});
+    displayBooks(); // Show all books initially
 
-// Add event listener to the search bar
-document.addEventListener("DOMContentLoaded", () => {
     const searchBar = document.querySelector(".search-bar input");
     if (searchBar) {
-        searchBar.addEventListener("input", searchBooks); // Trigger search on input
+        searchBar.addEventListener("input", searchBooks);
     }
+
+    // Genre filter click
+    const genreLinks = document.querySelectorAll("#genreList a");
+    genreLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const genre = link.textContent.trim();
+            displayBooksByGenre(genre);
+            hideBookInfo();
+        });
+    });
 });
