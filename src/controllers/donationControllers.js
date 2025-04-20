@@ -1,9 +1,8 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const mime = require('mime');
 const Donation = require('../models/donationModel');
-const PhysicalBook = require('../models/physicalBookModel');
+const book = require('../models/bookModel');
+const Log = require('../models/logModel');
 
 // Multer storage config
 const storage = multer.diskStorage({
@@ -89,7 +88,7 @@ const createDonation = async (req, res) => {
 };
 
 // View eBook file
-const getEbook = async (req, res) => {
+const getPending = async (req, res) => {
   try {
     const pendingDonations = await Donation.find({ status: 'pending' }).select(
       'donorName title authors bookType publishedYear'
@@ -104,7 +103,7 @@ const getEbook = async (req, res) => {
 };
 
 // View eBook file
-const getApproveEbook = async (req, res) => {
+const getApprove = async (req, res) => {
   try {
     const pendingDonations = await Donation.find({
       status: 'approved',
@@ -120,7 +119,8 @@ const getApproveEbook = async (req, res) => {
 };
 
 const updateDonationStatus = async (req, res) => {
-  const { _id, action } = req.params;
+  const { id, action } = req.params;
+
   const validActions = ['approve', 'reject', 'done'];
 
   if (!validActions.includes(action)) {
@@ -128,7 +128,15 @@ const updateDonationStatus = async (req, res) => {
   }
 
   let donStat;
+
   try {
+    console.log('Request Headers:', req.headers); // Add this to check headers
+
+    const { role } = req.body;
+    console.log('Request Body:', req.body); // Log req.body to confirm data
+    if (!role) {
+      return res.status(400).json({ message: 'Role is required' });
+    }
     if (action === 'approve') {
       donStat = 'approved'; // Use assignment operator here
     } else if (action === 'done') {
@@ -137,8 +145,18 @@ const updateDonationStatus = async (req, res) => {
       donStat = 'rejected'; // Use assignment operator here
     }
 
+    const actionLog = // Creating a new log entry
+      new Log({
+        type: 'DONATION',
+        refId: id,
+        action: donStat,
+        role: role,
+      });
+
+    await actionLog.save();
+
     const donation = await Donation.findOneAndUpdate(
-      { _id: _id },
+      { _id: id },
       {
         status: donStat,
       },
@@ -149,8 +167,8 @@ const updateDonationStatus = async (req, res) => {
       return res.status(404).json({ message: 'Donation not found' });
     }
 
-    if (donation.bookType === 'physical' && donStat === 'done') {
-      const donations = new PhysicalBook({
+    if (donStat === 'done') {
+      const donations = new book({
         donorName: donation.donorName,
         title: donation.title,
         authors: donation.authors,
@@ -158,10 +176,12 @@ const updateDonationStatus = async (req, res) => {
         publishedYear: donation.publishedYear,
         genre: donation.genre,
         bookType: donation.bookType,
-        quantity:
-          donation.bookType === 'physical' ? donation.quantity : undefined,
+        quantity: donation.quantity,
+        ebookFileUrl: donation.ebookFileUrl,
       });
+
       await donations.save();
+
       console.log(donations);
     }
 
@@ -175,7 +195,7 @@ const updateDonationStatus = async (req, res) => {
 module.exports = {
   upload,
   createDonation,
-  getEbook,
-  getApproveEbook,
+  getPending,
+  getApprove,
   updateDonationStatus,
 };

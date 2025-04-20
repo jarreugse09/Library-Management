@@ -84,6 +84,15 @@ function toggleFields() {
 // Call toggleFields() when the page loads to ensure correct fields are visible initially
 document.addEventListener('DOMContentLoaded', toggleFields);
 
+function resetForm() {
+  const confirmCancel = confirm('Are you sure you want to cancel?');
+  if (confirmCancel) {
+    // Redirect or reset form
+    window.location.href = '/userPage/'; // Or wherever you want to go
+    // OR: document.getElementById("donateForm").reset();
+  }
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
 

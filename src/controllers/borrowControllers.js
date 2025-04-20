@@ -1,5 +1,6 @@
 const BorrowedBook = require('../models/borrowModel'); // You can create a new model for borrowed books
-const PhysicalBook = require('../models/physicalBookModel'); // You can create a new model for borrowed books
+const book = require('../models/bookModel'); // You can create a new model for borrowed books
+const Log = require('../models/logModel'); // You can create a new model for borrowed books
 
 // CREATE a borrow request
 const createBorrow = async (req, res) => {
@@ -48,8 +49,10 @@ const getBorrowRequest = async (req, res) => {
 // PATCH: approve or reject borrow request
 const updateBorrowStatus = async (req, res) => {
   try {
-    const { _id, action } = req.params;
+    const { id, action } = req.params;
+    const { role } = req.body;
 
+    console.log(req.body);
     if (!['approve', 'reject'].includes(action)) {
       return res
         .status(400)
@@ -58,17 +61,35 @@ const updateBorrowStatus = async (req, res) => {
 
     // Find the borrow request to update
     const borrowRequest = await BorrowedBook.findOne({
-      borroweId: _id,
+      _id: id,
       status: 'pending',
     });
+
+    console.log(borrowRequest);
 
     if (!borrowRequest) {
       return res.status(404).json({ error: 'Borrow request not found.' });
     }
+    let stats;
+    if (action === 'approve') {
+      stats = 'approved';
+    } else {
+      stats = 'rejected';
+    }
+    const actionLog = // Creating a new log entry
+      new Log({
+        type: 'BORROW',
+        refId: id,
+        action: stats,
+        role: role,
+      });
+
+    await actionLog.save();
 
     // If the action is "approve", create a BorrowedBook entry
     if (action === 'approve') {
-      const availableCount = await PhysicalBook.countDocuments({
+      const availableCount = await book.countDocuments({
+        bookType: 'physical',
         title: borrowRequest.bookTitle,
         condition: 'good',
         status: { $ne: 'borrowed' },
@@ -80,19 +101,9 @@ const updateBorrowStatus = async (req, res) => {
         });
       }
 
-      // Create a new BorrowedBook entry with status "borrowed"
-      const borrowedBook = new BorrowedBook({
-        bookTitle: borrowRequest.bookTitle,
-        borrowerName: borrowRequest.borrowerName,
-        contactInfo: borrowRequest.contactInfo,
-        borrowDate: borrowRequest.borrowDate,
-        returnDate: borrowRequest.returnDate,
-        notes: borrowRequest.notes,
-        status: 'borrowed', // Set status as borrowed
-      });
-
-      const physicalBook = await PhysicalBook.findOneAndUpdate(
+      const physicalBook = await book.findOneAndUpdate(
         {
+          bookType: 'physical',
           title: borrowRequest.bookTitle,
           condition: 'good',
           status: { $ne: 'borrowed' }, // Optional: ensure you're not double-borrowing
@@ -105,14 +116,24 @@ const updateBorrowStatus = async (req, res) => {
         }
       );
     }
-
     await physicalBook.save();
+
+    // Create a new BorrowedBook entry with status "borrowed"
+    const borrowedBook = new BorrowedBook({
+      bookTitle: borrowRequest.bookTitle,
+      borrowerName: borrowRequest.borrowerName,
+      contactInfo: borrowRequest.contactInfo,
+      borrowDate: borrowRequest.borrowDate,
+      returnDate: borrowRequest.returnDate,
+      notes: borrowRequest.notes,
+      status: 'borrowed', // Set status as borrowed
+    });
 
     await borrowedBook.save();
 
     res.status(200).json({
       message: `Request ${action}d successfully.`,
-      data: borrowedBok,
+      data: borrowedBook,
     });
   } catch (error) {
     console.error('Error updating borrow status:', error);

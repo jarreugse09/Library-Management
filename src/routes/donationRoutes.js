@@ -10,9 +10,9 @@ router.post(
 );
 
 // View eBook by filename
-router.get('/pending/', donationController.getEbook);
-router.get('/approve/', donationController.getApproveEbook);
+router.get('/pending/', donationController.getPending);
+router.get('/approve/', donationController.getApprove);
 
-router.patch('/:_id/:action/', donationController.updateDonationStatus);
+router.patch('/:id/:action/', donationController.updateDonationStatus);
 
 module.exports = router;

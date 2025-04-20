@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Donate Book</title>
-    <link rel="stylesheet" href="/styles/header.css">
+    <link rel="stylesheet" href="/styles/header.css" />
     <link rel="stylesheet" href="/styles/donateForm.css" />
     <script src="/scripts/header.js"></script>
     <script src="/scripts/donateForm.js"></script>
@@ -34,12 +34,13 @@
       <form
         entype="multipart/form-data"
         class="donate-form"
+        id="donateForm"
         onsubmit="handleSubmit(event)"
       >
         <h2>Donate a Book</h2>
 
         <label>Donor Name:</label
-        ><input name="donorName" value="username" readonly />
+        ><input name="donorName" placeholder="e.g. Dante Gulapa" required />
 
         <label>Book Title:</label><input name="title" type="text" required />
 
@@ -126,7 +127,9 @@
           />
         </div>
 
-        <button class="btn btn-remove">Cancel</button>
+        <button type="button" onclick="resetForm()" class="btn btn-remove">
+          Cancel
+        </button>
         <button type="submit" class="btn btn-submit">Donate Book</button>
       </form>
     </div>
