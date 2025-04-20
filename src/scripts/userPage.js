@@ -8,24 +8,16 @@ const books = [
         image: "/images/OIP.jpg",
     },
     {
-<<<<<<< HEAD
         title: "Book Title 4",
         author: "Author Name 4",
         genre: "Fiction",
         description: "This is a brief description of Book Title 4.",
-=======
-        title: "Quantum Paradox",
-        author: "Marcus R. Fielding",
-        genre: "Sci-Fi",
-        description: "A physicist accidentally creates a time rift and must fix it before alternate realities collapse into chaos.",
->>>>>>> ac0ba3d64f613fc9ce2052a924da219e93ee32c6
         image: "/images/OIP.jpg",
     },
     {
         title: "Culinary Journeys",
         author: "Sophia Laurent",
         genre: "Non-Fiction",
-<<<<<<< HEAD
         description: "This is a brief description of Book Title 5.",
         image: "/images/OIP.jpg",
     },
@@ -48,16 +40,6 @@ const books = [
         author: "Author Name 8",
         genre: "Science",
         description: "This is a brief description of Book Title 6.",
-=======
-        description: "Explore world cuisines through the eyes of a Michelin-star chef who traveled to 50 countries in 5 years.",
-        image: "/images/OIP.jpg",
-    },
-    {
-        title: "The Forgotten Crown",
-        author: "Arthur Pendleton",
-        genre: "Fantasy",
-        description: "A lost heir discovers their royal lineage and must reclaim a magical throne from an ancient evil.",
->>>>>>> ac0ba3d64f613fc9ce2052a924da219e93ee32c6
         image: "/images/OIP.jpg",
     },
     {
@@ -135,11 +117,6 @@ function displayBooks() {
         </div>
         `;
 
-<<<<<<< HEAD
-=======
-
-        // Add click event to show book details
->>>>>>> ac0ba3d64f613fc9ce2052a924da219e93ee32c6
         bookItem.addEventListener("click", () => showBookDetails(index));
         bookList.appendChild(bookItem);
     });
@@ -205,15 +182,11 @@ function queryBookByTitle(title) {
 
 // Function to search books
 function searchBooks() {
-    const searchInput = document.querySelector(".search-bar input").value;
+    const searchInput = document.querySelector(".search-wrapper input").value;
     const results = queryBookByTitle(searchInput);
 
     const bookList = document.getElementById("bookList");
-<<<<<<< HEAD
     bookList.innerHTML = "";
-=======
-bookList.innerHTML = "";
->>>>>>> ac0ba3d64f613fc9ce2052a924da219e93ee32c6
 
 results.forEach((book, index) => {
     const bookItem = document.createElement("div");
@@ -228,16 +201,9 @@ results.forEach((book, index) => {
         </div>
     `;
 
-<<<<<<< HEAD
         bookItem.addEventListener("click", () => showBookDetails(index));
         bookList.appendChild(bookItem);
     });
-=======
-    bookItem.addEventListener("click", () => showBookDetails(index));
-    bookList.appendChild(bookItem);
-});
-
->>>>>>> ac0ba3d64f613fc9ce2052a924da219e93ee32c6
 }
 
 // DOM ready logic
@@ -249,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     displayBooks(); // Show all books initially
 
-    const searchBar = document.querySelector(".search-bar input");
+    const searchBar = document.querySelector(".search-wrapper input");
     if (searchBar) {
         searchBar.addEventListener("input", searchBooks);
     }
