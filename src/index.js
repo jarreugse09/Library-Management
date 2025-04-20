@@ -7,15 +7,21 @@ const cors = require('cors');
 const checkReferer = require('./middlewares/checkReferer');
 const mongoSanitize = require('./middlewares/mongoSanitize');
 
-const donationRoutes = require('./routes/donationRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const appRoutes = require('./routes/appRoutes');
 const postRoutes = require('./routes/postRoutes');
+const borrowRoutes = require('./routes/borrowRoutes');
+const donationRoutes = require('./routes/donationRoutes');
+const physicalBookRoutes = require('./routes/physicalBookRoutes');
 
 const app = express();
 
-app.use('/styles', checkReferer, express.static(join(__dirname, 'styles')));
+app.use(
+  '/styles', 
+  checkReferer, 
+  express.static(join(__dirname, 'styles'))
+);
 
 app.use('/scripts', checkReferer, express.static(join(__dirname, 'scripts')));
 
@@ -27,10 +33,12 @@ app.use(express.json());
 app.use(mongoSanitize);
 app.use(cors());
 
-app.use('/api/donations', donationRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/donations', donationRoutes);
+app.use('/api/books/physical', physicalBookRoutes);
+app.use('/api/borrows', borrowRoutes);
 
 const PORT = process.env.PORT || 7002;
 

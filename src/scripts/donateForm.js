@@ -97,10 +97,13 @@ async function handleSubmit(event) {
   }
 
   try {
-    const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
-      method: 'POST',
-      body: formData, // ✅ Send FormData directly
-    });
+    const response = await fetch(
+      'http://127.0.0.1:7001/api/donations/donate/',
+      {
+        method: 'POST',
+        body: formData, // ✅ Send FormData directly
+      }
+    );
     // Handle the response
     if (!response.ok) {
       const errorData = await response.json();

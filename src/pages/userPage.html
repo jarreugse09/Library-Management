@@ -4,34 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home Page</title>
-    <link rel="stylesheet" href="/styles/header.css">
-    <link rel="stylesheet" href="/styles/userPage.css" />
+    <link rel="stylesheet" href="../styles/header.css">
+    <link rel="stylesheet" href="../styles/userPage.css" />
   </head>
   <body>
-    <div class="header">
+    <header class="header"> <!-- Changed from div to header -->
       <div class="logo">
         <img src="../images/OIP.jpg" alt="Logo" />
+        <h1>Name of Lib</h1> <!-- Added missing h1 -->
       </div>
-      <div class="search-bar">
-        <input type="text" placeholder="Search..." />
+      <div class="search-wrapper"> <!-- Changed class to match CSS -->
+        <input type="text" placeholder="Search manga..." /> <!-- Consistent placeholder -->
       </div>
       <nav>
         <ul>
           <li><a href="/userpage/library">Library</a></li>
-          <li><a href="#Books">Books</a></li>
-          <li>
-            <a href="#" id="settingsLink">Settings</a>
-            <ul id="settingsDropdown" class="dropdown hidden">
+          <li><a href="/userpage">My Books</a></li>
+          <li class="dropdown">
+            <a href="#" id="settingsToggle">Settings ▾</a>
+            <ul class="dropdown-menu" id="settingsDropdown">
               <li><a href="/userpage/account">Account</a></li>
               <li><a href="/userpage/donateForm">Donate</a></li>
-              <li><a href="#Borrow">Borrow</a></li>
+              <li><a href="#">Borrow</a></li>
             </ul>
           </li>
         </ul>
       </nav>
-    </div>
-    <div class="container">
-      <div class="genre">
+    </header> <!-- Changed closing tag -->
+    
+    <main class="container"> <!-- Changed from div to main -->
+      <aside class="genre"> <!-- Changed from div to aside -->
         <h2>Genres</h2>
         <ul id="genreList">
           <li><a href="#All">All</a></li>
@@ -41,15 +43,17 @@
           <li><a href="#Fantasy">Fantasy</a></li>
           <li><a href="#Science">Science</a></li>
         </ul>
-      </div>
-      <div class="books">
-        <h2>Books</h2>
+      </aside>
+      
+      <section class="books"> <!-- Changed from div to section -->
+        <h2>My Books</h2>
         <div class="book-list" id="bookList">
           <!-- Book items will be dynamically added here -->
         </div>
-      </div>
-      <div class="book-info">
-        <button class="exit-button" id="closeBookInfo">X</button>
+      </section>
+      
+      <aside class="book-info"> <!-- Changed from div to aside -->
+        <button class="exit-btn" id="closeBookInfo">✕</button> <!-- Changed class to match CSS -->
         <h2>Book Information</h2>
         <div class="book-details" id="bookDetails">
           <!-- Book details will be dynamically added here -->
@@ -57,9 +61,10 @@
         <div class="book-actions">
           <button id="addToLibrary">Add to Library</button>
         </div>
-      </div>
-    </div>
-    <script src="/scripts/header.js"></script>
-    <script src="/scripts/userPage.js"></script>
+      </aside>
+    </main>
+    
+    <script src="../scripts/header.js"></script>
+    <script src="../scripts/userPage.js"></script>
   </body>
 </html>

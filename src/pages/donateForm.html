@@ -13,17 +13,18 @@
     <div class="header">
       <div class="logo">
         <img src="../images/OIP.jpg" alt="Logo" />
+        <h1>Name of Lib</h1>
       </div>
       <nav>
         <ul>
           <li><a href="/userpage/library">Library</a></li>
-          <li><a href="#Books">Books</a></li>
-          <li>
-            <a href="#" id="settingsLink">Settings</a>
-            <ul id="settingsDropdown" class="dropdown hidden">
+          <li><a href="/userpage">My Books</a></li>
+          <li class="dropdown">
+            <a href="#" id="settingsToggle">Settings ▾</a>
+            <ul class="dropdown-menu" id="settingsDropdown">
               <li><a href="/userpage/account">Account</a></li>
               <li><a href="/userpage/donateForm">Donate</a></li>
-              <li><a href="#Borrow">Borrow</a></li>
+              <li><a href="#">Borrow</a></li>
             </ul>
           </li>
         </ul>
@@ -129,5 +130,6 @@
         <button type="submit" class="btn btn-submit">Donate Book</button>
       </form>
     </div>
+    <script src="/scripts/header.js"></script>
   </body>
 </html>
