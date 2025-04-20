@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, login, getCurrentUser } = require("../controllers/authControllers");
+const { register, login, getCurrentUser, sendOtp, verifyOtp } = require("../controllers/authControllers");
 const verifyToken = require("../middlewares/authMiddleware");
 const User = require("../models/userModel");
 
@@ -16,5 +16,10 @@ router.get("/me", verifyToken, async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+router.post("/send-otp", sendOtp);
+
+// OTP verification route
+router.post("/verify-otp", verifyOtp);
 
 module.exports = router;
