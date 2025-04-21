@@ -15,6 +15,11 @@ router.route('/register').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'register.html'));
 });
 
+router.route('/verify-otp').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'verify-otp.html'));
+});
+
+
 router.route('/dashboard').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'dashboard.html'));
 });

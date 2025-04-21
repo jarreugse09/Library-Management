@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
-const { generateDonationId } = require('../utils/generateId'); // update path as needed
 
-const physicalBookSchema = new mongoose.Schema({
-  borrowId: {
-    type: String,
-    unique: true,
-    default: () => generateDonationId(),
-  },
+const BookSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -22,27 +16,28 @@ const physicalBookSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
   bookType: {
     type: String,
-    default: 'physical',
+    enum: ['physical', 'ebook'],
   },
   genre: {
     type: String,
   },
   quantity: {
     type: Number,
-    default: 1,
+    required: false,
   },
   shelfLocation: {
     type: String,
-    default: 'To be shelved',
+    required: false,
   },
   status: {
     type: String,
-    enum: ['borrowed', 'lost', 'good'],
+    enum: ['borrowed', 'lost', 'good', 'deleted'],
     default: 'good',
   },
+  quantity: { type: Number, required: false }, // only for physical
+  ebookFileUrl: { type: String, required: false }, //for ebook
   condition: {
     type: String,
     enum: ['new', 'good', 'fair', 'poor'],
@@ -54,6 +49,6 @@ const physicalBookSchema = new mongoose.Schema({
   },
 });
 
-const PhysicalBook = mongoose.model('PhysicalBook', physicalBookSchema);
+const book = mongoose.model('book', BookSchema);
 
-module.exports = PhysicalBook;
+module.exports = book;

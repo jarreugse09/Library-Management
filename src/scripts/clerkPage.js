@@ -131,6 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `http://127.0.0.1:7001/api/donations/${donationId}/${action}`,
         {
           method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            role: 'clerk', // Ensure this key is included in the body
+          }),
         }
       );
 
@@ -181,21 +187,27 @@ document.addEventListener('DOMContentLoaded', () => {
           Expected Return Date: ${new Date(
             borrow.returnDate
           ).toLocaleDateString()}<br><br>
-          <button class="approve-btn">Approve</button>
-          <button class="reject-btn">Reject</button>
+      
         `;
 
-        // Attach handlers to buttons
-        listItem
-          .querySelector('.approve-btn')
-          .addEventListener('click', () =>
-            handleActionBorrow(borrow._id, 'approve')
-          );
-        listItem
-          .querySelector('.reject-btn')
-          .addEventListener('click', () =>
-            handleActionBorrow(borrow._id, 'reject')
-          );
+        // Create approve button and attach event listener
+        const approveBtn = document.createElement('button');
+        approveBtn.textContent = 'Approve';
+        approveBtn.addEventListener('click', () =>
+          handleActionBorrow(borrow._id, 'approve')
+        );
+
+        // Create reject button and attach event listener
+        const rejectBtn = document.createElement('button');
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', () =>
+          handleActionBorrow(borrow._id, 'reject')
+        );
+
+        // Append buttons to the list item
+        listItem.appendChild(approveBtn);
+        listItem.appendChild(rejectBtn);
+        listItem.appendChild(document.createElement('hr'));
 
         borrowList.appendChild(listItem);
       });
@@ -211,6 +223,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `http://127.0.0.1:7001/api/borrows/${_id}/${action}`,
         {
           method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            role: 'clerk', // Ensure this key is included in the body
+          }),
         }
       );
       console.log(response);
@@ -219,12 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (response.ok) {
         alert(result.message);
-        fetchPendingDonations(); // reload list
+        fetchPendingBorrows(); // reload list
       } else {
-        alert(`Error: ${result.message}`);
+        alert(`Error: ${result}`);
       }
     } catch (err) {
-      console.error(`Error trying to ${action} donation:`, err);
+      console.error(`Error trying to ${action} borrow:`, err);
     }
   }
 

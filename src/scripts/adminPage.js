@@ -131,6 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `http://localhost:7001/api/donations/${donationId}/${action}/`,
         {
           method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            role: 'librarian', // Ensure this key is included in the body
+          }),
         }
       );
 

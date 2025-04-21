@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Verify Your Email</h2>
+        <form id="otpForm">
+            <input type="email" id="emailInput" placeholder="Enter your email" required>
+            <input type="text" id="otpInput" placeholder="6-digit OTP" maxlength="6" required>
+            <button type="submit">Verify OTP</button>
+        </form>
+        <p>Didn't receive OTP? <a href="/resend-otp">Resend</a></p>
+        <p><a href="/">Back to Login</a></p>
+    </div>
+
+    <script>
+        document.getElementById("otpForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("emailInput").value.trim();
+            const otp = document.getElementById("otpInput").value.trim();
+
+            if (otp.length !== 6 || isNaN(otp)) {
+                alert("Please enter a valid 6-digit OTP.");
+                return;
+            }
+
+            const response = await fetch("/api/auth/verify-otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, otp })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message || "Email verified successfully!");
+                window.location.href = "/";
+            } else {
+                alert(data.message || "OTP verification failed.");
+            }
+        });
+    </script>
+</body>
+</html>
