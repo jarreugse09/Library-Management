@@ -114,6 +114,8 @@ function displayBooks() {
         <div class="book-meta">
             <h3 class="book-title">${book.title}</h3>
             <p class="book-genre">${book.genre}</p>
+            <p class="book-author">Author: ${book.author}</p>
+            <p class="book-description">${book.description}</p>
         </div>
         `;
 
@@ -139,11 +141,13 @@ function displayBooksByGenre(genre) {
         bookItem.classList.add("book-item");
 
         bookItem.innerHTML = `
-        <img src="${book.image}" alt="${book.title}">
-        <div class="book-meta">
-            <h3 class="book-title">${book.title}</h3>
-            <p class="book-genre">${book.genre}</p>
-        </div>
+            <img src="${book.image}" alt="${book.title}">
+            <div class="book-meta">
+                <h3 class="book-title">${book.title}</h3>
+                <p class="book-genre">${book.genre}</p>
+                <p class="book-author">Author: ${book.author}</p>
+                <p class="book-description">${book.description}</p>
+            </div>
         `;
 
         const index = books.indexOf(book);
@@ -191,15 +195,16 @@ function searchBooks() {
 
 results.forEach((book, index) => {
     const bookItem = document.createElement("div");
-        bookItem.classList.add("book-item");
+    bookItem.classList.add("book-item-horizontal");
 
-        bookItem.innerHTML = `
-        <img src="${book.image}" alt="${book.title}">
+    bookItem.innerHTML = `
+        <img src="${book.image}" alt="${book.title}" class="book-cover">
         <div class="book-meta">
             <h3 class="book-title">${book.title}</h3>
-            <p class="book-genre">${book.genre}</p>
+            <p class="book-author">Author: ${book.author}</p>
+            <p class="book-genre">Genre: ${book.genre}</p>
         </div>
-        `;
+    `;
 
         bookItem.addEventListener("click", () => showBookDetails(index));
         bookList.appendChild(bookItem);

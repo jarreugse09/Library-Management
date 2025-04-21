@@ -92,6 +92,7 @@ body {
   cursor: pointer;
   padding: 1em;
   min-height: 200px;
+  max-width: 400px;
 }
 
 .book-item:hover {
