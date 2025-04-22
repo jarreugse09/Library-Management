@@ -1,6 +1,7 @@
 const bookSelect = document.getElementById('bookTitle');
+const bookIdInput = document.getElementById('bookId');
+let bookID;
 let hasLoadedBooks = false;
-
 bookSelect.addEventListener('click', async () => {
   if (hasLoadedBooks) return; // prevent refetching on every click
   hasLoadedBooks = true;
@@ -16,6 +17,7 @@ bookSelect.addEventListener('click', async () => {
     data.forEach(book => {
       const option = document.createElement('option');
       option.value = book.title;
+      bookID = book._id;
       option.textContent = book.title;
       bookSelect.appendChild(option);
     });
@@ -29,12 +31,19 @@ bookSelect.addEventListener('click', async () => {
   }
 });
 
+// When a book is selected, update the hidden input with the book ID
+bookSelect.addEventListener('change', () => {
+  const selectedBookId = bookSelect.value;
+  bookIdInput.value = selectedBookId;
+});
+
 // Define handleSubmit as an async function
 async function handleSubmit(e) {
   e.preventDefault(); // Prevent default form submission
 
   // Collect form data
   const formData = {
+    borrowedBookId: document.getElementById('bookId').value,
     bookTitle: document.getElementById('bookTitle').value,
     borrowerName: document.getElementById('borrowerName').value,
     contactInfo: document.getElementById('contactInfo').value,
@@ -52,7 +61,6 @@ async function handleSubmit(e) {
       },
       body: JSON.stringify(formData),
     });
-
     if (response.ok) {
       alert('Borrow request submitted successfully!');
       e.target.reset(); // Reset the form

@@ -161,9 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
 
-      // Log the data to debug the structure
-      console.log(data);
-
       // Ensure the data is an array
       if (!Array.isArray(data)) {
         throw new Error('Expected data to be an array');
@@ -180,7 +177,8 @@ document.addEventListener('DOMContentLoaded', () => {
       data.forEach(borrow => {
         const listItem = document.createElement('li');
         listItem.innerHTML = `
-          <strong>Book Title: ${borrow.bookTitle}</strong><br>
+          <strong>Book ID: ${borrow.borrowedBookId}</strong><br>
+           <strong>Book Title: ${borrow.bookTitle}</strong><br>
           Borrowed by: ${borrow.borrowerName}<br>
           Contact Info: ${borrow.contactInfo}<br>
           Borrow Date: ${new Date(borrow.borrowDate).toLocaleDateString()}<br>
@@ -189,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ).toLocaleDateString()}<br><br>
       
         `;
-
+        console.log(data);
         // Create approve button and attach event listener
         const approveBtn = document.createElement('button');
         approveBtn.textContent = 'Approve';

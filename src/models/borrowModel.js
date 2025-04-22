@@ -5,11 +5,7 @@ const { generateDonationId } = require('../utils/generateId'); // update path as
 const mongoose = require('mongoose');
 
 const borrowSchema = new mongoose.Schema({
-  borrowedId: {
-    type: String,
-    unique: true,
-    default: () => generateDonationId(),
-  },
+  borrowedBookId: { type: String, required: true },
   bookTitle: {
     type: String,
     required: true,

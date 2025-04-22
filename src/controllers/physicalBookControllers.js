@@ -6,6 +6,9 @@ exports.getAllBooks = async (req, res) => {
     const books = await book
       .find({
         bookType: 'Physical',
+        status: { $ne: 'deleted' },
+        isDone: true,
+        isApprove: true,
       })
       .select(
         'title authors publishedYear donorName genre quantity shelfLocation status condition'
@@ -19,7 +22,10 @@ exports.getAllBooks = async (req, res) => {
 // Get all book titles only
 exports.getAllBookTitle = async (req, res) => {
   try {
-    const titles = await book.find({ bookType: 'Physical' }, 'title'); // Only fetch the "title" field
+    const titles = await book.find(
+      { bookType: 'physical', isDone: true, isApprove: true },
+      'title _id'
+    ); // Only fetch the "title" field
     res.json(titles);
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch book titles' });
@@ -30,6 +36,8 @@ exports.getAllBookBorrowed = async (req, res) => {
   try {
     const borrowedBooks = await book.find({
       bookType: 'physical',
+      isDone: true,
+      isApprove: true,
       status: 'borrowed',
     });
 
@@ -44,7 +52,12 @@ exports.getAllBookBorrowed = async (req, res) => {
 exports.getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await book.findById({ _id: id, bookType: 'physical' });
+    const book = await book.findById({
+      _id: id,
+      bookType: 'physical',
+      isDone: true,
+      isApprove: true,
+    });
 
     if (!book) return res.status(404).json({ error: 'Book not found' });
     res.status(200).json(book);
@@ -105,7 +118,7 @@ exports.updateBook = async (req, res) => {
       res.status(404).json({ message: 'Invalid empty fields' });
 
     const updated = await book.findByIdAndUpdate(
-      { _id: id, bookType: 'physical' },
+      { _id: id, bookType: 'physical', isDone: true, isApprove: true },
       {
         title: title,
         authros: authors,
@@ -135,7 +148,7 @@ exports.deleteBook = async (req, res) => {
     if (!id) res.status(404).json({ message: 'Invalid empty fields' });
 
     const deleted = await book.findOneAndUpdate(
-      { _id: id, bookType: 'physical' },
+      { _id: id, bookType: 'physical', isDone: true, isApprove: true },
       { status: 'deleted' },
       { new: true }
     );

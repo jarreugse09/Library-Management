@@ -6,6 +6,7 @@ const Log = require('../models/logModel'); // You can create a new model for bor
 const createBorrow = async (req, res) => {
   try {
     const {
+      borrowedBookId,
       bookTitle,
       borrowerName,
       contactInfo,
@@ -15,12 +16,13 @@ const createBorrow = async (req, res) => {
     } = req.body;
 
     const newRequest = new BorrowedBook({
-      bookTitle,
-      borrowerName,
-      contactInfo,
-      borrowDate,
-      returnDate,
-      notes,
+      borrowedBookId: borrowedBookId,
+      bookTitle: bookTitle,
+      borrowerName: borrowerName,
+      contactInfo: contactInfo,
+      borrowDate: borrowDate,
+      returnDate: returnDate,
+      notes: notes,
       status: 'pending', // Default status when a borrow request is created
     });
 
@@ -51,12 +53,13 @@ const updateBorrowStatus = async (req, res) => {
   try {
     const { id, action } = req.params;
     const { role } = req.body;
-
+    console.log(req.params);
     console.log(req.body);
     if (!['approve', 'reject'].includes(action)) {
-      return res
-        .status(400)
-        .json({ error: 'Invalid action. Must be "approve" or "reject".' });
+      return res.status(404).json({ error: 'Invalid action.' });
+    }
+    if (!req.params | !req.body) {
+      return res.status(400).json({ error: 'Invalid empty fields.' });
     }
 
     // Find the borrow request to update
@@ -67,9 +70,6 @@ const updateBorrowStatus = async (req, res) => {
 
     console.log(borrowRequest);
 
-    if (!borrowRequest) {
-      return res.status(404).json({ error: 'Borrow request not found.' });
-    }
     let stats;
     if (action === 'approve') {
       stats = 'approved';
@@ -88,7 +88,8 @@ const updateBorrowStatus = async (req, res) => {
 
     // If the action is "approve", create a BorrowedBook entry
     if (action === 'approve') {
-      const availableCount = await book.countDocuments({
+      const availableCount = await book.findOne({
+        _id: borrowRequest.borrowedBookId,
         bookType: 'physical',
         title: borrowRequest.bookTitle,
         condition: 'good',
@@ -115,6 +116,10 @@ const updateBorrowStatus = async (req, res) => {
           new: true,
         }
       );
+    } else if (action === 'reject') {
+      res
+        .status(404)
+        .json({ status: 'Failed', message: 'Book cannot be borrowed' });
     }
     await physicalBook.save();
 

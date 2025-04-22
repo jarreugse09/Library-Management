@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rejectBtn = document.createElement('button');
         rejectBtn.textContent = 'Reject';
         rejectBtn.addEventListener('click', () =>
-          handleAction(donation._id, 'reject')
+          handleAction(donation._id, 'rejected')
         );
 
         // Append buttons to the list item
