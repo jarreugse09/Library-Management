@@ -1,11 +1,11 @@
 // models/BorrowRequest.js
-
-const { generateDonationId } = require('../utils/generateId'); // update path as needed
-
 const mongoose = require('mongoose');
-
+const book = require('./bookModel');
 const borrowSchema = new mongoose.Schema({
-  borrowedBookId: { type: String, required: true },
+  borrowedBookId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'book',
+  },
   bookTitle: {
     type: String,
     required: true,

@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
           ).toLocaleDateString()}<br><br>
       
         `;
-        console.log(data);
         // Create approve button and attach event listener
         const approveBtn = document.createElement('button');
         approveBtn.textContent = 'Approve';
@@ -229,15 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }),
         }
       );
-      console.log(response);
-
       const result = await response.json();
 
       if (response.ok) {
         alert(result.message);
         fetchPendingBorrows(); // reload list
-      } else {
-        alert(`Error: ${result}`);
       }
     } catch (err) {
       console.error(`Error trying to ${action} borrow:`, err);
@@ -247,3 +242,70 @@ document.addEventListener('DOMContentLoaded', () => {
   // Optional: Load default view
   showSection('Inventory');
 });
+
+async function loadDonationLogs() {
+  try {
+    const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+    if (!response.ok) throw new Error('Failed to fetch logs');
+
+    const logs = await response.json();
+    const logList = document.getElementById('donationLogList');
+    logList.innerHTML = ''; // Clear previous logs
+
+    const donationLogs = logs.filter(log => log.type === 'DONATION');
+
+    if (donationLogs.length === 0) {
+      logList.innerHTML = '<li>No donation logs found.</li>';
+    } else {
+      donationLogs.forEach(log => {
+        const listItem = document.createElement('li');
+        const date = new Date(log.timestamp).toLocaleString();
+        listItem.textContent = `DATE: [${date}] USER: ${log.role} ACTION: ${log.action} Donated Book ID: ${log.refId}`;
+        logList.appendChild(listItem);
+      });
+    }
+
+    document.getElementById('donationLogs').style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching donation logs:', error);
+  }
+}
+
+async function fetchBorrowedBooks() {
+  try {
+    const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const borrowedBooks = await response.json();
+    const borrowLog = document.getElementById('borrowLog');
+
+    // Clear previous logs
+    borrowLog.innerHTML = '';
+
+    // Check if there's data
+    if (!borrowedBooks.length) {
+      borrowLog.innerHTML = '<li>No borrowed books found.</li>';
+    } else {
+      borrowedBooks.forEach(book => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
+          book.borrowerName
+        } |
+          Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
+         Will Return: ${new Date(book.returnDate).toLocaleDateString()}
+        `;
+        borrowLog.appendChild(li);
+      });
+    }
+
+    // Reveal the borrowed books section
+    document.getElementById('borrow').style.display = 'block';
+    document.getElementById('borrowedLogs').style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching borrowed books:', error);
+    alert('Failed to fetch borrowed books. Please try again.');
+  }
+}

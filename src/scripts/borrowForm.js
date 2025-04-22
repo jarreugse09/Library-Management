@@ -1,7 +1,7 @@
 const bookSelect = document.getElementById('bookTitle');
 const bookIdInput = document.getElementById('bookId');
-let bookID;
 let hasLoadedBooks = false;
+
 bookSelect.addEventListener('click', async () => {
   if (hasLoadedBooks) return; // prevent refetching on every click
   hasLoadedBooks = true;
@@ -14,10 +14,10 @@ bookSelect.addEventListener('click', async () => {
     const data = await res.json();
 
     bookSelect.innerHTML = '<option value="">Select a book title</option>';
+
     data.forEach(book => {
       const option = document.createElement('option');
-      option.value = book.title;
-      bookID = book._id;
+      option.value = book._id; // Set the _id as the value!
       option.textContent = book.title;
       bookSelect.appendChild(option);
     });
@@ -44,7 +44,6 @@ async function handleSubmit(e) {
   // Collect form data
   const formData = {
     borrowedBookId: document.getElementById('bookId').value,
-    bookTitle: document.getElementById('bookTitle').value,
     borrowerName: document.getElementById('borrowerName').value,
     contactInfo: document.getElementById('contactInfo').value,
     borrowDate: document.getElementById('borrowDate').value,
@@ -53,6 +52,7 @@ async function handleSubmit(e) {
   };
 
   try {
+    console.log(formData);
     // Send the form data to the API endpoint
     const response = await fetch('http://127.0.0.1:7001/api/borrows/create', {
       method: 'POST',

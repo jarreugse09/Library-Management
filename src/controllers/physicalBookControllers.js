@@ -24,10 +24,11 @@ exports.getAllBookTitle = async (req, res) => {
   try {
     const titles = await book.find(
       { bookType: 'physical', isDone: true, isApprove: true },
-      'title _id'
-    ); // Only fetch the "title" field
+      { _id: 1, title: 1 } // Use projection object for clarity
+    );
     res.json(titles);
   } catch (err) {
+    console.error('Error fetching book titles:', err);
     res.status(500).json({ error: 'Failed to fetch book titles' });
   }
 };
