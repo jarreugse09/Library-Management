@@ -18,7 +18,7 @@ const BookSchema = new mongoose.Schema({
   },
   bookType: {
     type: String,
-    enum: ['physical', 'ebook'],
+    enum: ['physical', 'ebook', 'copy'],
   },
   genre: {
     type: String,
