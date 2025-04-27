@@ -4,25 +4,29 @@
     <meta charset="UTF-8" />
     <title>Pending Donations</title>
     <link rel="stylesheet" href="/styles/clerkPage.css" />
+    <link rel="stylesheet" href="/styles/header.css" />
   </head>
   <body>
-    <nav>
+    <header class="header">
       <div class="logo">
-        <img src="/images/OIP.jpg" alt="Logo" />
+        <img src="../images/OIP.jpg" alt="Logo" />
+        <h1>Name of Lib</h1>
       </div>
-      <div class="search-bar">
-        <input type="text" placeholder="Search..." />
-      </div>
-      <ul>
-        <li>
-          <a href="/userpage/library">Library</a>
-          <a href="#Books">Books</a>
-          <a href="./donateForm.html">Donate</a>
-          <a href="/borrowForm.html">Borrow</a>
-          <a href="#Settings">Settings</a>
-        </li>
-      </ul>
-    </nav>
+      <nav>
+        <ul>
+          <li><a href="/userpage/library">Library</a></li>
+          <li><a href="/userpage">My Books</a></li>
+          <li class="dropdown">
+            <a href="#" id="settingsToggle">Settings ▾</a>
+            <ul class="dropdown-menu" id="settingsDropdown">
+              <li><a href="/userpage/account">Account</a></li>
+              <li><a href="/userpage/donateForm">Donate</a></li>
+              <li><a href="/borrowForm">Borrow</a></li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+    </header>
     <div class="container">
       <div class="sidebar">
         <h2>Library Clerk</h2>
@@ -74,5 +78,6 @@
       </div>
     </div>
     <script src="/scripts/clerkPage.js"></script>
+    <script src="/scripts/header.js"></script>
   </body>
 </html>

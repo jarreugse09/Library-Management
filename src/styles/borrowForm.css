@@ -1,46 +1,88 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+:root {
+  --bg: #1b1b1f;
+  --card-bg: #2c2c31;
+  --accent: #ff4655;
+  --text: #fff;
+  --text-light: #aaa;
+  --border: rgba(255, 255, 255, 0.1);
+  --input-bg: #242428;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 2rem;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
 }
 
 form {
-  max-width: 500px;
-  margin: auto;
-  padding: 1.5rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: var(--card-bg);
+  width: 100%;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
 }
 
 h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
   text-align: center;
+  color: var(--accent);
 }
 
 label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 6px;
   display: block;
-  margin-top: 1rem;
 }
 
 input,
 select,
 textarea {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background-color: var(--input-bg);
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255, 70, 85, 0.2);
 }
 
 button {
   margin-top: 1.5rem;
   padding: 0.7rem 1.5rem;
-  background-color: #007bff;
+  background-color: var(--accent);
   color: white;
+  width: 100%;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #e03a4e;
 }

@@ -1,72 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+:root {
+  --bg: #1b1b1f;
+  --card-bg: #2c2c31;
+  --accent: #ff4655;
+  --text: #fff;
+  --text-light: #aaa;
+  --border: rgba(255, 255, 255, 0.1);
+  --input-bg: #242428;
+}
+
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-}
-/* Navigation Bar */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #333;
-  padding: 10px 20px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-nav .logo img {
-  height: 30px;
-}
-
-nav .search-bar input {
-  padding: 10px;
-  border: none;
-  border-radius: 40px;
-  width: 700px;
-}
-
-nav ul {
-  list-style: none;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: "Inter", sans-serif;
   margin: 0;
   padding: 0;
-}
-
-nav ul li {
-  display: flex;
-  justify-content: right;
-  align-items: center;
-  gap: 5px;
-  margin: 0 5px;
-}
-
-nav ul li a {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  font-size: 1.3rem;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-  margin-right: 20px;
-}
-
-nav ul li a:hover {
-  background-color: #45a049;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-.logo img {
-  max-width: 100px;
-  height: auto;
+  min-height: 100vh;
 }
 
 .container {
@@ -76,14 +26,13 @@ nav ul li a:hover {
   align-items: flex-start;
   gap: 20px;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: var(--bg);
 }
 
 .sidebar,
 .content {
   flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: var(--card-bg);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -102,7 +51,7 @@ nav ul li a:hover {
 .sidebar h2 {
   font-size: 1.5rem;
   margin-bottom: 10px;
-  color: #333;
+  color: var(--text);
 }
 
 .sidebar h2 {
