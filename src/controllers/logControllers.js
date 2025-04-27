@@ -31,7 +31,7 @@ const getAllBorrowedLogs = async (req, res) => {
 const getAllDonationLogs = async (req, res) => {
   try {
     const logs = await Log.find({
-      type: 'DONATION',
+      type: 'DONATION' || 'ENCODED BY CLERK',
     }).sort({ timestamp: -1 });
 
     res.status(200).json(logs);

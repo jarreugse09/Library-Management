@@ -262,11 +262,36 @@ async function loadDonationLogs() {
     if (donationLogs.length === 0) {
       logList.innerHTML = '<li>No donation logs found.</li>';
     } else {
+      // Create a table for the donation logs
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Donated Book ID</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      `;
+
+      // Append the table to the log list container
+      logList.appendChild(table);
+
+      // Populate the table with log data
+      const tbody = table.querySelector('tbody');
       donationLogs.forEach(log => {
-        const listItem = document.createElement('li');
         const date = new Date(log.timestamp).toLocaleString();
-        listItem.textContent = `DATE: [${date}] USER: ${log.role} ACTION: ${log.action} Donated Book ID: ${log.refId}`;
-        logList.appendChild(listItem);
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${log.role}</td>
+          <td>${log.action}</td>
+          <td>${log.refId}</td>
+        `;
+        tbody.appendChild(row);
       });
     }
 
@@ -620,8 +645,6 @@ document.querySelectorAll('li a').forEach(link => {
       // Otherwise hide the modal if it was open
       document.getElementById('encodeBookSection').style.display = 'none';
     }
-
-    // (Optional: you can load different content into #content based on the clicked link here)
   });
 });
 
@@ -632,13 +655,50 @@ document
     document.getElementById('encodeBookSection').style.display = 'none';
   });
 
-// Save button inside modal (optional logic)
+// Handle form submission
+async function handleBookFormSubmit(event) {
+  event.preventDefault();
+
+  const formData = {
+    title: document.getElementById('newTitle').value,
+    authors: document.getElementById('newAuthor').value.split(','), // Handle multiple authors if needed
+    publishedYear: document.getElementById('newYear').value,
+    genre: document.getElementById('newGenre').value,
+    type: document.getElementById('newType').value, // Mapped as 'bookType'
+    quantity: document.getElementById('newQuantity').value,
+    shelfLocation: document.getElementById('newLocation').value,
+    condition: document.getElementById('newCondition').value,
+    status: document.getElementById('newStatus').value,
+    donorName: 'clerk',
+  };
+
+  console.log(formData);
+
+  try {
+    console.log(formData);
+    const response = await fetch('/api/books/physical/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    console.log(response.json());
+    if (data._id) {
+      alert('Book successfully encoded!');
+      console.log(data); // Logging the successful response
+      document.getElementById('encodeBookSection').style.display = 'none'; // Hide modal
+    } else {
+      alert('Failed to encode book.');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Attach the event listener to the form
 document
   .getElementById('encodeBookForm')
-  .addEventListener('submit', function (event) {
-    event.preventDefault();
-    // Your save logic here...
-
-    // Close the modal after saving
-    document.getElementById('encodeBookSection').style.display = 'none';
-  });
+  .addEventListener('submit', handleBookFormSubmit);

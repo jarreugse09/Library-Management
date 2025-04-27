@@ -5,6 +5,7 @@
     <title>Pending Donations</title>
     <link rel="stylesheet" href="/styles/clerkPage.css" />
     <link rel="stylesheet" href="/styles/header.css" />
+    <link rel="stylesheet" href="/styles/clerkDonation.css" />
   </head>
   <body>
     <header class="header">
@@ -187,7 +188,7 @@
         <!-- Encode New Book Section -->
         <div id="encodeBookSection" class="modal" style="display: none">
           <div class="modal-content">
-            <h2>Encode New Book</h2>
+            <h2>Encode New Physical Book</h2>
             <form id="encodeBookForm">
               <div class="form-group">
                 <label for="newTitle">Title:</label>
@@ -263,11 +264,15 @@
         </div>
 
         <div id="donation" class="section">
-          <h1>Book Donations</h1>
-          <button id="donationPendingBtn">Pending</button>
-          <button id="donationLogsBtn" onclick="loadDonationLogs()">
-            Logs
-          </button>
+          <div class="donation-header">
+            <h1>Book Donations</h1>
+            <div class="donation-buttons">
+              <button id="donationPendingBtn">Pending</button>
+              <button id="donationLogsBtn" onclick="loadDonationLogs()">
+                Logs
+              </button>
+            </div>
+          </div>
 
           <div id="donationPending" style="display: block">
             <ul id="donationList"></ul>

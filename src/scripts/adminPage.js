@@ -125,11 +125,17 @@ document.addEventListener('DOMContentLoaded', () => {
       );
 
       const result = await response.json();
-      if (response.ok) {
+      console.log('result::', result);
+      if (response.ok || response.status === 200) {
         alert(result.message);
         fetchPendingDonations(); // reload list
       } else {
-        alert(`Error: ${result.message}`);
+        // Only display result.error if it exists
+        const errorMessage = result.error
+          ? result.error
+          : 'No additional error info available';
+        alert(`Error: ${result}, ${errorMessage}`);
+        console.log(`Error: ${result}, ${errorMessage}`);
       }
     } catch (err) {
       console.error(`Error trying to ${action} donation:`, err);

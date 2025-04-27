@@ -91,7 +91,7 @@ const createDonation = async (req, res) => {
 const getPending = async (req, res) => {
   try {
     const pendingDonations = await book
-      .find({ isApprove: false })
+      .find({ isApprove: false, isDone: false })
       .select('donorName title authors bookType publishedYear');
     console.log(pendingDonations);
 
@@ -132,15 +132,21 @@ const updateDonationStatus = async (req, res) => {
 
   try {
     console.log('Request Headers:', req.headers); // Add this to check headers
-
     const { role } = req.body;
     console.log('Request Body:', req.body); // Log req.body to confirm data
-
-    let donStat, approve, isFinish, donation;
 
     if (!role) {
       return res.status(400).json({ message: 'Role is required' });
     }
+
+    // Finding the donation by id
+    let donStat, donation;
+
+    donation = await book.findOne({ _id: id });
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
     const updateMap = {
       approve: { update: { isApprove: true }, status: 'approved' },
       done: { update: { isDone: true }, status: 'done' },
@@ -154,23 +160,21 @@ const updateDonationStatus = async (req, res) => {
     };
     donStat = status;
 
+    // Updating the donation status
     donation = await book.findOneAndUpdate({ _id: id }, update, { new: true });
 
-    const actionLog = // Creating a new log entry
-      new Log({
-        type: 'DONATION',
-        refId: id,
-        action: donStat,
-        role: role,
-      });
+    // Log action based on the donor
+    const actionLog = new Log({
+      type: donation.donorName === 'clerk' ? 'ENCODED BY CLERK' : 'DONATION',
+      refId: id,
+      action: donStat,
+      role: role,
+    });
 
     await actionLog.save();
 
-    if (!donation) {
-      return res.status(404).json({ message: 'Donation not found' });
-    }
-
-    if (donStat === 'done') {
+    // If donation status is 'done' and donor is not 'clerk', save a new book
+    if (donation.donorName !== 'clerk' && donStat === 'done') {
       const donations = new book({
         donorName: donation.donorName,
         title: donation.title,
@@ -184,14 +188,17 @@ const updateDonationStatus = async (req, res) => {
       });
 
       await donations.save();
-
-      console.log(donations);
     }
 
-    res.json({ message: `Donation ${action}d successfully`, data: donation });
+    res.status(200).json({
+      status: 'Success',
+      message: `Donation ${action}d successfully`,
+      data: donation,
+    });
   } catch (error) {
-    console.error(`Error updating donation:`, error);
-    res.status(500).json({ message: 'Server error' });
+    res
+      .status(500)
+      .json({ status: 'fail', message: 'Server error', error: error });
   }
 };
 

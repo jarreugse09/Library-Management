@@ -14,7 +14,7 @@ const BookSchema = new mongoose.Schema({
   },
   donorName: {
     type: String,
-    required: true,
+    required: false,
   },
   bookType: {
     type: String,

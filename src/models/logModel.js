@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const LogSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['DONATION', 'BORROW'],
+    enum: ['DONATION', 'BORROW', 'ENCODED BY CLERK'],
     required: true,
   },
   refId: {

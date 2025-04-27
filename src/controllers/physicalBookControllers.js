@@ -158,29 +158,51 @@ exports.createBook = async (req, res) => {
       title,
       authors,
       publishedYear,
-      donorName,
       genre,
+      type,
       quantity,
       shelfLocation,
+      condition,
+      status,
+      donorName,
     } = req.body;
 
     if (!req.body)
       return res.status(400).json({ message: 'Invalid empty fields' });
+
     if (
       !title ||
       !authors ||
       !publishedYear ||
-      !donorName ||
       !genre ||
+      !type ||
       !quantity ||
-      !shelfLocation
-    )
-      return res.status(404).json({ message: 'Invalid empty fields' });
+      !shelfLocation ||
+      !condition ||
+      !status ||
+      !donorName
+    ) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
 
-    const newBook = new book(req.body);
+    const newBook = new book({
+      title,
+      authors,
+      publishedYear: parseInt(publishedYear, 10),
+      genre,
+      bookType: type, // mapping `type` from frontend to `bookType` field
+      quantity,
+      shelfLocation,
+      condition,
+      status,
+      donorName,
+      isApprove: true,
+    });
+
     await newBook.save();
     res.status(201).json(newBook);
   } catch (err) {
+    console.error('Error creating book:', err);
     res.status(400).json({ error: 'Failed to create book' });
   }
 };
