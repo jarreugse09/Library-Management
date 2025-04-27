@@ -95,34 +95,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
       donations.forEach(donation => {
         const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>${donation.title}</strong><br>
-          Donated by: ${donation.donorName}<br>
-          Authors: ${donation.authors.join(', ')}<br>
-          Book Type: ${donation.bookType}<br>
-          Published Year: ${donation.publishedYear || 'N/A'}<br>
+
+        // Create a table for the donation data
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Donated By</th>
+              <th>Authors</th>
+              <th>Book Type</th>
+              <th>Published Year</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${donation.title}</td>
+              <td>${donation.donorName}</td>
+              <td>${donation.authors.join(', ')}</td>
+              <td>${donation.bookType}</td>
+              <td>${donation.publishedYear || 'N/A'}</td>
+              <td>
+                <div class="button-container">
+                  <button class="approve-btn">Approve</button>
+                  <button class="reject-btn">Reject</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         `;
 
-        // Create approve button and attach event listener
-        const approveBtn = document.createElement('button');
-        approveBtn.textContent = 'Approve';
+        // Add event listeners to the buttons
+        const approveBtn = table.querySelector('button');
         approveBtn.addEventListener('click', () =>
           handleAction(donation._id, 'approve')
         );
 
-        // Create reject button and attach event listener
-        const rejectBtn = document.createElement('button');
-        rejectBtn.textContent = 'Reject';
+        const rejectBtn = table.querySelector('button');
         rejectBtn.addEventListener('click', () =>
           handleAction(donation._id, 'reject')
         );
 
-        // Append buttons to the list item
-        li.appendChild(approveBtn);
-        li.appendChild(rejectBtn);
+        // Append the table to the list item
+        li.appendChild(table);
         li.appendChild(document.createElement('hr'));
 
-        // Append list item to the list
+        // Append the list item to the list
         list.appendChild(li);
       });
     } catch (err) {
