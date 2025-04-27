@@ -20,7 +20,7 @@ body {
 }
 
 .container {
-  margin-top: 60px; /* Add space equal to the height of the nav */
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;

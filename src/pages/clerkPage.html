@@ -5,6 +5,7 @@
     <title>Pending Donations</title>
     <link rel="stylesheet" href="/styles/clerkPage.css" />
     <link rel="stylesheet" href="/styles/header.css" />
+    <link rel="stylesheet" href="/styles/clerkDonation.css" />
   </head>
   <body>
     <header class="header">
@@ -263,20 +264,22 @@
         </div>
 
         <div id="donation" class="section">
-          <h1>Book Donations</h1>
-          <button id="donationPendingBtn">Pending</button>
-          <button id="donationLogsBtn" onclick="loadDonationLogs()">
-            Logs
-          </button>
-
+          <div class="donation-header">
+            <h1>Book Donations</h1>
+            <div class="donation-buttons">
+              <button id="donationPendingBtn">Pending</button>
+              <button id="donationLogsBtn" onclick="loadDonationLogs()">Logs</button>
+            </div>
+          </div>
+        
           <div id="donationPending" style="display: block">
             <ul id="donationList"></ul>
           </div>
-
+        
           <div id="donationLogs" style="display: none">
             <ul id="donationLogList"></ul>
           </div>
-        </div>
+        </div>        
 
         <!-- ... other HTML remains the same ... -->
         <div id="borrow" class="section" style="display: none">
