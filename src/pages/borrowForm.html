@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Borrow a Book</title>
     <link rel="stylesheet" href="/styles/borrowForm.css" />
-<<<<<<< HEAD
     <link rel="stylesheet" href="../styles/header.css" />
     <script src="../scripts/header.js"></script>
   </head>
@@ -14,19 +13,6 @@
       <div class="logo">
         <img src="../images/OIP.jpg" alt="Logo" />
         <h1>LibAG</h1>
-=======
-    <link rel="stylesheet" href="/styles/header.css" />
-
-    <script src="../scripts/header.js"></script>
-  </head>
-  <body>
-    <header class="header">
-      <!-- Changed from div to header -->
-      <div class="logo">
-        <img src="../images/OIP.jpg" alt="Logo" />
-        <h1>LibAG</h1>
-        <!-- Added missing h1 -->
->>>>>>> bfc59438ca27fdaf83388a4cf536cdf51ae3643b
       </div>
       <nav>
         <ul>
@@ -37,16 +23,11 @@
             <ul class="dropdown-menu" id="settingsDropdown">
               <li><a href="/userpage/account">Account</a></li>
               <li><a href="/userpage/donateForm">Donate</a></li>
-<<<<<<< HEAD
               <li><a href="/borrowForm">Borrow</a></li>
-=======
-              <li><a href="#">Borrow</a></li>
->>>>>>> bfc59438ca27fdaf83388a4cf536cdf51ae3643b
             </ul>
           </li>
         </ul>
       </nav>
-<<<<<<< HEAD
     </div>
     <div class="container">
       <form onsubmit="handleSubmit(event)">
@@ -86,47 +67,6 @@
         <button type="submit">Submit Request</button>
       </form>
     </div>
-=======
-    </header>
-    <!-- Changed closing tag -->
-
-    <form onsubmit="handleSubmit(event)">
-      <h2>Borrow a Physical Book</h2>
-
-      <label for="bookTitle">Book Title</label>
-      <select id="bookTitle" name="bookTitle" required>
-        <option value="">Select book title</option>
-      </select>
-      <input type="hidden" id="bookId" name="bookId" />
-      <label for="borrowerName">Your Full Name</label>
-      <input type="text" id="borrowerName" name="borrowerName" required />
-
-      <label for="contactInfo">Contact Information</label>
-      <input
-        type="text"
-        id="contactInfo"
-        name="contactInfo"
-        placeholder="Email or Phone"
-        required
-      />
-
-      <label for="borrowDate">Borrow Date</label>
-      <input type="date" id="borrowDate" name="borrowDate" required />
-
-      <label for="returnDate">Expected Return Date</label>
-      <input type="date" id="returnDate" name="returnDate" required />
-
-      <label for="notes">Additional Notes (optional)</label>
-      <textarea
-        id="notes"
-        name="notes"
-        rows="4"
-        placeholder="Any special instructions or requests..."
-      ></textarea>
-
-      <button type="submit">Submit Request</button>
-    </form>
->>>>>>> bfc59438ca27fdaf83388a4cf536cdf51ae3643b
     <script src="../scripts/borrowForm.js"></script>
   </body>
 </html>
