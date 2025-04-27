@@ -30,6 +30,7 @@
           <li>
             <a href="#inventory" id="inventoryLink">Inventory</a>
           </li>
+          <li><a href="#newbook" id="newBookLink">Encode New Book</a></li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
           <li><a href="#borrowed" id="borrowedLink">Borrowed</a></li>
         </ul>
@@ -58,6 +59,7 @@
 
             <button id="searchBtn">Search</button>
             <button id="resetFiltersBtn">Reset Filters</button>
+
             <!-- Reset Filters Button -->
           </div>
 
@@ -175,6 +177,84 @@
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+
+        <!-- Encode New Book Section -->
+        <div id="encodeBookSection" class="modal" style="display: none">
+          <div class="modal-content">
+            <h2>Encode New Book</h2>
+            <form id="encodeBookForm">
+              <div class="form-group">
+                <label for="newTitle">Title:</label>
+                <input type="text" id="newTitle" name="title" required />
+              </div>
+              <div class="form-group">
+                <label for="newAuthor">Author/s:</label>
+                <input type="text" id="newAuthor" name="authors" required />
+              </div>
+              <div class="form-group">
+                <label for="newYear">Publish Year:</label>
+                <input
+                  type="number"
+                  min="1600"
+                  id="newYear"
+                  name="publishedYear"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newGenre">Genre:</label>
+                <input type="text" id="newGenre" name="genre" required />
+              </div>
+              <div class="form-group">
+                <label for="newQuantity">Quantity:</label>
+                <input
+                  type="number"
+                  min="1"
+                  id="newQuantity"
+                  name="quantity"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newType">Type:</label>
+                <select id="newType" name="type" required>
+                  <option value="physical">Physical Book</option>
+                  <option value="copy">Book Copy</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newCondition">Condition:</label>
+                <select id="newCondition" name="condition" required>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newLocation">Location:</label>
+                <input
+                  type="text"
+                  id="newLocation"
+                  name="shelfLocation"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newStatus">Status:</label>
+                <select id="newStatus" name="status" required>
+                  <option value="good">Available</option>
+                  <option value="borrowed">Borrowed</option>
+                  <option value="lost">Lost</option>
+                </select>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" id="saveNewBookBtn">Save Book</button>
+                <button type="button" id="cancelNewBookBtn">Cancel</button>
+              </div>
+            </form>
           </div>
         </div>
 

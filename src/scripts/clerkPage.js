@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const links = {
     inventory: document.getElementById('inventoryLink'),
     donation: document.getElementById('donationLink'),
+    encodeNew: document.getElementById('newBookLink'),
     borrowed: document.getElementById('borrowedLink'),
   };
 
@@ -33,10 +34,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sidebar navigation
   links.inventory.addEventListener('click', () => showSection('Inventory'));
+  links.encodeNew.addEventListener('click', () =>
+    showSection('encodeBookSection')
+  );
   links.donation.addEventListener('click', () => {
     showSection('donation');
     showDonationPending(); // Show donation pending by default
   });
+
   links.borrowed.addEventListener('click', () => {
     showSection('borrow');
     showBorrowPending(); // Show borrow pending by default
@@ -592,3 +597,48 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial load
   fetchBooks();
 });
+
+// NEW BOOK
+// Handle clicks for all links
+document.querySelectorAll('li a').forEach(link => {
+  link.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent normal anchor behavior
+
+    // Empty the #content div
+    const contentDiv = document.getElementById('content');
+    if (contentDiv) {
+      contentDiv.innerHTML = '';
+    }
+
+    // Get which link was clicked
+    const linkId = this.id;
+
+    // Only open the Encode New Book modal if newBookLink was clicked
+    if (linkId === 'newBookLink') {
+      document.getElementById('encodeBookSection').style.display = 'block';
+    } else {
+      // Otherwise hide the modal if it was open
+      document.getElementById('encodeBookSection').style.display = 'none';
+    }
+
+    // (Optional: you can load different content into #content based on the clicked link here)
+  });
+});
+
+// Close the Encode Modal (Cancel button)
+document
+  .getElementById('cancelNewBookBtn')
+  .addEventListener('click', function () {
+    document.getElementById('encodeBookSection').style.display = 'none';
+  });
+
+// Save button inside modal (optional logic)
+document
+  .getElementById('encodeBookForm')
+  .addEventListener('submit', function (event) {
+    event.preventDefault();
+    // Your save logic here...
+
+    // Close the modal after saving
+    document.getElementById('encodeBookSection').style.display = 'none';
+  });
