@@ -3,26 +3,117 @@ const book = require('../models/bookModel');
 // Get all books
 exports.getAllBooks = async (req, res) => {
   try {
-    const books = await book
-      .find({
-        bookType: 'Physical',
-      })
-      .select(
-        'title authors publishedYear donorName genre quantity shelfLocation status condition'
-      );
-    res.json(books);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch books' });
+    const search = (req.query.search || '').toLowerCase();
+    const sortField = req.query.sort || 'title'; // default sort
+    const sortOrder = req.query.order === 'desc' ? 'desc' : 'asc'; // default asc
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const status = req.query.status || ''; // Filter by status
+    const location = req.query.location || ''; // Filter by location
+
+    // Build search filters
+    let query = {
+      bookType: { $in: ['physical', 'copy'] }, // Can change this as needed
+      status: { $ne: 'deleted' },
+      isApprove: true,
+      isDone: true,
+    };
+
+    if (status) {
+      query.status = status; // Add status filter if provided
+    }
+
+    if (location) {
+      query.shelfLocation = { $regex: location, $options: 'i' }; // Case-insensitive location filter
+    }
+
+    // Fetch books from DB
+    let books = await book.find(query); // Get all books based on the filters
+
+    // Search - modified to match beginning of the string (prefix search)
+    if (search) {
+      books = books.filter(book => {
+        const title = (book.title || '').toLowerCase();
+        const authors = book.authors.map(author => author.toLowerCase()); // authors is an array
+        return (
+          title.startsWith(search) ||
+          authors.some(author => author.startsWith(search))
+        ); // Match any author
+      });
+    }
+
+    // Sort
+    books.sort((a, b) => {
+      const valA = (a[sortField] || '').toString().toLowerCase();
+      const valB = (b[sortField] || '').toString().toLowerCase();
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    // Pagination
+    const totalBooks = books.length;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedBooks = books.slice(start, end);
+
+    res.json({
+      books: paginatedBooks,
+      total: totalBooks,
+      page,
+      totalPages: Math.ceil(totalBooks / limit),
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
 // Get all book titles only
 exports.getAllBookTitle = async (req, res) => {
   try {
-    const titles = await book.find({ bookType: 'Physical' }, 'title'); // Only fetch the "title" field
+    const titles = await book.find(
+      { bookType: 'physical', isDone: true, isApprove: true },
+      { _id: 1, title: 1 } // Use projection object for clarity
+    );
     res.json(titles);
   } catch (err) {
+    console.error('Error fetching book titles:', err);
     res.status(500).json({ error: 'Failed to fetch book titles' });
+  }
+};
+
+exports.getAllBookFilter = async (req, res) => {
+  const { search, status, location } = req.query;
+
+  let query = {};
+
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { authors: { $regex: search, $options: 'i' } },
+      { isbn: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  if (status) {
+    query.status = status;
+  }
+
+  if (location) {
+    query.shelfLocation = location;
+  }
+
+  // Ensure you're filtering by the 'bookType' field properly
+  query.bookType = { $in: ['physical', 'copy'] };
+
+  try {
+    const books = await book.find(query); // Fetch books that match the query
+    res.json(books);
+  } catch (error) {
+    console.error('Failed to fetch books:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -30,6 +121,8 @@ exports.getAllBookBorrowed = async (req, res) => {
   try {
     const borrowedBooks = await book.find({
       bookType: 'physical',
+      isDone: true,
+      isApprove: true,
       status: 'borrowed',
     });
 
@@ -44,7 +137,12 @@ exports.getAllBookBorrowed = async (req, res) => {
 exports.getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await book.findById({ _id: id, bookType: 'physical' });
+    const book = await book.findById({
+      _id: id,
+      bookType: 'physical' || 'copy',
+      isDone: true,
+      isApprove: true,
+    });
 
     if (!book) return res.status(404).json({ error: 'Book not found' });
     res.status(200).json(book);
@@ -95,6 +193,8 @@ exports.updateBook = async (req, res) => {
       title,
       authors,
       publishedYear,
+      status,
+      condition,
       donorName,
       genre,
       quantity,
@@ -105,13 +205,15 @@ exports.updateBook = async (req, res) => {
       res.status(404).json({ message: 'Invalid empty fields' });
 
     const updated = await book.findByIdAndUpdate(
-      { _id: id, bookType: 'physical' },
+      { _id: id, bookType: 'physical', isDone: true, isApprove: true },
       {
         title: title,
-        authros: authors,
+        authors: authors,
         publishedYear: publishedYear,
         donorName: donorName,
         genre: genre,
+        status: status,
+        condition: condition,
         quantity: quantity,
         shelfLocation: shelfLocation,
       },
@@ -135,7 +237,7 @@ exports.deleteBook = async (req, res) => {
     if (!id) res.status(404).json({ message: 'Invalid empty fields' });
 
     const deleted = await book.findOneAndUpdate(
-      { _id: id, bookType: 'physical' },
+      { _id: id, bookType: 'physical', isDone: true, isApprove: true },
       { status: 'deleted' },
       { new: true }
     );

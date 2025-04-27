@@ -1,6 +1,5 @@
 const multer = require('multer');
 const path = require('path');
-const Donation = require('../models/donationModel');
 const book = require('../models/bookModel');
 const Log = require('../models/logModel');
 
@@ -64,7 +63,7 @@ const createDonation = async (req, res) => {
       return res.status(400).json({ error: 'eBook file is required' });
     }
 
-    const donation = new Donation({
+    const donation = new book({
       donorName,
       title,
       authors,
@@ -72,6 +71,7 @@ const createDonation = async (req, res) => {
       publishedYear,
       genre,
       bookType,
+      maxQuantity: bookType === 'physical' ? quantity : undefined,
       quantity: bookType === 'physical' ? quantity : undefined,
       ebookFileUrl: bookType === 'ebook' ? ebookFileUrl : undefined,
     });
@@ -90,9 +90,9 @@ const createDonation = async (req, res) => {
 // View eBook file
 const getPending = async (req, res) => {
   try {
-    const pendingDonations = await Donation.find({ status: 'pending' }).select(
-      'donorName title authors bookType publishedYear'
-    );
+    const pendingDonations = await book
+      .find({ isApprove: false })
+      .select('donorName title authors bookType publishedYear');
     console.log(pendingDonations);
 
     res.json(pendingDonations);
@@ -105,9 +105,12 @@ const getPending = async (req, res) => {
 // View eBook file
 const getApprove = async (req, res) => {
   try {
-    const pendingDonations = await Donation.find({
-      status: 'approved',
-    }).select('donorName title authors bookType publishedYear'); // Only include these fields
+    const pendingDonations = await book
+      .find({
+        isApprove: true,
+        isDone: false,
+      })
+      .select('donorName title authors bookType publishedYear'); // Only include these fields
 
     console.log(pendingDonations);
 
@@ -121,29 +124,37 @@ const getApprove = async (req, res) => {
 const updateDonationStatus = async (req, res) => {
   const { id, action } = req.params;
 
-  const validActions = ['approve', 'reject', 'done'];
+  const validActions = ['approve', 'reject', 'rejected', 'done'];
 
   if (!validActions.includes(action)) {
     return res.status(400).json({ message: 'Invalid action' });
   }
-
-  let donStat;
 
   try {
     console.log('Request Headers:', req.headers); // Add this to check headers
 
     const { role } = req.body;
     console.log('Request Body:', req.body); // Log req.body to confirm data
+
+    let donStat, approve, isFinish, donation;
+
     if (!role) {
       return res.status(400).json({ message: 'Role is required' });
     }
-    if (action === 'approve') {
-      donStat = 'approved'; // Use assignment operator here
-    } else if (action === 'done') {
-      donStat = 'done'; // Use assignment operator here
-    } else {
-      donStat = 'rejected'; // Use assignment operator here
-    }
+    const updateMap = {
+      approve: { update: { isApprove: true }, status: 'approved' },
+      done: { update: { isDone: true }, status: 'done' },
+      reject: { update: { isApprove: false }, status: 'rejected' },
+      rejected: { update: { isDone: false }, status: 'rejected' },
+    };
+
+    const { update, status } = updateMap[action] || {
+      update: {},
+      status: undefined,
+    };
+    donStat = status;
+
+    donation = await book.findOneAndUpdate({ _id: id }, update, { new: true });
 
     const actionLog = // Creating a new log entry
       new Log({
@@ -154,14 +165,6 @@ const updateDonationStatus = async (req, res) => {
       });
 
     await actionLog.save();
-
-    const donation = await Donation.findOneAndUpdate(
-      { _id: id },
-      {
-        status: donStat,
-      },
-      { new: true }
-    );
 
     if (!donation) {
       return res.status(404).json({ message: 'Donation not found' });

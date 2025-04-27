@@ -31,29 +31,243 @@
       <div class="sidebar">
         <h2>Library Clerk</h2>
         <ul>
-          <li><a href="#inventory" id="inventoryLink">Inventory</a></li>
+          <li>
+            <a href="#inventory" id="inventoryLink">Inventory</a>
+          </li>
+          <li><a href="#newbook" id="newBookLink">Encode New Book</a></li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
           <li><a href="#borrowed" id="borrowedLink">Borrowed</a></li>
         </ul>
       </div>
       <div class="content">
         <div id="Inventory" class="section">
-          <h1>Physical Book Inventory</h1>
+          <!-- Search and Filters Section -->
+          <div class="filters">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by Title or Author"
+            />
 
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search by title or author"
-          />
-          <button id="searchBtn">Search</button>
+            <select id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="good">Available</option>
+              <option value="borrowed">Borrowed</option>
+              <option value="lost">Lost</option>
+            </select>
 
-          <ul id="inventorylist"></ul>
+            <select id="locationFilter">
+              <option value="">All Locations</option>
+              <!-- Locations will be populated dynamically -->
+            </select>
+
+            <button id="searchBtn">Search</button>
+            <button id="resetFiltersBtn">Reset Filters</button>
+
+            <!-- Reset Filters Button -->
+          </div>
+
+          <!-- Table Section -->
+          <div class="table-container">
+            <table id="inventoryTable">
+              <thead>
+                <tr>
+                  <th data-sort="title" class="sortable">Title</th>
+                  <th data-sort="authors" class="sortable">Author</th>
+                  <th data-sort="publishedYear" class="sortable">
+                    Publish Year
+                  </th>
+                  <th data-sort="genre" class="sortable">Genre</th>
+                  <th data-sort="quantity" class="sortable">Quantity</th>
+                  <th data-sort="bookType" class="sortable">Type</th>
+                  <th data-sort="condition" class="sortable">Condition</th>
+                  <th data-sort="shelfLocation" class="sortable">Location</th>
+                  <th data-sort="status" class="sortable">Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryList">
+                <!-- Book rows will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div id="paginationControls" class="pagination">
+            <button id="prevPage">Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button id="nextPage">Next</button>
+          </div>
+
+          <!-- Update Book Modal -->
+          <div id="updateBookModal" class="modal" style="display: none">
+            <div class="modal-content">
+              <h2>Update Book</h2>
+              <form id="updateBookForm">
+                <!-- Form fields for updating a book -->
+                <div class="form-group">
+                  <label for="updateTitle">Title:</label>
+                  <input type="text" id="updateTitle" name="title" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateAuthor">Author:</label>
+                  <input type="text" id="updateAuthor" name="author" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateYear">Publish Year:</label>
+                  <input
+                    type="number"
+                    min="1600"
+                    id="updateYear"
+                    name="year"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateCategory">Genre:</label>
+                  <input
+                    type="text"
+                    id="updateCategory"
+                    name="category"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateQuantity">Quantity:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    id="updateQuantity"
+                    name="quantity"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateType">Type:</label>
+                  <select id="updateType" name="type" required>
+                    <option value="physical">Physical Book</option>
+                    <option value="copy">Book Copy</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="updateCondition">Condition:</label>
+                  <select id="updateCondition" name="condition" required>
+                    <option value="new">New</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="updateLocation">Location:</label>
+                  <input
+                    type="text"
+                    id="updateLocation"
+                    name="location"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateStatus">Status:</label>
+                  <select id="updateStatus" name="status" required>
+                    <option value="good">Available</option>
+                    <option value="borrowed">Borrowed</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+                <div class="form-actions">
+                  <button type="submit">Save Changes</button>
+                  <button type="button" id="closeUpdateModal">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Encode New Book Section -->
+        <div id="encodeBookSection" class="modal" style="display: none">
+          <div class="modal-content">
+            <h2>Encode New Book</h2>
+            <form id="encodeBookForm">
+              <div class="form-group">
+                <label for="newTitle">Title:</label>
+                <input type="text" id="newTitle" name="title" required />
+              </div>
+              <div class="form-group">
+                <label for="newAuthor">Author/s:</label>
+                <input type="text" id="newAuthor" name="authors" required />
+              </div>
+              <div class="form-group">
+                <label for="newYear">Publish Year:</label>
+                <input
+                  type="number"
+                  min="1600"
+                  id="newYear"
+                  name="publishedYear"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newGenre">Genre:</label>
+                <input type="text" id="newGenre" name="genre" required />
+              </div>
+              <div class="form-group">
+                <label for="newQuantity">Quantity:</label>
+                <input
+                  type="number"
+                  min="1"
+                  id="newQuantity"
+                  name="quantity"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newType">Type:</label>
+                <select id="newType" name="type" required>
+                  <option value="physical">Physical Book</option>
+                  <option value="copy">Book Copy</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newCondition">Condition:</label>
+                <select id="newCondition" name="condition" required>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="newLocation">Location:</label>
+                <input
+                  type="text"
+                  id="newLocation"
+                  name="shelfLocation"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="newStatus">Status:</label>
+                <select id="newStatus" name="status" required>
+                  <option value="good">Available</option>
+                  <option value="borrowed">Borrowed</option>
+                  <option value="lost">Lost</option>
+                </select>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" id="saveNewBookBtn">Save Book</button>
+                <button type="button" id="cancelNewBookBtn">Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <div id="donation" class="section">
           <h1>Book Donations</h1>
           <button id="donationPendingBtn">Pending</button>
-          <button id="donationLogsBtn">Logs</button>
+          <button id="donationLogsBtn" onclick="loadDonationLogs()">
+            Logs
+          </button>
 
           <div id="donationPending" style="display: block">
             <ul id="donationList"></ul>
@@ -68,7 +282,7 @@
         <div id="borrow" class="section" style="display: none">
           <h1>Borrowed Books</h1>
           <button id="pendingBtn">Pending</button>
-          <button id="logsBtn">Logs</button>
+          <button id="logsBtn" onclick="fetchBorrowedBooks()">Logs</button>
 
           <div id="pending-borrow"><ul id="borrowList"></ul></div>
           <div id="borrowedLogs" style="display: none">

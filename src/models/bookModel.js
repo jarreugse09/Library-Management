@@ -18,7 +18,7 @@ const BookSchema = new mongoose.Schema({
   },
   bookType: {
     type: String,
-    enum: ['physical', 'ebook'],
+    enum: ['physical', 'ebook', 'copy'],
   },
   genre: {
     type: String,
@@ -36,12 +36,21 @@ const BookSchema = new mongoose.Schema({
     enum: ['borrowed', 'lost', 'good', 'deleted'],
     default: 'good',
   },
+  maxQuantity: { type: Number, required: false }, //physical only
   quantity: { type: Number, required: false }, // only for physical
   ebookFileUrl: { type: String, required: false }, //for ebook
   condition: {
     type: String,
     enum: ['new', 'good', 'fair', 'poor'],
     default: 'good',
+  },
+  isApprove: {
+    type: Boolean,
+    default: false,
+  },
+  isDone: {
+    type: Boolean,
+    default: false,
   },
   donatedAt: {
     type: Date,

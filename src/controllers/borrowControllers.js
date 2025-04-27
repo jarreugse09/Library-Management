@@ -6,21 +6,40 @@ const Log = require('../models/logModel'); // You can create a new model for bor
 const createBorrow = async (req, res) => {
   try {
     const {
-      bookTitle,
+      borrowedBookId,
       borrowerName,
       contactInfo,
       borrowDate,
       returnDate,
       notes,
     } = req.body;
+    if (
+      !req.body ||
+      !borrowedBookId ||
+      !borrowerName ||
+      !contactInfo ||
+      !borrowDate ||
+      !returnDate ||
+      !notes
+    )
+      return res
+        .status(400)
+        .json({ status: 'Failed', message: 'Invalid empty fields' });
+
+    const fetchBook = await book.findById(borrowedBookId);
+    if (!fetchBook)
+      return res
+        .status(400)
+        .json({ status: 'Failed', message: 'Invalid empty fields' });
 
     const newRequest = new BorrowedBook({
-      bookTitle,
-      borrowerName,
-      contactInfo,
-      borrowDate,
-      returnDate,
-      notes,
+      borrowedBookId: fetchBook._id,
+      bookTitle: fetchBook.title,
+      borrowerName: borrowerName,
+      contactInfo: contactInfo,
+      borrowDate: borrowDate,
+      returnDate: returnDate,
+      notes: notes,
       status: 'pending', // Default status when a borrow request is created
     });
 
@@ -51,12 +70,13 @@ const updateBorrowStatus = async (req, res) => {
   try {
     const { id, action } = req.params;
     const { role } = req.body;
-
+    console.log(req.params);
     console.log(req.body);
     if (!['approve', 'reject'].includes(action)) {
-      return res
-        .status(400)
-        .json({ error: 'Invalid action. Must be "approve" or "reject".' });
+      return res.status(404).json({ error: 'Invalid action.' });
+    }
+    if (!req.params | !req.body) {
+      return res.status(400).json({ error: 'Invalid empty fields.' });
     }
 
     // Find the borrow request to update
@@ -65,17 +85,17 @@ const updateBorrowStatus = async (req, res) => {
       status: 'pending',
     });
 
-    console.log(borrowRequest);
+    if (!borrowRequest)
+      return res.status(400).json({ message: 'Request not found' });
 
-    if (!borrowRequest) {
-      return res.status(404).json({ error: 'Borrow request not found.' });
-    }
     let stats;
     if (action === 'approve') {
       stats = 'approved';
-    } else {
+    }
+    if (action == 'reject') {
       stats = 'rejected';
     }
+
     const actionLog = // Creating a new log entry
       new Log({
         type: 'BORROW',
@@ -86,55 +106,47 @@ const updateBorrowStatus = async (req, res) => {
 
     await actionLog.save();
 
+    if (action === 'reject') {
+      borrowRequest.status = 'rejected';
+      console.log('rejected successfully');
+      return res
+        .status(404)
+        .json({ status: 'Failed', message: 'Book cannot be borrowed' });
+    }
     // If the action is "approve", create a BorrowedBook entry
     if (action === 'approve') {
-      const availableCount = await book.countDocuments({
-        bookType: 'physical',
-        title: borrowRequest.bookTitle,
-        condition: 'good',
-        status: { $ne: 'borrowed' },
-      });
+      // Find the book by ID
+      const availableCount = await book.findById(borrowRequest.borrowedBookId);
 
-      if (availableCount === 0) {
+      if (!availableCount) {
+        return res.status(404).json({
+          error: 'Book not found',
+        });
+      }
+
+      // Check if there are available copies of the book
+      if (availableCount.quantity === 0) {
         return res.status(400).json({
           error: 'No available copies of this book to approve the request.',
         });
       }
 
-      const physicalBook = await book.findOneAndUpdate(
-        {
-          bookType: 'physical',
-          title: borrowRequest.bookTitle,
-          condition: 'good',
-          status: { $ne: 'borrowed' }, // Optional: ensure you're not double-borrowing
-        },
-        {
-          status: 'borrowed',
-        },
-        {
-          new: true,
-        }
-      );
+      // Update the status to 'borrowed' and decrement the quantity
+      availableCount.status = 'borrowed';
+      availableCount.quantity -= 1; // Decrease the quantity by 1
+
+      // Save the updated book document
+      await availableCount.save();
+
+      borrowRequest.status = 'borrowed';
+
+      await borrowRequest.save();
+
+      res.status(200).json({
+        message: `Request ${action}d successfully.`,
+        data: borrowRequest,
+      });
     }
-    await physicalBook.save();
-
-    // Create a new BorrowedBook entry with status "borrowed"
-    const borrowedBook = new BorrowedBook({
-      bookTitle: borrowRequest.bookTitle,
-      borrowerName: borrowRequest.borrowerName,
-      contactInfo: borrowRequest.contactInfo,
-      borrowDate: borrowRequest.borrowDate,
-      returnDate: borrowRequest.returnDate,
-      notes: borrowRequest.notes,
-      status: 'borrowed', // Set status as borrowed
-    });
-
-    await borrowedBook.save();
-
-    res.status(200).json({
-      message: `Request ${action}d successfully.`,
-      data: borrowedBook,
-    });
   } catch (error) {
     console.error('Error updating borrow status:', error);
     res.status(500).json({ error: 'Failed to update borrow request status.' });

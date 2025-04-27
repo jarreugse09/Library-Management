@@ -11,9 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     borrowed: document.getElementById('borrowedLink'),
   };
 
-  const pendingBtn = document.getElementById('pendingBtn');
-  const logsBtn = document.getElementById('logsBtn');
-  const pendingBorrow = document.getElementById('pending-borrow');
   const borrowedLogs = document.getElementById('borrowedLogs');
 
   const donationPendingBtn = document.getElementById('donationPendingBtn');
@@ -39,16 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   links.borrowed.addEventListener('click', () => {
     showSection('borrow');
-    showBorrowPending(); // Show borrow pending by default
   });
 
   // Borrow toggle buttons
-  pendingBtn.addEventListener('click', showBorrowPending);
-  logsBtn.addEventListener('click', () => {
-    pendingBorrow.style.display = 'none';
-    borrowedLogs.style.display = 'block';
-    // fetchBorrowLogs(); // optional future feature
-  });
 
   // Donation toggle buttons
   donationPendingBtn.addEventListener('click', showDonationPending);
@@ -62,12 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
     donationPending.style.display = 'block';
     donationLogs.style.display = 'none';
     fetchPendingDonations();
-  }
-
-  function showBorrowPending() {
-    pendingBorrow.style.display = 'block';
-    borrowedLogs.style.display = 'none';
-    fetchPendingBorrows();
   }
 
   async function fetchPendingDonations() {
@@ -109,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rejectBtn = document.createElement('button');
         rejectBtn.textContent = 'Reject';
         rejectBtn.addEventListener('click', () =>
-          handleAction(donation._id, 'reject')
+          handleAction(donation._id, 'rejected')
         );
 
         // Append buttons to the list item
@@ -155,35 +139,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function fetchBorrowedBooks() {
   try {
-    const response = await fetch(
-      'http://127.0.0.1:7001/api/books/physical/borrowed'
-    ); // Replace with your actual endpoint
+    const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
     const borrowedBooks = await response.json();
-
     const borrowLog = document.getElementById('borrowLog');
-    borrowLog.innerHTML = ''; // Clear the list before appending new items
 
+    // Clear previous logs
+    borrowLog.innerHTML = '';
+
+    // Check if there's data
     if (!borrowedBooks.length) {
       borrowLog.innerHTML = '<li>No borrowed books found.</li>';
     } else {
       borrowedBooks.forEach(book => {
         const li = document.createElement('li');
-        li.textContent = `${book.bookTitle} - Borrower: ${
+        li.innerHTML = `
+          <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
           book.borrowerName
-        } | Borrowed: ${new Date(
-          book.borrowDate
-        ).toLocaleDateString()} | Return: ${new Date(
-          book.returnDate
-        ).toLocaleDateString()}`;
+        } |
+          Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
+         Will Return: ${new Date(book.returnDate).toLocaleDateString()}
+        `;
         borrowLog.appendChild(li);
       });
     }
 
-    // Show the borrowed section
+    // Reveal the borrowed books section
     document.getElementById('borrow').style.display = 'block';
     document.getElementById('borrowedLogs').style.display = 'block';
   } catch (error) {
     console.error('Error fetching borrowed books:', error);
     alert('Failed to fetch borrowed books. Please try again.');
+  }
+}
+
+async function loadDonationLogs() {
+  try {
+    const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+    if (!response.ok) throw new Error('Failed to fetch logs');
+
+    const logs = await response.json();
+    const logList = document.getElementById('donationLogList');
+    logList.innerHTML = ''; // Clear previous logs
+
+    const donationLogs = logs.filter(log => log.type === 'DONATION');
+
+    if (donationLogs.length === 0) {
+      logList.innerHTML = '<li>No donation logs found.</li>';
+    } else {
+      donationLogs.forEach(log => {
+        const listItem = document.createElement('li');
+        const date = new Date(log.timestamp).toLocaleString();
+        listItem.textContent = `DATE: [${date}] USER: ${log.role} ACTION: ${log.action} Donated Book ID: ${log.refId}`;
+        logList.appendChild(listItem);
+      });
+    }
+
+    document.getElementById('donationLogs').style.display = 'block';
+  } catch (error) {
+    console.error('Error fetching donation logs:', error);
   }
 }

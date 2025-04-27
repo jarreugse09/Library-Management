@@ -11,6 +11,7 @@
 }
 
 body {
+<<<<<<< HEAD
   background-color: var(--bg);
   color: var(--text);
   font-family: "Inter", sans-serif;
@@ -34,6 +35,21 @@ form {
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   border: 1px solid var(--border);
+=======
+  font-family: Arial, sans-serif;
+  margin: 0;
+}
+
+form {
+  max-width: 500px;
+  margin: auto;
+  margin-top: 10px;
+
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+>>>>>>> bfc59438ca27fdaf83388a4cf536cdf51ae3643b
 }
 
 h2 {
