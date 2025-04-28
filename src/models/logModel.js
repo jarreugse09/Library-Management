@@ -13,7 +13,7 @@ const LogSchema = new mongoose.Schema({
   },
   action: {
     type: String,
-    enum: ['approved', 'done', 'rejected'],
+    enum: ['approved', 'done', 'rejected', 'approve and encode'],
     required: true,
   },
   role: {

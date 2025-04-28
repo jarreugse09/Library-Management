@@ -157,9 +157,10 @@ exports.createBook = async (req, res) => {
     const {
       title,
       authors,
+      description,
       publishedYear,
       genre,
-      type,
+      bookType,
       quantity,
       shelfLocation,
       condition,
@@ -168,29 +169,60 @@ exports.createBook = async (req, res) => {
     } = req.body;
 
     if (!req.body)
-      return res.status(400).json({ message: 'Invalid empty fields' });
+      return res
+        .status(400)
+        .json({ message: 'Invalid empty fields. Request is empty' });
 
+    // Validate required fields
     if (
       !title ||
       !authors ||
       !publishedYear ||
       !genre ||
-      !type ||
+      !bookType ||
       !quantity ||
       !shelfLocation ||
       !condition ||
       !status ||
       !donorName
     ) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      const missingFields = {};
+
+      // Check for missing fields and add to missingFields object
+      if (!title) missingFields.title = 'Title is required';
+      if (!authors) missingFields.authors = 'Authors are required';
+      if (!publishedYear)
+        missingFields.publishedYear = 'Published year is required';
+      if (!genre) missingFields.genre = 'Genre is required';
+      if (!bookType) missingFields.bookType = 'Book type is required';
+      if (!quantity) missingFields.quantity = 'Quantity is required';
+      if (!shelfLocation)
+        missingFields.shelfLocation = 'Shelf location is required';
+      if (!condition) missingFields.condition = 'Condition is required';
+      if (!status) missingFields.status = 'Status is required';
+      if (!donorName) missingFields.donorName = 'Donor name is required';
+
+      return res.status(400).json({
+        message: missingFields,
+      });
     }
 
+    // Validate publishedYear to ensure it's a valid number
+    const validPublishedYear = parseInt(publishedYear, 10);
+    if (isNaN(validPublishedYear)) {
+      return res.status(400).json({
+        message: 'Invalid published year. Please provide a valid number.',
+      });
+    }
+
+    // Create the new book
     const newBook = new book({
       title,
       authors,
-      publishedYear: parseInt(publishedYear, 10),
+      publishedYear: validPublishedYear,
       genre,
-      bookType: type, // mapping `type` from frontend to `bookType` field
+      description,
+      bookType,
       quantity,
       shelfLocation,
       condition,
@@ -199,6 +231,7 @@ exports.createBook = async (req, res) => {
       isApprove: true,
     });
 
+    // Save the book
     await newBook.save();
     res.status(201).json(newBook);
   } catch (err) {

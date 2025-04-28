@@ -6,7 +6,10 @@ const router = express.Router();
 // Create donation with optional eBook upload
 router.post(
   '/donate',
-  donationController.upload.single('ebookFile'),
+  donationController.upload.fields([
+    { name: 'ebookFile', maxCount: 1 },
+    { name: 'coverImage', maxCount: 1 },
+  ]),
   donationController.createDonation
 );
 

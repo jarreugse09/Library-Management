@@ -275,8 +275,8 @@ async function loadDonationLogs() {
     const logs = await response.json();
     const logList = document.getElementById('donationLogList');
     logList.innerHTML = ''; // Clear previous logs
-
-    const donationLogs = logs.filter(log => log.type === 'DONATION');
+    const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
+    const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
 
     if (donationLogs.length === 0) {
       logList.innerHTML = '<li>No donation logs found.</li>';
@@ -287,6 +287,7 @@ async function loadDonationLogs() {
         <thead>
           <tr>
             <th>Date</th>
+            <th>Type</th>
             <th>User</th>
             <th>Action</th>
             <th>Donated Book ID</th>
@@ -306,6 +307,7 @@ async function loadDonationLogs() {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${date}</td>
+          <td>${log.type}</td>
           <td>${log.role}</td>
           <td>${log.action}</td>
           <td>${log.refId}</td>
@@ -593,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
       quantity: document.getElementById('updateQuantity').value,
       bookType: document.getElementById('updateType').value,
       condition: document.getElementById('updateCondition').value,
-      shelfLocation: document.getElementById('updateLocation').value,
+      shelfLocation: bookdocument.getElementById('updateLocation').value,
       status: document.getElementById('updateStatus').value,
     };
 
@@ -642,26 +644,22 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchBooks();
 });
 
-// NEW BOOK
-// Handle clicks for all links
+//NEW BOOK
+// Handle clicks for all links (new book, etc.)
 document.querySelectorAll('li a').forEach(link => {
   link.addEventListener('click', function (event) {
     event.preventDefault(); // Prevent normal anchor behavior
 
-    // Empty the #content div
     const contentDiv = document.getElementById('content');
     if (contentDiv) {
       contentDiv.innerHTML = '';
     }
 
-    // Get which link was clicked
     const linkId = this.id;
 
-    // Only open the Encode New Book modal if newBookLink was clicked
     if (linkId === 'newBookLink') {
       document.getElementById('encodeBookSection').style.display = 'block';
     } else {
-      // Otherwise hide the modal if it was open
       document.getElementById('encodeBookSection').style.display = 'none';
     }
   });
@@ -674,50 +672,110 @@ document
     document.getElementById('encodeBookSection').style.display = 'none';
   });
 
-// Handle form submission
-async function handleBookFormSubmit(event) {
+// Function to handle form submission
+async function handleSubmit(event) {
   event.preventDefault();
 
-  const formData = {
-    title: document.getElementById('newTitle').value,
-    authors: document.getElementById('newAuthor').value.split(','), // Handle multiple authors if needed
-    publishedYear: document.getElementById('newYear').value,
-    genre: document.getElementById('newGenre').value,
-    type: document.getElementById('newType').value, // Mapped as 'bookType'
-    quantity: document.getElementById('newQuantity').value,
-    shelfLocation: document.getElementById('newLocation').value,
-    condition: document.getElementById('newCondition').value,
-    status: document.getElementById('newStatus').value,
-    donorName: 'clerk',
-  };
+  const formData = new FormData(event.target);
 
-  console.log(formData);
+  // Optional: Disable submit button
+  const submitButton = event.target.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.innerText = 'Submitting...';
+
+  // Debugging output
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
 
   try {
-    console.log(formData);
-    const response = await fetch('/api/books/physical/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
+    const response = await fetch(
+      'http://127.0.0.1:7001/api/donations/donate/',
+      {
+        method: 'POST',
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error submitting donation');
+    }
 
     const data = await response.json();
-    console.log(response.json());
-    if (data._id) {
-      alert('Book successfully encoded!');
-      console.log(data); // Logging the successful response
-      document.getElementById('encodeBookSection').style.display = 'none'; // Hide modal
-    } else {
-      alert('Failed to encode book.');
-    }
+    alert('Donation submitted successfully!');
+    event.target.reset();
+
+    // Reset authors input
+    const authorsContainer = document.getElementById('authors-container');
+    authorsContainer.innerHTML = `
+      <label>Author(s)</label>
+      <div>
+        <input type="text" name="authors[]" required />
+        <button type="button" class="btn btn-remove" onclick="removeAuthor(this)">Remove</button>
+      </div>
+    `;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error submitting donation:', error);
+    alert('An error occurred: ' + error.message);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.innerText = 'Donate';
   }
 }
 
-// Attach the event listener to the form
-document
-  .getElementById('encodeBookForm')
-  .addEventListener('submit', handleBookFormSubmit);
+// Function to add a new author input field
+function addAuthor() {
+  const authorsContainer = document.getElementById('authors-container');
+  const newAuthorDiv = document.createElement('div');
+  newAuthorDiv.innerHTML = `
+    <input type="text" name="authors[]" required />
+    <button type="button" class="btn btn-remove" onclick="removeAuthor(this)">Remove</button>
+  `;
+  authorsContainer.appendChild(newAuthorDiv);
+}
+
+// Function to remove an author input field
+function removeAuthor(button) {
+  const authorsContainer = document.getElementById('authors-container');
+  authorsContainer.removeChild(button.parentElement);
+}
+
+// Function to toggle the visibility of conditional fields based on the selected book type
+function toggleFields() {
+  const physicalRadio = document.querySelector(
+    'input[name="bookType"][value="physical"]'
+  );
+  const ebookRadio = document.querySelector(
+    'input[name="bookType"][value="ebook"]'
+  );
+  const copyRadio = document.querySelector(
+    'input[name="bookType"][value="copy"]'
+  );
+
+  const quantityField = document.getElementById('quantityField');
+  const ebookFileInput = document.getElementById('ebookFileInput');
+  const coverPageInput = document.getElementById('coverPageInput'); // NEW: Cover page input
+  const shelfInput = document.getElementById('shelfLocation');
+  const shelf = document.getElementById('shelf');
+
+  if (physicalRadio.checked) {
+    quantityField.style.display = 'block';
+    ebookFileInput.style.display = 'none';
+    coverPageInput.style.display = 'none';
+    shelf.style.display = 'block';
+    shelfInput.style.display = 'block';
+  } else if (ebookRadio.checked) {
+    quantityField.style.display = 'none';
+    ebookFileInput.style.display = 'block';
+    coverPageInput.style.display = 'block'; // Show cover page input for ebook
+    shelf.style.display = 'none';
+    shelfInput.style.display = 'none';
+  } else if (copyRadio.checked) {
+    quantityField.style.display = 'none';
+    ebookFileInput.style.display = 'none';
+    coverPageInput.style.display = 'none';
+    shelf.style.display = 'block';
+    shelfInput.style.display = 'block';
+  }
+}

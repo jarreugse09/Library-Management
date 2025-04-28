@@ -5,6 +5,7 @@ const BookSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  description: { type: String },
   authors: {
     type: [String],
     required: true,
@@ -39,6 +40,7 @@ const BookSchema = new mongoose.Schema({
   maxQuantity: { type: Number, required: false }, //physical only
   quantity: { type: Number, required: false }, // only for physical
   ebookFileUrl: { type: String, required: false }, //for ebook
+  coverImageUrl: { type: String }, //for ebook
   condition: {
     type: String,
     enum: ['new', 'good', 'fair', 'poor'],

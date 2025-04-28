@@ -185,82 +185,132 @@
           </div>
         </div>
 
-        <!-- Encode New Book Section -->
-        <div id="encodeBookSection" class="modal" style="display: none">
-          <div class="modal-content">
-            <h2>Encode New Physical Book</h2>
-            <form id="encodeBookForm">
-              <div class="form-group">
-                <label for="newTitle">Title:</label>
-                <input type="text" id="newTitle" name="title" required />
+        <!-- Modal Container -->
+        <div id="encodeBookSection" class="section" style="display: none">
+          <form
+            entype="multipart/form-data"
+            id="donateForm"
+            onsubmit="handleSubmit(event)"
+          >
+            <div>
+              <label for="title">Title:</label>
+              <input type="text" id="title" name="title" required /><br /><br />
+
+              <div id="authors-container">
+                <label>Author(s)</label>
+                <div>
+                  <input type="text" name="authors[]" required />
+                  <button
+                    type="button"
+                    class="btn btn-remove"
+                    onclick="removeAuthor(this)"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="newAuthor">Author/s:</label>
-                <input type="text" id="newAuthor" name="authors" required />
-              </div>
-              <div class="form-group">
-                <label for="newYear">Publish Year:</label>
-                <input
-                  type="number"
-                  min="1600"
-                  id="newYear"
-                  name="publishedYear"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="newGenre">Genre:</label>
-                <input type="text" id="newGenre" name="genre" required />
-              </div>
-              <div class="form-group">
-                <label for="newQuantity">Quantity:</label>
-                <input
-                  type="number"
-                  min="1"
-                  id="newQuantity"
-                  name="quantity"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="newType">Type:</label>
-                <select id="newType" name="type" required>
-                  <option value="physical">Physical Book</option>
-                  <option value="copy">Book Copy</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="newCondition">Condition:</label>
-                <select id="newCondition" name="condition" required>
-                  <option value="good">Good</option>
-                  <option value="fair">Fair</option>
-                  <option value="poor">Poor</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="newLocation">Location:</label>
-                <input
-                  type="text"
-                  id="newLocation"
-                  name="shelfLocation"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="newStatus">Status:</label>
-                <select id="newStatus" name="status" required>
-                  <option value="good">Available</option>
-                  <option value="borrowed">Borrowed</option>
-                  <option value="lost">Lost</option>
-                </select>
+              <button type="button" onclick="addAuthor()">Add Author</button
+              ><br /><br />
+
+              <label for="description">Description:</label>
+              <textarea
+                id="description"
+                name="description"
+                rows="4"
+                cols="50"
+              ></textarea
+              ><br /><br />
+
+              <label for="donorName">Encoder Name:</label>
+              <input
+                type="text"
+                id="donorName"
+                name="donorName"
+                value="ENCODED BY CLERK"
+                readonly
+              /><br /><br />
+              <label for="bookType">Book Type:</label><br />
+              <input
+                type="radio"
+                id="physical"
+                name="bookType"
+                value="physical"
+                onchange="toggleFields()"
+                checked
+              />
+              Physical Book
+              <input
+                type="radio"
+                id="copy"
+                name="bookType"
+                value="copy"
+                onchange="toggleFields()"
+              />
+              Book Copy
+              <input
+                type="radio"
+                id="ebook"
+                name="bookType"
+                value="ebook"
+                onchange="toggleFields()"
+              />
+              E-Book<br /><br />
+
+              <label for="publishedYear">Published Year:</label>
+              <input
+                type="number"
+                id="publishedYear"
+                name="publishedYear"
+              /><br /><br />
+
+              <div id="quantityField">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" />
               </div>
 
-              <div class="form-actions">
-                <button type="submit" id="saveNewBookBtn">Save Book</button>
-                <button type="button" id="cancelNewBookBtn">Cancel</button>
+              <div id="coverPageInput" style="display: none">
+                <label for="coverPage">Upload Cover Page Image</label>
+                <input
+                  type="file"
+                  name="coverImage"
+                  id="coverImage"
+                  accept="image/*"
+                />
               </div>
-            </form>
-          </div>
+
+              <div id="ebookFileInput" style="display: none">
+                <label for="ebookFile">E-Book File:</label>
+                <input
+                  type="file"
+                  id="ebookFile"
+                  name="ebookFile"
+                  accept=".epub,.pdf,.mobi"
+                />
+              </div>
+
+              <label for="genre">Genre:</label>
+              <input type="text" id="genre" name="genre" /><br /><br />
+
+              <label id="shelf" for="shelfLocation">Shelf Location:</label>
+              <input type="text" id="shelfLocation" name="shelfLocation" />
+
+              <label for="condition">Condition:</label><br />
+              <select id="condition" name="condition">
+                <option value="new">New</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option></select
+              ><br /><br />
+
+              <label for="status">Status:</label><br />
+              <select id="status" name="status">
+                <option value="good">Good</option></select
+              ><br /><br />
+            </div>
+
+            <button type="submit">Donate</button>
+            <button type="button" id="cancelNewBookBtn">Cancel</button>
+          </form>
         </div>
 
         <div id="donation" class="section">
