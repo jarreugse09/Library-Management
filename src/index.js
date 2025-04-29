@@ -13,18 +13,15 @@ const appRoutes = require('./routes/appRoutes');
 const postRoutes = require('./routes/postRoutes');
 const borrowRoutes = require('./routes/borrowRoutes');
 const donationRoutes = require('./routes/donationRoutes');
+const ebookRoutes = require('./routes/ebookRoutes');
 const physicalBookRoutes = require('./routes/physicalBookRoutes');
 
 const app = express();
 
-app.use(
-  '/styles', 
-  checkReferer, 
-  express.static(join(__dirname, 'styles'))
-);
+app.use('/styles', checkReferer, express.static(join(__dirname, 'styles')));
 
 app.use('/scripts', checkReferer, express.static(join(__dirname, 'scripts')));
-
+app.use('/uploads', express.static(join(__dirname, 'uploads')));
 app.use('/images', express.static(join(__dirname, 'images')));
 
 app.use('/', appRoutes);
@@ -38,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/books/physical', physicalBookRoutes);
+app.use('/api/books/ebook', ebookRoutes);
 app.use('/api/borrows', borrowRoutes);
 
 const PORT = process.env.PORT || 7002;

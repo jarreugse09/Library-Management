@@ -2,11 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = {
     Inventory: document.getElementById('Inventory'),
     donation: document.getElementById('donation'),
+    ebook: document.getElementById('ebookInventory'),
     borrow: document.getElementById('borrow'),
   };
 
   const links = {
     inventory: document.getElementById('inventoryLink'),
+    ebook: document.getElementById('eBookLink'),
     donation: document.getElementById('donationLink'),
     borrowed: document.getElementById('borrowedLink'),
   };
@@ -34,8 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
     showSection('donation');
     showDonationPending(); // Show donation pending by default
   });
+
   links.borrowed.addEventListener('click', () => {
     showSection('borrow');
+  });
+
+  links.ebook.addEventListener('click', () => {
+    showSection('ebookInventory');
   });
 
   // Borrow toggle buttons
@@ -239,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const updateBookModal = document.getElementById('updateBookModal');
   const closeUpdateModalBtn = document.getElementById('closeUpdateModal');
   const updateBookForm = document.getElementById('updateBookForm');
+  const editEbookBtn = document.getElementById('ebook-edit-btn');
 
   let currentPage = 1;
   let totalPages = 1;
@@ -351,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${
             book.status === 'good' ? 'AVAILABLE' : book.status.toUpperCase()
           }</td>
-          <td><button class="edit-btn">Edit</button>
+          <td><button id="ebook-edit-btn">Edit</button>
           <button class="deleteBtn">Tag Delete</button>
           <button class="finalDeleteBtn">Delete</button></td>
         </tr>
@@ -457,6 +465,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentPage = 1;
     fetchBooks();
   }
+
+  editEbookBtn.addEventListener('click', () => {
+    updateBookModal.style.display = 'block';
+    openUpdateModal();
+  });
 
   function openUpdateModal(book) {
     console.log('Opening modal for book:', book);
@@ -584,4 +597,186 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial load
   fetchBooks();
+});
+
+//EBOOK INVENTORY
+document.addEventListener('DOMContentLoaded', () => {
+  const ebookSearchInput = document.getElementById('ebookSearchInput');
+  const ebookSearchBtn = document.getElementById('ebookSearchBtn');
+  const ebookResetBtn = document.getElementById('ebookResetBtn');
+  const ebookList = document.getElementById('ebookList');
+  const ebookPrevPageBtn = document.getElementById('ebookPrevPage');
+  const ebookNextPageBtn = document.getElementById('ebookNextPage');
+  const ebookPageInfo = document.getElementById('ebookPageInfo');
+
+  const ebookUpdateModal = document.getElementById('ebookUpdateModal');
+  const ebookUpdateForm = document.getElementById('ebookUpdateForm');
+  const ebookCloseModal = document.getElementById('ebookCloseModal');
+
+  // Add reference to ebookInventory div
+  const ebookInventoryDiv = document.getElementById('ebookInventory');
+  ebookInventoryDiv.style.display = 'none'; // Start with the div hidden
+
+  let currentPage = 1;
+  let totalPages = 1;
+
+  // Initially hide the modal
+  ebookUpdateModal.style.display = 'none';
+  ebookUpdateForm.style.display = 'none';
+
+  // Fetch ebook data from API
+  async function fetchEbooks(page = 1) {
+    try {
+      const search = ebookSearchInput.value;
+      const url = `/api/books/ebook?search=${search}&page=${page}&limit=10`; // Modify limit as needed
+      const response = await fetch(url);
+      const data = await response.json();
+
+      totalPages = data.totalPages;
+      currentPage = data.page;
+      ebookPageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+      renderEbooks(data.books);
+    } catch (error) {
+      console.error('Error fetching ebooks:', error);
+    }
+  }
+
+  // Render ebooks in the table
+  function renderEbooks(ebooks) {
+    ebookList.innerHTML = '';
+    ebooks.forEach(ebook => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><img src="${
+          ebook.coverImageUrl
+        }" alt="Book Cover" width="50" height="75" /></td>
+        <td>${ebook.title}</td>
+        <td>${ebook.authors.join(', ')}</td>
+        <td>${ebook.publishedYear}</td>
+        <td>${ebook.genre}</td>
+        <td><a href="${
+          ebook.ebookFileUrl
+        }" target="_blank" class="ebook-link">View PDF</a></td>
+        <td>
+          <button class="edit-btn" data-id="${ebook._id}">Edit</button>
+          <button onclick="deleteEbookTag(${ebook._id})">Delete Tag</button>
+          <button onclick="deleteEbook(${ebook._id})">Delete</button>
+        </td>
+      `;
+      ebookList.appendChild(tr);
+    });
+
+    // Rebind the edit button event listeners for each book
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const ebookId = e.target.getAttribute('data-id');
+        openEditEbook(ebookId); // Open the edit modal when clicked
+      });
+    });
+
+    const ebookLinks = document.querySelectorAll('.ebook-link');
+    ebookLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault(); // Prevent default behavior (link navigation)
+        const pdfUrl = link.getAttribute('href'); // Get the ebook's file URL
+        displayPdf(pdfUrl); // Call the function to display the PDF
+      });
+    });
+  }
+
+  // Function to display the PDF in the iframe
+  function displayPdf(pdfUrl) {
+    const pdfViewer = document.getElementById('pdfViewer');
+    const iframe = document.getElementById('pdfIframe');
+
+    iframe.src = pdfUrl; // Set the PDF URL in the iframe
+    pdfViewer.style.display = 'block'; // Show the PDF viewer
+
+    // Handle close button click
+    const closePdfButton = document.getElementById('closePdfViewer');
+    closePdfButton.addEventListener('click', () => {
+      pdfViewer.style.display = 'none'; // Hide the PDF viewer
+      iframe.src = ''; // Reset the iframe source to stop the PDF from loading
+    });
+  }
+
+  // Toggle ebookInventory div visibility
+  function toggleEbookInventory(inventoryDiv) {
+    if (inventoryDiv.style.display === 'none') {
+      inventoryDiv.style.display = 'block'; // Show the div
+    } else {
+      inventoryDiv.style.display = 'none'; // Hide the div
+    }
+  }
+
+  // Handle search button click
+  ebookSearchBtn.addEventListener('click', () => {
+    fetchEbooks(1); // Reset to first page when searching
+  });
+
+  // Handle reset button click
+  ebookResetBtn.addEventListener('click', () => {
+    ebookSearchInput.value = '';
+    fetchEbooks(1); // Reset to first page when resetting
+  });
+
+  // Handle pagination (Previous and Next buttons)
+  ebookPrevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      fetchEbooks(currentPage - 1);
+    }
+  });
+
+  ebookNextPageBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      fetchEbooks(currentPage + 1);
+    }
+  });
+
+  // Function to open and populate the edit modal
+  function openEditEbook(ebookId) {
+    // Just store the ebookId somewhere (for use when submitting later)
+    ebookUpdateForm.dataset.ebookId = ebookId;
+
+    // Show the modal and form
+    ebookUpdateModal.style.display = 'block';
+    ebookUpdateForm.style.display = 'block';
+  }
+
+  // Handle ebook update form submission
+  ebookUpdateForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const ebookId = ebookUpdateForm.dataset.ebookId; // get the stored id
+    const formData = new FormData(ebookUpdateForm);
+
+    try {
+      await fetch(`/api/books/ebook/${ebookId}`, {
+        method: 'PATCH',
+        body: formData,
+      });
+
+      alert('Ebook updated successfully!');
+      ebookUpdateModal.style.display = 'none';
+      fetchEbooks(); // reload ebook list
+    } catch (error) {
+      console.error('Failed to update ebook:', error);
+    }
+  });
+
+  // Close modal
+  ebookCloseModal.addEventListener('click', () => {
+    ebookUpdateModal.style.display = 'none'; // Hide the modal when close is clicked
+  });
+
+  // Handle eBookLink button click to show ebookInventory div
+  const eBookLinkBtn = document.getElementById('eBookLink');
+  eBookLinkBtn.addEventListener('click', () => {
+    toggleEbookInventory(ebookInventoryDiv); // Show the ebook inventory div
+  });
+
+  // Fetch initial ebooks on page load
+  fetchEbooks();
 });

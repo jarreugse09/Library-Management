@@ -27,7 +27,10 @@
       <div class="sidebar">
         <h2>Librarian</h2>
         <ul>
-          <li><a href="#inventory" id="inventoryLink">Inventory</a></li>
+          <li><a href="#inventory" id="inventoryLink">Book Inventory</a></li>
+          <li>
+            <a href="#ebookInventory" id="eBookLink">E-Book Inventory</a>
+          </li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
           <li>
             <a href="#borrowed" id="borrowedLink" onclick="fetchBorrowedBooks()"
@@ -38,6 +41,7 @@
       </div>
       <div class="content">
         <div id="Inventory" class="section">
+          <h2>Physical Book Management</h2>
           <!-- Search and Filters Section -->
           <div class="filters">
             <input
@@ -180,6 +184,99 @@
               </form>
             </div>
           </div>
+        </div>
+
+        <!------ EBOOK ---->
+
+        <div id="ebookInventory" class="section">
+          <h2>Ebook Management</h2>
+
+          <div>
+            <input
+              type="text"
+              id="ebookSearchInput"
+              placeholder="Search ebooks..."
+            />
+            <button id="ebookSearchBtn">Search</button>
+            <button id="ebookResetBtn">Reset Filters</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th class="ebook-sortable" data-field="coverImage">
+                  Cover Image
+                </th>
+                <th class="ebook-sortable" data-field="title">Title</th>
+                <th class="ebook-sortable" data-field="authors">Authors</th>
+                <th class="ebook-sortable" data-field="publishedYear">Year</th>
+                <th class="ebook-sortable" data-field="genre">Genre</th>
+                <th class="ebook-sortable" data-field="ebookFileUrl">PDF</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ebookList"></tbody>
+          </table>
+
+          <div>
+            <button id="ebookPrevPage">Previous</button>
+            <span id="ebookPageInfo"></span>
+            <button id="ebookNextPage">Next</button>
+          </div>
+        </div>
+        <div id="pdfViewer" style="display: none">
+          <iframe
+            id="pdfIframe"
+            style="width: 100%; height: 600px"
+            frameborder="0"
+          ></iframe>
+          <button id="closePdfViewer">Close</button>
+        </div>
+
+        <!-- Edit Ebook Modal -->
+        <div id="ebookUpdateModal">
+          <form id="ebookUpdateForm">
+            <h3>Edit Ebook</h3>
+            <input type="hidden" id="ebookEditId" />
+            <div>
+              <label>Title:</label>
+              <input type="text" id="ebookEditTitle" required />
+            </div>
+            <div>
+              <label>Authors (comma separated):</label>
+              <input type="text" id="ebookEditAuthors" required />
+            </div>
+            <div>
+              <label>Year:</label>
+              <input type="number" id="ebookEditYear" required />
+            </div>
+            <div>
+              <label>Genre:</label>
+              <input type="text" id="ebookEditGenre" required />
+            </div>
+            <div>
+              <label>Cover Image URL:</label>
+              <input
+                type="text"
+                id="ebookEditCoverImage"
+                name="ebookEditCoverImage"
+                required
+              />
+            </div>
+            <div>
+              <label>Ebook File URL:</label>
+              <input
+                type="text"
+                id="ebookEditFileUrl"
+                name="ebookEditFileUrl"
+                required
+              />
+            </div>
+            <div style="margin-top: 10px">
+              <button type="submit">Save Changes</button>
+              <button type="button" id="ebookCloseModal">Cancel</button>
+            </div>
+          </form>
         </div>
 
         <div id="donation" class="section">
