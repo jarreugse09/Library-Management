@@ -38,16 +38,148 @@
       </div>
       <div class="content">
         <div id="Inventory" class="section">
-          <h1>Physical Book Inventory</h1>
+          <!-- Search and Filters Section -->
+          <div class="filters">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by Title or Author"
+            />
 
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="Search by title or author"
-          />
-          <button id="searchBtn">Search</button>
+            <select id="statusFilter">
+              <option value="">All Statuses</option>
+              <option value="good">Available</option>
+              <option value="borrowed">Borrowed</option>
+              <option value="lost">Lost</option>
+              <option value="deleted">Deleted</option>
+            </select>
 
-          <ul id="inventorylist"></ul>
+            <select id="locationFilter">
+              <option value="">All Locations</option>
+              <!-- Locations will be populated dynamically -->
+            </select>
+
+            <button id="searchBtn">Search</button>
+            <button id="resetFiltersBtn">Reset Filters</button>
+
+            <!-- Reset Filters Button -->
+          </div>
+
+          <!-- Table Section -->
+          <div class="table-container">
+            <table id="inventoryTable">
+              <thead>
+                <tr>
+                  <th data-sort="title" class="sortable">Title</th>
+                  <th data-sort="authors" class="sortable">Author</th>
+                  <th data-sort="publishedYear" class="sortable">
+                    Publish Year
+                  </th>
+                  <th data-sort="genre" class="sortable">Genre</th>
+                  <th data-sort="quantity" class="sortable">Quantity</th>
+                  <th data-sort="bookType" class="sortable">Type</th>
+                  <th data-sort="condition" class="sortable">Condition</th>
+                  <th data-sort="shelfLocation" class="sortable">Location</th>
+                  <th data-sort="status" class="sortable">Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryList">
+                <!-- Book rows will be inserted here -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div id="paginationControls" class="pagination">
+            <button id="prevPage">Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button id="nextPage">Next</button>
+          </div>
+
+          <!-- Update Book Modal -->
+          <div id="updateBookModal" class="modal" style="display: none">
+            <div class="modal-content">
+              <h2>Update Book</h2>
+              <form id="updateBookForm">
+                <!-- Form fields for updating a book -->
+                <div class="form-group">
+                  <label for="updateTitle">Title:</label>
+                  <input type="text" id="updateTitle" name="title" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateAuthor">Author:</label>
+                  <input type="text" id="updateAuthor" name="author" required />
+                </div>
+                <div class="form-group">
+                  <label for="updateYear">Publish Year:</label>
+                  <input
+                    type="number"
+                    min="1600"
+                    id="updateYear"
+                    name="year"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateCategory">Genre:</label>
+                  <input
+                    type="text"
+                    id="updateCategory"
+                    name="category"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateQuantity">Quantity:</label>
+                  <input
+                    type="number"
+                    min="0"
+                    id="updateQuantity"
+                    name="quantity"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateType">Type:</label>
+                  <select id="updateType" name="type" required>
+                    <option value="physical">Physical Book</option>
+                    <option value="copy">Book Copy</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="updateCondition">Condition:</label>
+                  <select id="updateCondition" name="condition" required>
+                    <option value="new">New</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="updateLocation">Location:</label>
+                  <input
+                    type="text"
+                    id="updateLocation"
+                    name="location"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="updateStatus">Status:</label>
+                  <select id="updateStatus" name="status" required>
+                    <option value="good">Available</option>
+                    <option value="borrowed">Borrowed</option>
+                    <option value="lost">Lost</option>
+                  </select>
+                </div>
+                <div class="form-actions">
+                  <button type="submit">Save Changes</button>
+                  <button type="button" id="closeUpdateModal">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
 
         <div id="donation" class="section">

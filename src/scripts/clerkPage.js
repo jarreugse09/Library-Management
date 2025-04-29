@@ -308,8 +308,12 @@ async function loadDonationLogs() {
         row.innerHTML = `
           <td>${date}</td>
           <td>${log.type}</td>
-          <td>${log.role}</td>
-          <td>${log.action}</td>
+          <td>${log.role.toUpperCase()}</td>
+          <td>${
+            log.action === 'approve and encode'
+              ? 'ENCODE'
+              : log.action.toUpperCase()
+          }</td>
           <td>${log.refId}</td>
         `;
         tbody.appendChild(row);
@@ -484,11 +488,48 @@ document.addEventListener('DOMContentLoaded', () => {
             book.shelfLocation == null ? 'Not Set' : book.shelfLocation
           }</td>
           <td>${book.status === 'good' ? 'available' : book.status}</td>
-          <td><button class="edit-btn">Edit</button></td>
+           <td><button class="edit-btn">Edit</button>
+          <button class="deleteBtn">Tag Delete</button>
         </tr>
       `;
       inventoryList.insertAdjacentHTML('beforeend', row);
     });
+  }
+
+  //SOFT DELETE BUTTON
+  document.addEventListener('click', function (event) {
+    if (event.target.classList.contains('deleteBtn')) {
+      const row = event.target.closest('tr');
+      const bookId = row.getAttribute('data-id');
+
+      if (confirm('Are you sure you want to delete this book?')) {
+        deleteBook(bookId, row);
+      }
+    }
+  });
+
+  async function deleteBook(bookId, row) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:7001/api/books/physical/${bookId}/delete`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        row.remove(); // Remove row from the table if the request is successful
+        alert('Book deleted successfully.');
+      } else {
+        alert('Failed to delete the book.');
+      }
+    } catch (error) {
+      console.error('Error deleting book:', error);
+      alert('An error occurred while deleting the book.');
+    }
   }
 
   function updatePaginationControls() {

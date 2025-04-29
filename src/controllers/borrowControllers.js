@@ -19,8 +19,7 @@ const createBorrow = async (req, res) => {
       !borrowerName ||
       !contactInfo ||
       !borrowDate ||
-      !returnDate ||
-      !notes
+      !returnDate
     )
       return res
         .status(400)
@@ -39,7 +38,7 @@ const createBorrow = async (req, res) => {
       contactInfo: contactInfo,
       borrowDate: borrowDate,
       returnDate: returnDate,
-      notes: notes,
+      notes: notes || undefined,
       status: 'pending', // Default status when a borrow request is created
     });
 

@@ -104,9 +104,14 @@ const createDonation = async (req, res) => {
       genre: genre,
       bookType: bookType,
       isApprove: isApprove,
-      maxQuantity: bookType === 'physical' ? quantity : undefined,
-      quantity: bookType === 'physical' ? quantity : undefined,
-      shelfLocation: bookType === 'physical' ? shelfLocation : undefined,
+      maxQuantity:
+        bookType === 'physical' || bookType === 'copy' ? quantity : undefined,
+      quantity:
+        bookType === 'physical' || bookType === 'copy' ? quantity : undefined,
+      shelfLocation:
+        bookType === 'physical' || bookType === 'copy'
+          ? shelfLocation
+          : undefined,
       ebookFileUrl: ebookFileUrl,
       coverImageUrl: coverImageUrl,
     });

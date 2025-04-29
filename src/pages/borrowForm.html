@@ -6,7 +6,8 @@
     <title>Borrow a Book</title>
     <link rel="stylesheet" href="/styles/borrowForm.css" />
     <link rel="stylesheet" href="../styles/header.css" />
-    <script src="../scripts/header.js"></script>
+    <script src="../scripts/header.js" defer></script>
+    <script src="../scripts/borrowForm.js" defer></script>
   </head>
   <body>
     <div class="header">
@@ -29,18 +30,19 @@
         </ul>
       </nav>
     </div>
+
     <div class="container">
-      <form onsubmit="handleSubmit(event)">
+      <form id="borrowForm">
         <h2>Borrow a Physical Book</h2>
-  
+
         <label for="bookTitle">Book Title</label>
-        <select id="bookTitle" name="bookTitle" required>
+        <select id="bookTitle" name="bookId" required>
           <option value="">Select book title</option>
         </select>
-  
+
         <label for="borrowerName">Your Full Name</label>
         <input type="text" id="borrowerName" name="borrowerName" required />
-  
+
         <label for="contactInfo">Contact Information</label>
         <input
           type="text"
@@ -49,13 +51,13 @@
           placeholder="Email or Phone"
           required
         />
-  
+
         <label for="borrowDate">Borrow Date</label>
         <input type="date" id="borrowDate" name="borrowDate" required />
-  
+
         <label for="returnDate">Expected Return Date</label>
         <input type="date" id="returnDate" name="returnDate" required />
-  
+
         <label for="notes">Additional Notes (optional)</label>
         <textarea
           id="notes"
@@ -63,10 +65,9 @@
           rows="4"
           placeholder="Any special instructions or requests..."
         ></textarea>
-  
+
         <button type="submit">Submit Request</button>
       </form>
     </div>
-    <script src="../scripts/borrowForm.js"></script>
   </body>
 </html>

@@ -70,6 +70,76 @@ exports.getAllBooks = async (req, res) => {
   }
 };
 
+// Get all books
+exports.getAllBooksAdmin = async (req, res) => {
+  try {
+    const search = (req.query.search || '').toLowerCase();
+    const sortField = req.query.sort || 'title'; // default sort
+    const sortOrder = req.query.order === 'desc' ? 'desc' : 'asc'; // default asc
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const status = req.query.status || ''; // Filter by status
+    const location = req.query.location || ''; // Filter by location
+
+    // Build search filters
+    let query = {
+      bookType: { $in: ['physical', 'copy'] }, // Can change this as needed
+      status: { $in: ['good', 'borrowed', 'deleted', 'lost'] },
+      isApprove: true,
+      isDone: true,
+    };
+
+    if (status) {
+      query.status = status; // Add status filter if provided
+    }
+
+    if (location) {
+      query.shelfLocation = { $regex: location, $options: 'i' }; // Case-insensitive location filter
+    }
+
+    // Fetch books from DB
+    let books = await book.find(query); // Get all books based on the filters
+
+    // Search - modified to match beginning of the string (prefix search)
+    if (search) {
+      books = books.filter(book => {
+        const title = (book.title || '').toLowerCase();
+        const authors = book.authors.map(author => author.toLowerCase()); // authors is an array
+        return (
+          title.startsWith(search) ||
+          authors.some(author => author.startsWith(search))
+        ); // Match any author
+      });
+    }
+
+    // Sort
+    books.sort((a, b) => {
+      const valA = (a[sortField] || '').toString().toLowerCase();
+      const valB = (b[sortField] || '').toString().toLowerCase();
+
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    // Pagination
+    const totalBooks = books.length;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const paginatedBooks = books.slice(start, end);
+
+    res.json({
+      books: paginatedBooks,
+      total: totalBooks,
+      page,
+      totalPages: Math.ceil(totalBooks / limit),
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // Get all book titles only
 exports.getAllBookTitle = async (req, res) => {
   try {
@@ -285,20 +355,66 @@ exports.updateBook = async (req, res) => {
 };
 
 // Delete book
-exports.deleteBook = async (req, res) => {
+exports.softDeleteBook = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id) res.status(404).json({ message: 'Invalid empty fields' });
+    if (!id) return res.status(404).json({ message: 'Invalid empty fields' });
 
     const deleted = await book.findOneAndUpdate(
-      { _id: id, bookType: 'physical', isDone: true, isApprove: true },
+      {
+        _id: id,
+        bookType: { $in: ['physical', 'copy'] }, // Corrected condition
+        isDone: true,
+        isApprove: true,
+      },
       { status: 'deleted' },
       { new: true }
     );
+
     if (!deleted) return res.status(404).json({ error: 'Book not found' });
-    res.json({ message: 'Book deleted successfully' });
+
+    res.status(200).json({ message: 'Book deleted successfully' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to delete book' });
+  }
+};
+
+exports.permanentDeleteBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if the book ID is provided
+    if (!id) {
+      return res.status(400).json({ message: 'Book ID is required' });
+    }
+
+    // Find the book by ID
+    const bookToDelete = await book.findById(id);
+
+    // Check if the book exists
+    if (!bookToDelete) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    // Only allow deletion for 'physical' or 'copy' book types
+    if (
+      bookToDelete.bookType !== 'physical' &&
+      bookToDelete.bookType !== 'copy'
+    ) {
+      return res
+        .status(400)
+        .json({ message: 'Invalid book type for permanent deletion' });
+    }
+
+    // Perform permanent deletion of the book
+    await book.findByIdAndDelete({ _id: id });
+
+    // Return success response
+    return res.status(200).json({ message: 'Book deleted permanently' });
+  } catch (err) {
+    console.error('Error deleting book:', err);
+    return res.status(500).json({ error: 'Failed to delete book permanently' });
   }
 };
