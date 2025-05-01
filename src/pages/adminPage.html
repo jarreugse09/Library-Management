@@ -211,6 +211,7 @@
                 <th class="ebook-sortable" data-field="authors">Authors</th>
                 <th class="ebook-sortable" data-field="publishedYear">Year</th>
                 <th class="ebook-sortable" data-field="genre">Genre</th>
+                <th class="ebook-sortable" data-field="status">Status</th>
                 <th class="ebook-sortable" data-field="ebookFileUrl">PDF</th>
                 <th>Actions</th>
               </tr>
@@ -235,43 +236,80 @@
 
         <!-- Edit Ebook Modal -->
         <div id="ebookUpdateModal">
-          <form id="ebookUpdateForm">
+          <form id="ebookUpdateForm" enctype="multipart/form-data">
             <h3>Edit Ebook</h3>
+
             <input type="hidden" id="ebookEditId" />
+
             <div>
               <label>Title:</label>
               <input type="text" id="ebookEditTitle" required />
             </div>
+
             <div>
               <label>Authors (comma separated):</label>
               <input type="text" id="ebookEditAuthors" required />
             </div>
+
             <div>
               <label>Year:</label>
               <input type="number" id="ebookEditYear" required />
             </div>
+
             <div>
               <label>Genre:</label>
               <input type="text" id="ebookEditGenre" required />
             </div>
+
+            <!-- Current Cover Image Preview -->
+            <div style="margin-top: 10px">
+              <label>Current Cover Image:</label><br />
+              <img
+                id="coverImagePreview"
+                src=""
+                alt="No Cover"
+                style="
+                  width: 120px;
+                  height: 160px;
+                  object-fit: cover;
+                  display: none;
+                  margin-top: 5px;
+                "
+              />
+            </div>
+
             <div>
-              <label>Cover Image URL:</label>
+              <label>Upload New Cover Image:</label>
               <input
-                type="text"
+                type="file"
                 id="ebookEditCoverImage"
                 name="ebookEditCoverImage"
-                required
+                accept="image/*"
               />
             </div>
+
+            <!-- Current Ebook File Preview -->
             <div>
-              <label>Ebook File URL:</label>
+              <label>Current Ebook File:</label><br />
+              <a
+                id="ebookFilePreview"
+                href="#"
+                target="_blank"
+                style="display: none"
+                >View Current Ebook</a
+              >
+            </div>
+
+            <div>
+              <label>Upload New Ebook File:</label>
               <input
-                type="text"
+                type="file"
                 id="ebookEditFileUrl"
                 name="ebookEditFileUrl"
-                required
+                accept=".pdf,.epub"
               />
             </div>
+
             <div style="margin-top: 10px">
               <button type="submit">Save Changes</button>
               <button type="button" id="ebookCloseModal">Cancel</button>

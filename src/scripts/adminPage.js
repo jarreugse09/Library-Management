@@ -655,24 +655,77 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${ebook.authors.join(', ')}</td>
         <td>${ebook.publishedYear}</td>
         <td>${ebook.genre}</td>
+        <td>${ebook.status}</td>
         <td><a href="${
           ebook.ebookFileUrl
         }" target="_blank" class="ebook-link">View PDF</a></td>
         <td>
           <button class="edit-btn" data-id="${ebook._id}">Edit</button>
-          <button onclick="deleteEbookTag(${ebook._id})">Delete Tag</button>
-          <button onclick="deleteEbook(${ebook._id})">Delete</button>
+          <button id="ebookSoftBtn" data-id="${ebook._id}" >Delete Tag</button>
+          <button  id="ebookDeleteBtn" data-id="${ebook._id}">Delete</button>
         </td>
       `;
       ebookList.appendChild(tr);
     });
 
-    // Rebind the edit button event listeners for each book
+    //SOFT DELETE BUTTON
+    document.addEventListener('click', function (event) {
+      if (event.target.getElementById('ebookSoftBtn')) {
+        const row = event.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+
+        if (confirm('Are you sure you want to delete this book?')) {
+          deleteBook(bookId, row);
+        }
+      }
+    });
+
+    async function deleteBook(bookId, row) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:7001/api/books/ebook/${bookId}/delete`,
+          {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.ok) {
+          row.remove(); // Remove row from the table if the request is successful
+          alert('Book deleted successfully.');
+        } else {
+          alert('Failed to delete the book.');
+        }
+      } catch (error) {
+        console.error('Error deleting book:', error);
+        alert('An error occurred while deleting the book.');
+      }
+    }
+
+    //PERMANENT DELETE
+    document.addEventListener('click', function (event) {
+      if (event.target.getElementById('ebookDeleteBtn')) {
+        const row = event.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+
+        if (confirm('Are you sure you want to delete this book?')) {
+          permanentDeleteBook(bookId, row);
+        }
+      }
+    });
+
+    // Rebind edit button event listeners
     const editButtons = document.querySelectorAll('.edit-btn');
     editButtons.forEach(button => {
       button.addEventListener('click', e => {
         const ebookId = e.target.getAttribute('data-id');
-        openEditEbook(ebookId); // Open the edit modal when clicked
+        // Find the ebook using the id
+        const ebookData = ebooks.find(book => book._id === ebookId);
+        if (ebookData) {
+          openEditEbook(ebookData); // Pass the found ebook
+        }
       });
     });
 
@@ -736,11 +789,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Function to open and populate the edit modal
-  function openEditEbook(ebookId) {
-    // Just store the ebookId somewhere (for use when submitting later)
-    ebookUpdateForm.dataset.ebookId = ebookId;
+  function openEditEbook(ebook) {
+    // Set the ebookId somewhere (for form submission later)
+    ebookUpdateForm.dataset.ebookId = ebook._id;
+    document.getElementById('ebookEditId').value = ebook._id;
 
-    // Show the modal and form
+    // Populate the text inputs
+    document.getElementById('ebookEditTitle').value = ebook.title || '';
+    document.getElementById('ebookEditAuthors').value =
+      ebook.authors?.join(', ') || '';
+
+    document.getElementById('ebookEditYear').value = ebook.publishedYear || '';
+    document.getElementById('ebookEditGenre').value = ebook.genre || '';
+
+    // Display current cover image
+    const coverPreview = document.getElementById('coverImagePreview');
+    if (coverPreview) {
+      coverPreview.src = ebook.coverImageUrl || '';
+      coverPreview.style.display = ebook.coverImageUrl ? 'block' : 'none';
+    }
+
+    // Display current ebook file link
+    const fileLink = document.getElementById('ebookFilePreview');
+    if (fileLink) {
+      fileLink.href = ebook.ebookFileUrl || '#';
+      fileLink.textContent = ebook.ebookFileUrl ? 'View Current File' : '';
+      fileLink.style.display = ebook.ebookFileUrl ? 'inline-block' : 'none';
+    }
+
+    // Show the modal
     ebookUpdateModal.style.display = 'block';
     ebookUpdateForm.style.display = 'block';
   }
@@ -749,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ebookUpdateForm.addEventListener('submit', async e => {
     e.preventDefault();
 
-    const ebookId = ebookUpdateForm.dataset.ebookId; // get the stored id
+    const ebookId = document.getElementById('ebookEditId').value; // get the stored id
     const formData = new FormData(ebookUpdateForm);
 
     try {

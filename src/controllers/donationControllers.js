@@ -60,10 +60,27 @@ const createDonation = async (req, res) => {
       role,
     } = req.body;
 
-    if (!description) {
+    // Helper function to check if any required field is missing
+    const isFieldEmpty = field =>
+      field === undefined || field === null || field === '';
+
+    // Check for required fields
+    if (isFieldEmpty(donorName)) {
+      return res.status(400).json({ error: 'Donor name is required' });
+    }
+    if (isFieldEmpty(title)) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+    if (isFieldEmpty(authors)) {
+      return res.status(400).json({ error: 'Authors are required' });
+    }
+    if (isFieldEmpty(description)) {
       return res
         .status(400)
         .json({ error: 'Description is required for books' });
+    }
+    if (isFieldEmpty(genre)) {
+      return res.status(400).json({ error: 'Genre is required' });
     }
 
     let ebookFileUrl = undefined;

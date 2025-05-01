@@ -1,53 +1,60 @@
-const book = require('../models/bookModel');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const book = require('../models/bookModel');
+const multer = require('multer');
 
-// Multer storage for cover image
-const coverStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, '../uploads/cover');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '_' + file.originalname);
-  },
-});
+// Ensure upload directories exist
+const uploadDirectory = directory => {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
+};
 
-// Multer storage for ebook file
-const ebookStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, '../uploads/ebooks');
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '_' + file.originalname);
-  },
-});
+uploadDirectory(path.join(__dirname, '../uploads/ebooks'));
+uploadDirectory(path.join(__dirname, '../uploads/covers'));
 
-// Multer file filter to separate files
+// Multer storage configuration
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      if (file.fieldname === 'ebookEditCoverImage') {
-        cb(null, '../uploads/cover');
-      } else if (file.fieldname === 'ebookEditFileUrl') {
-        cb(null, '../uploads/ebooks');
+      if (file.fieldname === 'ebookEditFileUrl') {
+        cb(null, path.join(__dirname, '../uploads/ebooks'));
+      } else if (file.fieldname === 'ebookEditCoverImage') {
+        cb(null, path.join(__dirname, '../uploads/covers'));
       } else {
         cb(new Error('Unknown file field'), null);
       }
     },
     filename: (req, file, cb) => {
-      cb(null, Date.now() + '_' + file.originalname);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(
+        null,
+        file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname)
+      );
     },
   }),
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === 'ebookEditFileUrl') {
+      const allowedTypes = ['application/pdf', 'application/epub+zip'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only PDF or ePub files are allowed for ebooks'));
+      }
+    } else if (file.fieldname === 'ebookEditCoverImage') {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only JPG or PNG files are allowed for covers'));
+      }
+    } else {
+      cb(new Error('Unknown file field'));
+    }
+  },
 });
 
-// Upload fields setup
-const uploadFields = upload.fields([
-  { name: 'ebookEditCoverImage', maxCount: 1 },
-  { name: 'ebookEditFileUrl', maxCount: 1 },
-]);
-
-exports.getAllEbook = async (req, res) => {
+const getAllEbook = async (req, res) => {
   try {
     const search = (req.query.search || '').toLowerCase();
     const sortField = req.query.sort || 'title'; // default sort
@@ -111,7 +118,7 @@ exports.getAllEbook = async (req, res) => {
   }
 };
 
-exports.getAllEbookAdmin = async (req, res) => {
+const getAllEbookAdmin = async (req, res) => {
   try {
     const search = (req.query.search || '').toLowerCase();
     const sortField = req.query.sort || 'title'; // default sort
@@ -175,81 +182,85 @@ exports.getAllEbookAdmin = async (req, res) => {
   }
 };
 
-// controllers/ebookController.js
-
-// Update ebook controller
+// Update ebook details with file upload
 const updateEbook = async (req, res) => {
-  const { id } = req.params;
-  const { title, authors, publishedYear, genre } = req.body;
-
   try {
-    // Validate required fields
-    if (!title || !authors || !publishedYear || !genre) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    const { id } = req.params;
+    const { title, description, authors, status } = req.body;
+
+    // Fetch the current book details
+    const currentBook = await book.findById({ _id: id });
+    if (!currentBook) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Ebook not found' });
     }
 
-    // Find the existing ebook
-    const ebook = await book.findById(id);
-    if (!ebook) {
-      return res.status(404).json({ message: 'Ebook not found' });
-    }
+    const updateFields = {
+      title,
+      description,
+      authors: authors ? authors.split(',').map(author => author.trim()) : [],
+      status,
+    };
 
-    let coverImageUrl = ebook.coverImageUrl;
-    let ebookFileUrl = ebook.ebookFileUrl;
-
-    // Handle uploaded files
-    if (req.files) {
-      if (req.files.coverImage && req.files.coverImage.length > 0) {
-        const coverImage = req.files.coverImage[0];
-        const newCoverPath = path.join('uploads/cover', coverImage.filename);
-
-        // Delete old cover image
-        if (ebook.coverImageUrl) {
-          const oldCoverPath = path.join(__dirname, '..', ebook.coverImageUrl);
-          if (fs.existsSync(oldCoverPath)) {
-            fs.unlinkSync(oldCoverPath);
-          }
-        }
-
-        coverImageUrl = `/${newCoverPath}`;
+    // Handle uploaded files and delete old ones
+    if (req.files['ebookEditCoverImage']) {
+      // If there's an old cover image, delete it
+      if (currentBook.coverImageUrl) {
+        const oldCoverImagePath = path.join(
+          __dirname,
+          '..',
+          currentBook.coverImageUrl
+        );
+        fs.unlink(oldCoverImagePath, err => {
+          if (err) console.error('Error deleting old cover image:', err);
+        });
       }
-
-      if (req.files.ebookFile && req.files.ebookFile.length > 0) {
-        const ebookFile = req.files.ebookFile[0];
-        const newEbookPath = path.join('uploads/ebooks', ebookFile.filename);
-
-        // Delete old ebook file
-        if (ebook.ebookFileUrl) {
-          const oldEbookPath = path.join(__dirname, '..', ebook.ebookFileUrl);
-          if (fs.existsSync(oldEbookPath)) {
-            fs.unlinkSync(oldEbookPath);
-          }
-        }
-
-        ebookFileUrl = `/${newEbookPath}`;
-      }
+      updateFields.coverImageUrl = `/uploads/covers/${req.files['ebookEditCoverImage'][0].filename}`;
     }
 
-    // Update fields
-    ebook.title = title;
-    ebook.authors = Array.isArray(authors)
-      ? authors
-      : authors.split(',').map(a => a.trim());
-    ebook.publishedYear = Number(publishedYear);
-    ebook.genre = genre;
-    ebook.coverImageUrl = coverImageUrl;
-    ebook.ebookFileUrl = ebookFileUrl;
+    if (req.files['ebookEditFileUrl']) {
+      // If there's an old ebook file, delete it
+      if (currentBook.ebookFileUrl) {
+        const oldEbookFilePath = path.join(
+          __dirname,
+          '..',
+          currentBook.ebookFileUrl
+        );
+        fs.unlink(oldEbookFilePath, err => {
+          if (err) console.error('Error deleting old ebook file:', err);
+        });
+      }
+      updateFields.ebookFileUrl = `/uploads/ebooks/${req.files['ebookEditFileUrl'][0].filename}`;
+    }
 
-    await ebook.save();
+    // Update the book record in the database
+    const updatedBook = await book.findByIdAndUpdate(id, updateFields, {
+      new: true,
+    });
 
-    res.status(200).json({ message: 'Ebook updated successfully', ebook });
+    if (!updatedBook) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Ebook not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Ebook updated successfully',
+      book: updatedBook,
+    });
   } catch (error) {
-    console.error('Error updating ebook:', error);
+    console.error(error);
     res
       .status(500)
-      .json({ message: 'Failed to update ebook', error: error.message });
+      .json({ success: false, message: 'Server Error', error: error.message });
   }
 };
 
-exports.uploadFields = uploadFields;
-exports.updateEbook = updateEbook;
+module.exports = {
+  getAllEbookAdmin,
+  getAllEbook,
+  upload,
+  updateEbook,
+};
