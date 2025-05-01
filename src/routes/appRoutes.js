@@ -28,6 +28,10 @@ router.route('/userpage').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'userPage.html'));
 });
 
+router.route('/clerkPage').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'clerkPage.html'));
+});
+
 router.route('/userpage/library').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'library.html'));
 });

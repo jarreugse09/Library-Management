@@ -1,0 +1,114 @@
+#encodeBookSection {
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  padding: 30px;
+  max-width: 800px;
+  margin: auto;
+  color: var(--text);
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); */
+  display: none;
+}
+
+#encodeBookSection form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+#encodeBookSection label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--text-light);
+}
+
+#encodeBookSection input[type="text"],
+#encodeBookSection input[type="number"],
+#encodeBookSection input[type="file"],
+#encodeBookSection textarea,
+#encodeBookSection select {
+  background-color: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 0.95rem;
+  transition: border 0.3s ease, background-color 0.3s ease;
+}
+
+#encodeBookSection input:focus,
+#encodeBookSection textarea:focus,
+#encodeBookSection select:focus {
+  border-color: var(--accent);
+  outline: none;
+  background-color: #303035;
+}
+
+#authors-container > div {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+#encodeBookSection button {
+  padding: 12px 20px;
+  background-color: var(--accent);
+  color: var(--text);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+#encodeBookSection button:hover {
+  background-color: #e03a4e;
+}
+
+#encodeBookSection button.btn-remove {
+  background-color: #444;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+
+#encodeBookSection button.btn-remove:hover {
+  background-color: #333;
+}
+
+#encodeBookSection input[type="radio"] {
+  margin-right: 5px;
+}
+
+#encodeBookSection input[type="radio"] + label {
+  margin-right: 20px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.flex-row {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.flex-item {
+  flex: 1;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  #encodeBookSection {
+    padding: 20px;
+  }
+
+  #authors-container > div {
+    flex-direction: column;
+  }
+
+  #encodeBookSection button {
+    width: 100%;
+  }
+}

@@ -6,12 +6,13 @@
     <link rel="stylesheet" href="/styles/clerkPage.css" />
     <link rel="stylesheet" href="/styles/header.css" />
     <link rel="stylesheet" href="/styles/clerkDonation.css" />
+    <link rel="stylesheet" href="/styles/clerkEncode.css" />
   </head>
   <body>
     <header class="header">
       <div class="logo">
-        <img src="../images/OIP.jpg" alt="Logo" />
-        <h1>Name of Lib</h1>
+        <img src="/images/OIP.jpg" alt="Logo" />
+        <h1>LibAG</h1>
       </div>
       <nav>
         <ul>
@@ -28,6 +29,7 @@
         </ul>
       </nav>
     </header>
+    
     <div class="container">
       <div class="sidebar">
         <h2>Library Clerk</h2>
@@ -49,6 +51,7 @@
               id="searchInput"
               placeholder="Search by Title or Author"
             />
+            <button id="searchBtn">Search</button>
 
             <select id="statusFilter">
               <option value="">All Statuses</option>
@@ -62,7 +65,6 @@
               <!-- Locations will be populated dynamically -->
             </select>
 
-            <button id="searchBtn">Search</button>
             <button id="resetFiltersBtn">Reset Filters</button>
 
             <!-- Reset Filters Button -->
@@ -294,18 +296,24 @@
               <label id="shelf" for="shelfLocation">Shelf Location:</label>
               <input type="text" id="shelfLocation" name="shelfLocation" />
 
-              <label for="condition">Condition:</label><br />
-              <select id="condition" name="condition">
-                <option value="new">New</option>
-                <option value="good">Good</option>
-                <option value="fair">Fair</option>
-                <option value="poor">Poor</option></select
-              ><br /><br />
-
-              <label for="status">Status:</label><br />
-              <select id="status" name="status">
-                <option value="good">Good</option></select
-              ><br /><br />
+              <div class="flex-row">
+                <div class="flex-item">
+                  <label for="condition">Condition:</label>
+                  <select id="condition" name="condition">
+                    <option value="new">New</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                    <option value="poor">Poor</option>
+                  </select>
+                </div>
+              
+                <div class="flex-item">
+                  <label for="status">Status:</label>
+                  <select id="status" name="status">
+                    <option value="good">Good</option>
+                  </select>
+                </div>
+              </div>              
             </div>
 
             <button type="submit">Donate</button>
