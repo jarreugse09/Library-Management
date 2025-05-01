@@ -9,7 +9,7 @@
 }
 
 /* Flex container for heading and buttons */
-.donation-header {
+.donation-header, .borrow-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,7 +17,7 @@
   }
   
   /* Make buttons stay together on the right */
-  .donation-buttons {
+  .donation-buttons, .borrow-buttons {
     display: flex;
     gap: 40px;
   }
@@ -49,20 +49,20 @@
   }
 
 /* Style for the logs table */
-#donationLogList table {
+#donationLogList table, #borrowLog table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
   }
   
   #donationLogList th,
-  #donationLogList td {
+  #donationLogList td, #borrowLog th, #borrowLog td {
     padding: 10px;
     text-align: left;
     border: 1px solid #ccc;
   }
   
-  #donationLogList th {
+  #donationLogList th, #borrowLog th {
     background-color: var(--card-bg);
     font-weight: bold;
   }

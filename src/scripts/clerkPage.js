@@ -343,16 +343,35 @@ async function fetchBorrowedBooks() {
     if (!borrowedBooks.length) {
       borrowLog.innerHTML = '<li>No borrowed books found.</li>';
     } else {
+      // Create a table for the borrowed books
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Borrower</th>
+            <th>Borrowed At</th>
+            <th>Will Return</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      `;
+
+      // Append the table to the borrow log container
+      borrowLog.appendChild(table);
+
+      // Populate the table with borrowed book data
+      const tbody = table.querySelector('tbody');
       borrowedBooks.forEach(book => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
-          book.borrowerName
-        } |
-          Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
-         Will Return: ${new Date(book.returnDate).toLocaleDateString()}
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${book.bookTitle}</td>
+          <td>${book.borrowerName}</td>
+          <td>${new Date(book.borrowDate).toLocaleDateString()}</td>
+          <td>${new Date(book.returnDate).toLocaleDateString()}</td>
         `;
-        borrowLog.appendChild(li);
+        tbody.appendChild(row);
       });
     }
 

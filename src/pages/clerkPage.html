@@ -335,9 +335,15 @@
 
         <!-- ... other HTML remains the same ... -->
         <div id="borrow" class="section" style="display: none">
-          <h1>Borrowed Books</h1>
-          <button id="pendingBtn">Pending</button>
-          <button id="logsBtn" onclick="fetchBorrowedBooks()">Logs</button>
+          <div class="borrow-header">
+            <h1>Borrowed Books</h1>
+            <div class="borrow-buttons">
+              <button id="pendingBorrowBtn">Pending</button>
+              <button id="borrowedLogsBtn" onclick="loadBorrowedLogs()">
+                Logs
+              </button>
+            </div>
+          </div>
 
           <div id="pending-borrow"><ul id="borrowList"></ul></div>
           <div id="borrowedLogs" style="display: none">
