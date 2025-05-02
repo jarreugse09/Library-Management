@@ -13,32 +13,6 @@ function removeAuthor(button) {
   div.remove();
 }
 
-function handleSubmit(event) {
-  event.preventDefault();
-  const formData = new FormData(event.target);
-  const author = formData.getAll('author[]');
-  const bookData = {
-    donorName: formData.get('donorName'),
-    title: formData.get('title'),
-    author: author,
-    publishedYear: formData.get('publishedYear'),
-    genre: formData.get('genre'),
-  };
-
-  console.log('Book submitted: ', bookData);
-  alert('Book submitted successfully!');
-  event.target.reset();
-
-  const authorsContainer = document.getElementById('authors-container');
-  authorsContainer.innerHTML = `
-    <label>Author(s)</label>
-    <div>
-      <input type="text" name="authors[]" required />
-      <button type="button" class="btn btn-remove" onclick="removeAuthor(this)">Remove</button>
-    </div>
-  `;
-}
-
 function toggleFields() {
   const bookType = document.querySelector(
     'input[name="bookType"]:checked'
@@ -96,34 +70,62 @@ function resetForm() {
 async function handleSubmit(event) {
   event.preventDefault();
 
-  const formData = new FormData(event.target);
-
+  const form = event.target;
+  const formData = new FormData(form);
   const bookType = formData.get('bookType');
 
-  // Log all values for debugging
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}: ${value}`);
+  // Manually collect all selected genres from checkboxes
+  const checkedGenres = Array.from(
+    document.querySelectorAll('input[name="genre[]"]:checked')
+  ).map(input => input.value);
+
+  // Add the "Other" genre if visible and filled
+  const otherInput = document.getElementById('other-genre-input');
+  const otherGenre = otherInput?.value.trim();
+  if (otherInput?.style.display !== 'none' && otherGenre) {
+    checkedGenres.push(otherGenre);
   }
 
+  // Clear previous genre[] entries to prevent duplicates
+  formData.delete('genre[]');
+
+  // Append combined genres to the formData
+  checkedGenres.forEach(genre => {
+    formData.append('genre[]', genre);
+  });
+
+  // Remove ebook file if the book is physical
+  if (bookType === 'physical') {
+    formData.delete('ebookFile');
+    formData.delete('coverImage'); // Also remove cover image for physical books
+  }
+
+  // Debug log of the form submission
+  console.log('Form Data:', formData);
+
   try {
-    const response = await fetch(
-      'http://127.0.0.1:7001/api/donations/donate/',
-      {
-        method: 'POST',
-        body: formData, // ✅ Send FormData directly
-      }
-    );
-    // Handle the response
+    // Debug logs to ensure proper data collection
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
+    // Submitting the form using fetch
+    const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
+      method: 'POST',
+      body: formData, // The form data should be passed here
+    });
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Error submitting donation');
     }
 
     const data = await response.json();
+    console.log(data.data);
     alert('Donation submitted successfully!');
-    event.target.reset(); // Reset the form
+    form.reset();
 
-    // Optionally reset authors container
+    // Reset authors UI
     const authorsContainer = document.getElementById('authors-container');
     authorsContainer.innerHTML = `
       <label>Author(s)</label>
@@ -132,8 +134,50 @@ async function handleSubmit(event) {
         <button type="button" class="btn btn-remove" onclick="removeAuthor(this)">Remove</button>
       </div>
     `;
+
+    // Reset "Other genre" input
+    if (otherInput) {
+      otherInput.style.display = 'none';
+      otherInput.value = '';
+    }
   } catch (error) {
     console.error('Error submitting donation:', error);
     alert('An error occurred: ' + error.message);
   }
 }
+
+async function loadGenres() {
+  const res = await fetch('/api/books/genre/'); // Replace with your actual route
+  const genres = await res.json(); // Assume it returns an array like ['Fiction', 'Mystery', ...]
+
+  const container = document.getElementById('genre-checkboxes');
+  container.innerHTML = ''; // Clear existing content
+
+  genres.forEach(genre => {
+    const label = document.createElement('label');
+    label.innerHTML = `
+    <input type="checkbox" name="genre[]" value="${
+      genre.name
+    }"> ${genre.name.toUpperCase()}
+  `;
+    container.appendChild(label);
+  });
+
+  // Add the "Other" option
+  const otherLabel = document.createElement('label');
+  otherLabel.innerHTML = `
+  <input type="checkbox" id="genre-other"> Other
+`;
+  container.appendChild(otherLabel);
+
+  // Add toggle logic for "Other"
+  const otherCheckbox = otherLabel.querySelector('#genre-other');
+  const otherInput = document.getElementById('other-genre-input');
+
+  otherCheckbox.addEventListener('change', () => {
+    otherInput.style.display = otherCheckbox.checked ? 'block' : 'none';
+    if (!otherCheckbox.checked) otherInput.value = '';
+  });
+}
+
+loadGenres();

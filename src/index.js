@@ -15,6 +15,7 @@ const borrowRoutes = require('./routes/borrowRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const ebookRoutes = require('./routes/ebookRoutes');
 const physicalBookRoutes = require('./routes/physicalBookRoutes');
+const genreRoutes = require('./routes/genreRoutes');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/books/physical', physicalBookRoutes);
 app.use('/api/books/ebook', ebookRoutes);
+app.use('/api/books/genre', genreRoutes);
 app.use('/api/borrows', borrowRoutes);
 
 const PORT = process.env.PORT || 7002;

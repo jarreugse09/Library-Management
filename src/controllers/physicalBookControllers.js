@@ -1,4 +1,5 @@
 const book = require('../models/bookModel');
+const genre = require('../models/genreModel');
 
 // Get all books
 exports.getAllBooks = async (req, res) => {

@@ -22,7 +22,7 @@ const BookSchema = new mongoose.Schema({
     enum: ['physical', 'ebook', 'copy'],
   },
   genre: {
-    type: String,
+    type: [String],
   },
   quantity: {
     type: Number,

@@ -2,6 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const book = require('../models/bookModel');
 const Log = require('../models/logModel');
+const Genre = require('../models/genreModel');
 
 // Multer setup
 const upload = multer({
@@ -44,7 +45,6 @@ const upload = multer({
   },
 });
 
-// Controller
 const createDonation = async (req, res) => {
   try {
     const {
@@ -59,32 +59,46 @@ const createDonation = async (req, res) => {
       quantity,
       role,
     } = req.body;
-
-    // Helper function to check if any required field is missing
-    const isFieldEmpty = field =>
-      field === undefined || field === null || field === '';
-
-    // Check for required fields
-    if (isFieldEmpty(donorName)) {
+    console.log(req.body);
+    // Validate required fields
+    if (!donorName) {
       return res.status(400).json({ error: 'Donor name is required' });
     }
-    if (isFieldEmpty(title)) {
+
+    if (!title || title.trim() === '') {
       return res.status(400).json({ error: 'Title is required' });
     }
-    if (isFieldEmpty(authors)) {
+
+    if (!authors || (Array.isArray(authors) && authors.length === 0)) {
       return res.status(400).json({ error: 'Authors are required' });
     }
-    if (isFieldEmpty(description)) {
+
+    if (!description || description.trim() === '') {
       return res
         .status(400)
         .json({ error: 'Description is required for books' });
     }
-    if (isFieldEmpty(genre)) {
+
+    if (!genre || (Array.isArray(genre) && genre.length === 0)) {
       return res.status(400).json({ error: 'Genre is required' });
     }
 
-    let ebookFileUrl = undefined;
-    let coverImageUrl = undefined;
+    // Handle genre validation and creation
+    const genres = await Genre.find();
+    const allowedGenres = genres.map(g => g.name.toLowerCase());
+
+    const invalidGenres = genre.filter(
+      g => !allowedGenres.includes(g.toLowerCase())
+    );
+
+    if (invalidGenres.length > 0) {
+      const newGenres = invalidGenres.map(g => ({ name: g.toLowerCase() }));
+      await Genre.insertMany(newGenres);
+    }
+
+    // Handle file upload paths
+    let ebookFileUrl;
+    let coverImageUrl;
 
     if (bookType === 'ebook') {
       if (!req.files?.ebookFile?.[0] || !req.files?.coverImage?.[0]) {
@@ -98,50 +112,43 @@ const createDonation = async (req, res) => {
     }
 
     if (bookType === 'physical') {
-      if (!quantity || quantity <= 0) {
+      if (!quantity || Number(quantity) <= 0) {
         return res
           .status(400)
           .json({ error: 'Quantity must be greater than 0' });
       }
-      if (!shelfLocation) {
-        return res
-          .status(400)
-          .json({ error: 'Shelf location is required for physical books' });
-      }
     }
 
-    const isApprove = donorName === 'ENCODED BY CLERK' ? true : false;
+    const isApprove = donorName === 'ENCODED BY CLERK';
 
-    const donation = new book({
-      donorName: donorName,
-      title: title,
-      authors: authors,
-      description: description,
-      publishedYear: publishedYear,
-      genre: genre,
-      bookType: bookType,
-      isApprove: isApprove,
+    const donationData = {
+      donorName,
+      title,
+      authors,
+      description,
+      publishedYear,
+      genre: genre.map(g => g.toLowerCase()),
+      bookType,
+      isApprove,
       maxQuantity:
         bookType === 'physical' || bookType === 'copy' ? quantity : undefined,
       quantity:
         bookType === 'physical' || bookType === 'copy' ? quantity : undefined,
-      shelfLocation:
-        bookType === 'physical' || bookType === 'copy'
-          ? shelfLocation
-          : undefined,
-      ebookFileUrl: ebookFileUrl,
-      coverImageUrl: coverImageUrl,
-    });
+      ebookFileUrl,
+      coverImageUrl,
+    };
 
-    // Save the donation first
-    await donation.save();
+    if (
+      (bookType === 'physical' || bookType === 'copy') &&
+      shelfLocation &&
+      shelfLocation.trim() !== ''
+    ) {
+      donationData.shelfLocation = shelfLocation;
+    }
 
-    // Respond immediately after saving donation
-    res
-      .status(201)
-      .json({ message: 'Donation created successfully', donation });
+    const donation = new book(donationData);
+    await donation.save(); // Don't forget to actually save it
 
-    // Then handle logs **after response is sent**
     if (isApprove) {
       const actionLog = new Log({
         type: 'ENCODED BY CLERK',
@@ -150,11 +157,15 @@ const createDonation = async (req, res) => {
         role: role || 'clerk',
       });
 
-      // Saving action log in background (no await)
-      actionLog.save().catch(err => {
+      await actionLog.save().catch(err => {
         console.error('Failed to save action log:', err.message);
       });
     }
+
+    return res.status(201).json({
+      message: 'Donation created successfully',
+      data: donation,
+    });
   } catch (error) {
     console.error('Donation creation failed:', error.message);
     return res.status(500).json({ error: error.message });

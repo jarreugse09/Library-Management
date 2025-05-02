@@ -32,25 +32,29 @@
     </div>
     <div class="container">
       <form
-        entype="multipart/form-data"
+        enctype="multipart/form-data"
         class="donate-form"
         id="donateForm"
         onsubmit="handleSubmit(event)"
       >
-        <h2>Donate a Book</h2>
+        <label for="donorName">Donor Name:</label>
+        <input
+          id="donorName"
+          name="donorName"
+          placeholder="e.g. Dante Gulapa"
+          required
+        />
 
-        <label>Donor Name:</label
-        ><input name="donorName" placeholder="e.g. Dante Gulapa" required />
+        <label for="title">Book Title:</label>
+        <input id="title" name="title" type="text" required />
 
-        <label>Book Title:</label><input name="title" type="text" required />
-
-        <label>Description:</label
-        ><input name="description" type="text" required />
+        <label for="description">Description:</label>
+        <input id="description" name="description" type="text" required />
 
         <div class="authors-container" id="authors-container">
-          <label>Author(s)</label>
+          <label for="authors-1">Author(s)</label>
           <div>
-            <input type="text" name="authors[]" required />
+            <input id="authors-1" type="text" name="authors[]" required />
             <button
               type="button"
               class="btn btn-remove"
@@ -66,46 +70,44 @@
 
         <label for="year">Year Published: </label>
         <input
-          type="number"
           id="year"
+          type="number"
           min="1800"
           max="2025"
           name="publishedYear"
         />
 
         <label for="genre">Genre</label>
-        <select id="genre" name="genre" required>
-          <option value="" disabled selected>Select a genre</option>
-          <option value="Fiction">Fiction</option>
-          <option value="Non-fiction">Non-fiction</option>
-          <option value="Science">Science</option>
-          <option value="Biography">Biography</option>
-          <option value="Mystery">Mystery</option>
-          <option value="Fantasy">Fantasy</option>
-          <option value="Romance">Romance</option>
-          <option value="History">History</option>
-          <option value="Self-Help">Self-Help</option>
-          <option value="Children">Children</option>
-          <option value="Other">Other</option>
-        </select>
+        <div id="genre-checkboxes">
+          <!-- Checkboxes will be injected here -->
+        </div>
+
+        <input
+          type="text"
+          id="other-genre-input"
+          name="genre[]"
+          placeholder="Enter custom genre"
+          style="display: none; margin-top: 5px"
+        />
 
         <!-- Book Type Selection -->
-
         <label for="bookType">Book Type</label>
         <div class="book-type">
-          <label>Physical Book</label>
+          <label for="physical">Physical Book</label>
           <input
             type="radio"
             name="bookType"
             value="physical"
+            id="physical"
             onchange="toggleFields()"
             checked
           />
-          <label> E-Book</label>
+          <label for="ebook"> E-Book</label>
           <input
             type="radio"
             name="bookType"
             value="ebook"
+            id="ebook"
             onchange="toggleFields()"
           />
         </div>
