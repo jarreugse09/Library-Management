@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const book = require('./bookModel');
 const borrowSchema = new mongoose.Schema({
   borrowedBookId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: String,
     ref: 'book',
   },
   bookTitle: {

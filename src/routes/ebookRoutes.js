@@ -14,4 +14,7 @@ router.patch(
   ebookController.updateEbook
 );
 
+router.delete('/:id/delete', ebookController.softDelete);
+router.delete('/:id/admin', ebookController.deleteBook);
+
 module.exports = router;

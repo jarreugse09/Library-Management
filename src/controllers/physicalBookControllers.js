@@ -84,7 +84,6 @@ exports.getAllBooksAdmin = async (req, res) => {
     // Build search filters
     let query = {
       bookType: { $in: ['physical', 'copy'] }, // Can change this as needed
-      status: { $in: ['good', 'borrowed', 'deleted', 'lost'] },
       isApprove: true,
       isDone: true,
     };

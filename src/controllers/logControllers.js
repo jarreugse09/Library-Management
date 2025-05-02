@@ -9,7 +9,7 @@ const getAllBorrowedLogs = async (req, res) => {
       .populate({
         path: 'refId',
         model: Borrow, // Must match the model name exactly
-        select: 'bookTitle borrowerName borrowDate returnDate',
+        select: 'bookTitle borrowerName borrowDate returnDate role',
       })
       .sort({ timestamp: -1 });
 
@@ -18,6 +18,7 @@ const getAllBorrowedLogs = async (req, res) => {
       borrowerName: log.refId?.borrowerName || 'N/A',
       borrowDate: log.refId?.borrowDate,
       returnDate: log.refId?.returnDate,
+      role: log.role,
     }));
 
     res.status(200).json(formatted);

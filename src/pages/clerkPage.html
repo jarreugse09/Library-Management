@@ -29,7 +29,7 @@
         </ul>
       </nav>
     </header>
-    
+
     <div class="container">
       <div class="sidebar">
         <h2>Library Clerk</h2>
@@ -306,14 +306,14 @@
                     <option value="poor">Poor</option>
                   </select>
                 </div>
-              
+
                 <div class="flex-item">
                   <label for="status">Status:</label>
                   <select id="status" name="status">
                     <option value="good">Good</option>
                   </select>
                 </div>
-              </div>              
+              </div>
             </div>
 
             <button type="submit">Donate</button>
@@ -321,18 +321,16 @@
           </form>
         </div>
 
-        <div id="donation" class="section">
+        <div id="donation" style="display: none" class="section">
           <div class="donation-header">
             <h1>Book Donations</h1>
             <div class="donation-buttons">
               <button id="donationPendingBtn">Pending</button>
-              <button id="donationLogsBtn" onclick="loadDonationLogs()">
-                Logs
-              </button>
+              <button id="donationLogsBtn">Logs</button>
             </div>
           </div>
 
-          <div id="donationPending" style="display: block">
+          <div id="donationPending" style="display: none">
             <ul id="donationList"></ul>
           </div>
 
@@ -347,9 +345,7 @@
             <h1>Borrowed Books</h1>
             <div class="borrow-buttons">
               <button id="pendingBorrowBtn">Pending</button>
-              <button id="borrowedLogsBtn" onclick="loadBorrowedLogs()">
-                Logs
-              </button>
+              <button id="borrowedLogsBtn">Logs</button>
             </div>
           </div>
 

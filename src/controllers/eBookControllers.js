@@ -130,7 +130,6 @@ const getAllEbookAdmin = async (req, res) => {
     // Build search filters
     let query = {
       bookType: 'ebook', // Can change this as needed
-      status: { $ne: 'deleted' },
       isApprove: true,
       isDone: true,
     };
@@ -258,9 +257,72 @@ const updateEbook = async (req, res) => {
   }
 };
 
+const softDelete = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Fetch the current book details
+    const currentBook = await book.findById({ _id: id });
+    if (!currentBook || currentBook.status === 'deleted') {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Ebook not found' });
+    }
+
+    const updatedBook = await book.findByIdAndUpdate(
+      { _id: id },
+      { status: 'deleted' },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Ebook deleted successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
+
+const deleteBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Attempt to delete the book directly using findByIdAndDelete
+    const deletedBook = await book.findByIdAndDelete(id);
+
+    // Check if the book was not found
+    if (!deletedBook) {
+      return res.status(404).json({
+        success: false,
+        message: 'Ebook not found',
+      });
+    }
+
+    // Return success response after successful deletion
+    res.status(200).json({
+      success: true,
+      message: 'Ebook deleted successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllEbookAdmin,
   getAllEbook,
   upload,
   updateEbook,
+  softDelete,
+  deleteBook,
 };

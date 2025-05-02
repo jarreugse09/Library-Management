@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Section references
   const sections = {
     Inventory: document.getElementById('Inventory'),
     donation: document.getElementById('donation'),
@@ -6,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     borrow: document.getElementById('borrow'),
   };
 
+  // Link references
   const links = {
     inventory: document.getElementById('inventoryLink'),
     ebook: document.getElementById('eBookLink'),
@@ -13,48 +15,57 @@ document.addEventListener('DOMContentLoaded', () => {
     borrowed: document.getElementById('borrowedLink'),
   };
 
-  const borrowedLogs = document.getElementById('borrowedLogs');
+  // eBook related elements for searching, pagination, and modals
+  const ebookInventoryDiv = document.getElementById('ebookInventory');
+  const ebookUpdateModal = document.getElementById('ebookUpdateModal');
 
-  const donationPendingBtn = document.getElementById('donationPendingBtn');
-  const donationLogsBtn = document.getElementById('donationLogsBtn');
-  const donationPending = document.getElementById('donationPending');
-  const donationLogs = document.getElementById('donationLogs');
+  // Handle link clicks to show corresponding sections
+  links.inventory.addEventListener('click', () => {
+    showSection('Inventory');
+    fetchBooks(); // Fetch books when the Inventory section is shown
+  });
 
-  const donationList = document.getElementById('donationList');
-  const borrowList = document.getElementById('borrowList');
-
-  // Helper to show only one main section
-  function showSection(activeSection) {
-    Object.keys(sections).forEach(key => {
-      sections[key].style.display = key === activeSection ? 'block' : 'none';
-    });
-  }
-
-  // Sidebar navigation
-  links.inventory.addEventListener('click', () => showSection('Inventory'));
   links.donation.addEventListener('click', () => {
     showSection('donation');
-    showDonationPending(); // Show donation pending by default
+    showDonationPending(); // Show pending donations when the Donation section is shown
   });
 
-  links.borrowed.addEventListener('click', () => {
-    showSection('borrow');
-  });
-
-  links.ebook.addEventListener('click', () => {
-    showSection('ebookInventory');
-  });
-
-  // Borrow toggle buttons
-
-  // Donation toggle buttons
   donationPendingBtn.addEventListener('click', showDonationPending);
   donationLogsBtn.addEventListener('click', () => {
     donationPending.style.display = 'none';
     donationLogs.style.display = 'block';
-    // fetchDonationLogs(); // optional future feature
+    loadDonationLogs();
   });
 
+  links.borrowed.addEventListener('click', () => {
+    fetchBorrowedBooks();
+    showSection('borrow');
+  });
+
+  links.ebook.addEventListener('click', () => {
+    fetchEbooks();
+    showSection('ebook');
+  });
+
+  // Close the ebook update modal
+  const ebookCloseModal = document.getElementById('ebookCloseModal');
+
+  ebookCloseModal.addEventListener('click', () => {
+    ebookUpdateModal.style.display = 'none'; // Hide the modal when close is clicked
+  });
+
+  // Function to show the correct section
+  function showSection(sectionName) {
+    Object.keys(sections).forEach(section => {
+      if (section === sectionName) {
+        sections[section].style.display = 'block'; // Show selected section
+      } else {
+        sections[section].style.display = 'none'; // Hide all other sections
+      }
+    });
+  }
+
+  // Function to show donation pending list
   function showDonationPending() {
     donationPending.style.display = 'block';
     donationLogs.style.display = 'none';
@@ -148,72 +159,32 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(`Error trying to ${action} donation:`, err);
     }
   }
-});
 
-async function fetchBorrowedBooks() {
-  try {
-    const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
+  async function loadDonationLogs() {
+    try {
+      const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+      if (!response.ok) throw new Error('Failed to fetch logs');
 
-    const borrowedBooks = await response.json();
-    const borrowLog = document.getElementById('borrowLog');
+      const logs = await response.json();
+      const logList = document.getElementById('donationLogList');
+      logList.innerHTML = ''; // Clear previous logs
+      const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
+      const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
 
-    // Clear previous logs
-    borrowLog.innerHTML = '';
+      if (donationLogs.length === 0) {
+        logList.innerHTML = '<li>No donation logs found.</li>';
+      } else {
+        donationLogs.forEach(log => {
+          const listItem = document.createElement('li');
+          const date = new Date(log.timestamp).toLocaleString();
 
-    // Check if there's data
-    if (!borrowedBooks.length) {
-      borrowLog.innerHTML = '<li>No borrowed books found.</li>';
-    } else {
-      borrowedBooks.forEach(book => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
-          book.borrowerName
-        } |
-          Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
-         Will Return: ${new Date(book.returnDate).toLocaleDateString()}
-        `;
-        borrowLog.appendChild(li);
-      });
-    }
-
-    // Reveal the borrowed books section
-    document.getElementById('borrow').style.display = 'block';
-    document.getElementById('borrowedLogs').style.display = 'block';
-  } catch (error) {
-    console.error('Error fetching borrowed books:', error);
-    alert('Failed to fetch borrowed books. Please try again.');
-  }
-}
-
-async function loadDonationLogs() {
-  try {
-    const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
-    if (!response.ok) throw new Error('Failed to fetch logs');
-
-    const logs = await response.json();
-    const logList = document.getElementById('donationLogList');
-    logList.innerHTML = ''; // Clear previous logs
-    const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
-    const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
-
-    if (donationLogs.length === 0) {
-      logList.innerHTML = '<li>No donation logs found.</li>';
-    } else {
-      donationLogs.forEach(log => {
-        const listItem = document.createElement('li');
-        const date = new Date(log.timestamp).toLocaleString();
-
-        listItem.textContent = `DATE: [${date}] TYPE: ${
-          log.type
-        } USER: ${log.role.toUpperCase()} ACTION: ${
-          log.action === 'approve and encode'
-            ? 'ENCODE'
-            : log.action.toUpperCase()
-        }
+          listItem.textContent = `DATE: [${date}] TYPE: ${
+            log.type
+          } USER: ${log.role.toUpperCase()} ACTION: ${
+            log.action === 'approve and encode'
+              ? 'ENCODE'
+              : log.action.toUpperCase()
+          }
         
         ${
           log.action === 'approve and encode'
@@ -221,18 +192,57 @@ async function loadDonationLogs() {
             : 'DONATED BOOK '
         }ID: ${log.refId}`;
 
-        logList.appendChild(listItem);
-      });
+          logList.appendChild(listItem);
+        });
+      }
+
+      document.getElementById('donationLogs').style.display = 'block';
+    } catch (error) {
+      console.error('Error fetching donation logs:', error);
     }
-
-    document.getElementById('donationLogs').style.display = 'block';
-  } catch (error) {
-    console.error('Error fetching donation logs:', error);
   }
-}
+  async function fetchBorrowedBooks() {
+    try {
+      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-// INVENTORY
-document.addEventListener('DOMContentLoaded', () => {
+      const borrowedBooks = await response.json();
+      const borrowLog = document.getElementById('borrowLog');
+
+      // Clear previous logs
+      borrowLog.innerHTML = '';
+
+      // Check if there's data
+      if (!borrowedBooks.length) {
+        borrowLog.innerHTML = '<li>No borrowed books found.</li>';
+      } else {
+        borrowedBooks.forEach(book => {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
+            book.borrowerName
+          } |
+            Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
+           Will Return: ${new Date(
+             book.returnDate
+           ).toLocaleDateString()} | User: ${book.role}
+          `;
+          borrowLog.appendChild(li);
+        });
+      }
+
+      // Reveal the borrowed books section
+      document.getElementById('borrow').style.display = 'block';
+      document.getElementById('borrowedLogs').style.display = 'block';
+    } catch (error) {
+      console.error('Error fetching borrowed books:', error);
+      alert('Failed to fetch borrowed books. Please try again.');
+    }
+  }
+
+  // INVENTORY + book edit/delete
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
   const inventoryList = document.getElementById('inventoryList');
@@ -300,6 +310,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePaginationControls();
     hideLoader(); // Hide loader after fetching
   }
+
+  // Initial load
+  showSection('Inventory');
+  fetchBooks();
 
   function populateLocationFilter(books) {
     const locationFilter = document.getElementById('locationFilter');
@@ -595,40 +609,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Initial load
-  fetchBooks();
-});
-
-//EBOOK INVENTORY
-document.addEventListener('DOMContentLoaded', () => {
-  const ebookSearchInput = document.getElementById('ebookSearchInput');
-  const ebookSearchBtn = document.getElementById('ebookSearchBtn');
-  const ebookResetBtn = document.getElementById('ebookResetBtn');
-  const ebookList = document.getElementById('ebookList');
-  const ebookPrevPageBtn = document.getElementById('ebookPrevPage');
-  const ebookNextPageBtn = document.getElementById('ebookNextPage');
-  const ebookPageInfo = document.getElementById('ebookPageInfo');
-
-  const ebookUpdateModal = document.getElementById('ebookUpdateModal');
-  const ebookUpdateForm = document.getElementById('ebookUpdateForm');
-  const ebookCloseModal = document.getElementById('ebookCloseModal');
-
-  // Add reference to ebookInventory div
-  const ebookInventoryDiv = document.getElementById('ebookInventory');
-  ebookInventoryDiv.style.display = 'none'; // Start with the div hidden
-
-  let currentPage = 1;
-  let totalPages = 1;
-
-  // Initially hide the modal
-  ebookUpdateModal.style.display = 'none';
-  ebookUpdateForm.style.display = 'none';
+  // EBOOK INVENTORY
 
   // Fetch ebook data from API
   async function fetchEbooks(page = 1) {
     try {
       const search = ebookSearchInput.value;
-      const url = `/api/books/ebook?search=${search}&page=${page}&limit=10`; // Modify limit as needed
+      const url = `/api/books/ebook/admin?search=${search}&page=${page}&limit=10`; // Modify limit as needed
       const response = await fetch(url);
       const data = await response.json();
 
@@ -647,6 +634,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ebookList.innerHTML = '';
     ebooks.forEach(ebook => {
       const tr = document.createElement('tr');
+      tr.setAttribute('data-id', ebook._id); // Set data-id on the tr for easy access
+
       tr.innerHTML = `
         <td><img src="${
           ebook.coverImageUrl
@@ -661,59 +650,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }" target="_blank" class="ebook-link">View PDF</a></td>
         <td>
           <button class="edit-btn" data-id="${ebook._id}">Edit</button>
-          <button id="ebookSoftBtn" data-id="${ebook._id}" >Delete Tag</button>
-          <button  id="ebookDeleteBtn" data-id="${ebook._id}">Delete</button>
+          <button class="ebookSoftDeleteBtn" data-id="${
+            ebook._id
+          }">Delete Tag</button>
+          <button class="ebookDeleteBtn" data-id="${ebook._id}">Delete</button>
         </td>
       `;
       ebookList.appendChild(tr);
-    });
-
-    //SOFT DELETE BUTTON
-    document.addEventListener('click', function (event) {
-      if (event.target.getElementById('ebookSoftBtn')) {
-        const row = event.target.closest('tr');
-        const bookId = row.getAttribute('data-id');
-
-        if (confirm('Are you sure you want to delete this book?')) {
-          deleteBook(bookId, row);
-        }
-      }
-    });
-
-    async function deleteBook(bookId, row) {
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:7001/api/books/ebook/${bookId}/delete`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          row.remove(); // Remove row from the table if the request is successful
-          alert('Book deleted successfully.');
-        } else {
-          alert('Failed to delete the book.');
-        }
-      } catch (error) {
-        console.error('Error deleting book:', error);
-        alert('An error occurred while deleting the book.');
-      }
-    }
-
-    //PERMANENT DELETE
-    document.addEventListener('click', function (event) {
-      if (event.target.getElementById('ebookDeleteBtn')) {
-        const row = event.target.closest('tr');
-        const bookId = row.getAttribute('data-id');
-
-        if (confirm('Are you sure you want to delete this book?')) {
-          permanentDeleteBook(bookId, row);
-        }
-      }
     });
 
     // Rebind edit button event listeners
@@ -729,6 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    // Rebind ebook links
     const ebookLinks = document.querySelectorAll('.ebook-link');
     ebookLinks.forEach(link => {
       link.addEventListener('click', e => {
@@ -737,6 +681,83 @@ document.addEventListener('DOMContentLoaded', () => {
         displayPdf(pdfUrl); // Call the function to display the PDF
       });
     });
+
+    // Soft delete (Delete Tag) button event listener
+    const ebookSoftDeleteButtons = document.querySelectorAll(
+      '.ebookSoftDeleteBtn'
+    );
+    ebookSoftDeleteButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const row = e.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+        console.log(bookId);
+
+        if (confirm('Are you sure you want to delete this book tag?')) {
+          deleteEBook(bookId, row);
+        }
+      });
+    });
+
+    // Permanent delete button event listener
+    const ebookDeleteButtons = document.querySelectorAll('.ebookDeleteBtn');
+    ebookDeleteButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const row = e.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+        console.log(bookId);
+
+        if (confirm('Are you sure you want to permanently delete this book?')) {
+          permanentDeleteEBook(bookId, row);
+        }
+      });
+    });
+  }
+
+  // Soft delete function
+  async function deleteEBook(bookId, row) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:7001/api/books/ebook/${bookId}/delete`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        row.remove(); // Remove row from the table if the request is successful
+        alert('Book tag deleted successfully.');
+      } else {
+        alert('Failed to delete the book tag.');
+      }
+    } catch (error) {
+      console.error('Error deleting book tag:', error);
+      alert('An error occurred while deleting the book tag.');
+    }
+  }
+
+  // Permanent delete function
+  async function permanentDeleteEBook(bookId, row) {
+    try {
+      const response = await fetch(`/api/books/ebook/${bookId}/admin`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        row.remove(); // Remove row from the table if the request is successful
+        alert('Book permanently deleted successfully.');
+      } else {
+        alert('Failed to permanently delete the book.');
+      }
+    } catch (error) {
+      console.error('Error permanently deleting book:', error);
+      alert('An error occurred while permanently deleting the book.');
+    }
   }
 
   // Function to display the PDF in the iframe
@@ -753,15 +774,6 @@ document.addEventListener('DOMContentLoaded', () => {
       pdfViewer.style.display = 'none'; // Hide the PDF viewer
       iframe.src = ''; // Reset the iframe source to stop the PDF from loading
     });
-  }
-
-  // Toggle ebookInventory div visibility
-  function toggleEbookInventory(inventoryDiv) {
-    if (inventoryDiv.style.display === 'none') {
-      inventoryDiv.style.display = 'block'; // Show the div
-    } else {
-      inventoryDiv.style.display = 'none'; // Hide the div
-    }
   }
 
   // Handle search button click
@@ -842,18 +854,4 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Failed to update ebook:', error);
     }
   });
-
-  // Close modal
-  ebookCloseModal.addEventListener('click', () => {
-    ebookUpdateModal.style.display = 'none'; // Hide the modal when close is clicked
-  });
-
-  // Handle eBookLink button click to show ebookInventory div
-  const eBookLinkBtn = document.getElementById('eBookLink');
-  eBookLinkBtn.addEventListener('click', () => {
-    toggleEbookInventory(ebookInventoryDiv); // Show the ebook inventory div
-  });
-
-  // Fetch initial ebooks on page load
-  fetchEbooks();
 });

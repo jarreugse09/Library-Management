@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     Inventory: document.getElementById('Inventory'),
     donation: document.getElementById('donation'),
     borrow: document.getElementById('borrow'),
+    encodeBookSection: document.getElementById('encodeBookSection'), // Make sure this exists
   };
 
   const links = {
@@ -24,55 +25,126 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const donationList = document.getElementById('donationList');
   const borrowList = document.getElementById('borrowList');
+  const borrowLogsBtn = document.getElementById('borrowedLogsBtn');
 
-  // Helper to show only one main section
   function showSection(activeSection) {
     Object.keys(sections).forEach(key => {
-      sections[key].style.display = key === activeSection ? 'block' : 'none';
+      if (sections[key]) {
+        sections[key].style.display = key === activeSection ? 'block' : 'none';
+      }
     });
   }
 
-  // Sidebar navigation
-  links.inventory.addEventListener('click', () => showSection('Inventory'));
-  links.encodeNew.addEventListener('click', () =>
-    showSection('encodeBookSection')
-  );
-  links.donation.addEventListener('click', () => {
-    showSection('donation');
-    showDonationPending(); // Show donation pending by default
-  });
-
-  links.borrowed.addEventListener('click', () => {
-    showSection('borrow');
-    showBorrowPending(); // Show borrow pending by default
-  });
-
-  // Borrow toggle buttons
-  pendingBtn.addEventListener('click', showBorrowPending);
-  logsBtn.addEventListener('click', () => {
-    pendingBorrow.style.display = 'none';
-    borrowedLogs.style.display = 'block';
-    // fetchBorrowLogs(); // optional future feature
-  });
-
-  // Donation toggle buttons
-  donationPendingBtn.addEventListener('click', showDonationPending);
-  donationLogsBtn.addEventListener('click', () => {
-    donationPending.style.display = 'none';
-    donationLogs.style.display = 'block';
-    // fetchDonationLogs(); // optional future feature
-  });
-
   function showDonationPending() {
-    donationPending.style.display = 'block';
-    donationLogs.style.display = 'none';
-    fetchPendingDonations();
+    if (donationPending && donationLogs) {
+      donationPending.style.display = 'block';
+      donationLogs.style.display = 'none';
+      fetchPendingDonations();
+    }
   }
 
   function showBorrowPending() {
-    pendingBorrow.style.display = 'block';
-    borrowedLogs.style.display = 'none';
-    fetchPendingBorrows();
+    if (pendingBorrow && borrowedLogs) {
+      pendingBorrow.style.display = 'block';
+      borrowedLogs.style.display = 'none';
+      fetchPendingBorrows();
+    }
+  }
+
+  // Event bindings with null checks
+  donationPendingBtn?.addEventListener('click', showDonationPending);
+  donationLogsBtn?.addEventListener('click', () => {
+    if (donationPending && donationLogs) {
+      donationPending.style.display = 'none';
+      donationLogs.style.display = 'block';
+      loadDonationLogs();
+    }
+  });
+
+  pendingBtn?.addEventListener('click', showBorrowPending);
+  borrowLogsBtn?.addEventListener('click', () => {
+    pendingBorrow.style.display = 'none';
+    borrowedLogs.style.display = 'block';
+    fetchBorrowedBooks();
+  });
+
+  pendingBtn?.addEventListener('click', showBorrowPending);
+  logsBtn?.addEventListener('click', () => {
+    pendingBorrow.style.display = 'none';
+    borrowedLogs.style.display = 'block';
+    fetchBorrowedBooks();
+  });
+
+  links.inventory?.addEventListener('click', () => showSection('Inventory'));
+  links.encodeNew?.addEventListener('click', () =>
+    showSection('encodeBookSection')
+  );
+  links.donation?.addEventListener('click', () => {
+    showSection('donation');
+    showDonationPending();
+  });
+  links.borrowed?.addEventListener('click', () => {
+    showSection('borrow');
+    showBorrowPending();
+  });
+
+  async function loadDonationLogs() {
+    try {
+      const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+      if (!response.ok) throw new Error('Failed to fetch logs');
+
+      const logs = await response.json();
+      const logList = document.getElementById('donationLogList');
+      logList.innerHTML = ''; // Clear previous logs
+      const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
+      const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
+
+      if (donationLogs.length === 0) {
+        logList.innerHTML = '<li>No donation logs found.</li>';
+      } else {
+        // Create a table for the donation logs
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Donated Book ID</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        `;
+
+        // Append the table to the log list container
+        logList.appendChild(table);
+
+        // Populate the table with log data
+        const tbody = table.querySelector('tbody');
+        donationLogs.forEach(log => {
+          const date = new Date(log.timestamp).toLocaleString();
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${date}</td>
+            <td>${log.type}</td>
+            <td>${log.role.toUpperCase()}</td>
+            <td>${
+              log.action === 'approve and encode'
+                ? 'ENCODE'
+                : log.action.toUpperCase()
+            }</td>
+            <td>${log.refId}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      document.getElementById('donationLogs').style.display = 'block';
+    } catch (error) {
+      console.error('Error fetching donation logs:', error);
+    }
   }
 
   async function fetchPendingDonations() {
@@ -263,126 +335,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  async function fetchBorrowedBooks() {
+    try {
+      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const borrowedBooks = await response.json();
+      const borrowLog = document.getElementById('borrowLog');
+
+      // Clear previous logs
+      borrowLog.innerHTML = '';
+
+      // Check if there's data
+      if (!borrowedBooks.length) {
+        borrowLog.innerHTML = '<li>No borrowed books found.</li>';
+      } else {
+        // Create a table for the borrowed books
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Borrower</th>
+              <th>Borrowed At</th>
+              <th>Will Return</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        `;
+
+        // Append the table to the borrow log container
+        borrowLog.appendChild(table);
+
+        // Populate the table with borrowed book data
+        const tbody = table.querySelector('tbody');
+        borrowedBooks.forEach(book => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${book.bookTitle}</td>
+            <td>${book.borrowerName}</td>
+            <td>${new Date(book.borrowDate).toLocaleDateString()}</td>
+            <td>${new Date(book.returnDate).toLocaleDateString()}</td>
+            <td>${book.role.toUpperCase()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching borrowed books:', error);
+      alert('Failed to fetch borrowed books. Please try again.');
+    }
+  }
+
   // Optional: Load default view
   showSection('Inventory');
 });
-
-async function loadDonationLogs() {
-  try {
-    const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
-    if (!response.ok) throw new Error('Failed to fetch logs');
-
-    const logs = await response.json();
-    const logList = document.getElementById('donationLogList');
-    logList.innerHTML = ''; // Clear previous logs
-    const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
-    const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
-
-    if (donationLogs.length === 0) {
-      logList.innerHTML = '<li>No donation logs found.</li>';
-    } else {
-      // Create a table for the donation logs
-      const table = document.createElement('table');
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>User</th>
-            <th>Action</th>
-            <th>Donated Book ID</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      `;
-
-      // Append the table to the log list container
-      logList.appendChild(table);
-
-      // Populate the table with log data
-      const tbody = table.querySelector('tbody');
-      donationLogs.forEach(log => {
-        const date = new Date(log.timestamp).toLocaleString();
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${date}</td>
-          <td>${log.type}</td>
-          <td>${log.role.toUpperCase()}</td>
-          <td>${
-            log.action === 'approve and encode'
-              ? 'ENCODE'
-              : log.action.toUpperCase()
-          }</td>
-          <td>${log.refId}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    document.getElementById('donationLogs').style.display = 'block';
-  } catch (error) {
-    console.error('Error fetching donation logs:', error);
-  }
-}
-
-async function fetchBorrowedBooks() {
-  try {
-    const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const borrowedBooks = await response.json();
-    const borrowLog = document.getElementById('borrowLog');
-
-    // Clear previous logs
-    borrowLog.innerHTML = '';
-
-    // Check if there's data
-    if (!borrowedBooks.length) {
-      borrowLog.innerHTML = '<li>No borrowed books found.</li>';
-    } else {
-      // Create a table for the borrowed books
-      const table = document.createElement('table');
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Borrower</th>
-            <th>Borrowed At</th>
-            <th>Will Return</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      `;
-
-      // Append the table to the borrow log container
-      borrowLog.appendChild(table);
-
-      // Populate the table with borrowed book data
-      const tbody = table.querySelector('tbody');
-      borrowedBooks.forEach(book => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${book.bookTitle}</td>
-          <td>${book.borrowerName}</td>
-          <td>${new Date(book.borrowDate).toLocaleDateString()}</td>
-          <td>${new Date(book.returnDate).toLocaleDateString()}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    // Reveal the borrowed books section
-    document.getElementById('borrow').style.display = 'block';
-    document.getElementById('borrowedLogs').style.display = 'block';
-  } catch (error) {
-    console.error('Error fetching borrowed books:', error);
-    alert('Failed to fetch borrowed books. Please try again.');
-  }
-}
 
 // INVENTORY
 document.addEventListener('DOMContentLoaded', () => {
@@ -666,7 +677,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const data = await res.json();
-    console.log(data);
     if (res.ok) {
       alert('Book updated successfully');
       updateBookModal.style.display = 'none';
@@ -742,11 +752,6 @@ async function handleSubmit(event) {
   const submitButton = event.target.querySelector('button[type="submit"]');
   submitButton.disabled = true;
   submitButton.innerText = 'Submitting...';
-
-  // Debugging output
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
 
   try {
     const response = await fetch(
