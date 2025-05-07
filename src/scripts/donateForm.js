@@ -74,47 +74,44 @@ async function handleSubmit(event) {
   const formData = new FormData(form);
   const bookType = formData.get('bookType');
 
-  // Manually collect all selected genres from checkboxes
+  // Collect selected genres
   const checkedGenres = Array.from(
     document.querySelectorAll('input[name="genre[]"]:checked')
   ).map(input => input.value);
 
-  // Add the "Other" genre if visible and filled
+  // Include custom "Other" genre if provided
   const otherInput = document.getElementById('other-genre-input');
   const otherGenre = otherInput?.value.trim();
   if (otherInput?.style.display !== 'none' && otherGenre) {
     checkedGenres.push(otherGenre);
   }
 
-  // Clear previous genre[] entries to prevent duplicates
+  // Remove previous genre[] entries to avoid duplicates
   formData.delete('genre[]');
+  formData.delete('genre[]'); // In case "genre" (single string) already exists
 
-  // Append combined genres to the formData
-  checkedGenres.forEach(genre => {
-    formData.append('genre[]', genre);
-  });
+  // Combine genres into a single comma-separated string and set it
+  const combinedGenres = checkedGenres.join(', ');
+  formData.set('genre[]', combinedGenres);
 
   // Remove ebook file if the book is physical
   if (bookType === 'physical') {
     formData.delete('ebookFile');
-    formData.delete('coverImage'); // Also remove cover image for physical books
+    formData.delete('coverImage');
   }
 
-  // Debug log of the form submission
   console.log('Form Data:', formData);
 
   try {
-    // Debug logs to ensure proper data collection
     for (let [key, value] of formData.entries()) {
       console.log(`${key}: ${value}`);
     }
 
-    // Submitting the form using fetch
     const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
       method: 'POST',
-      body: formData, // The form data should be passed here
+      body: formData,
     });
-
+    console.log(response);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Error submitting donation');

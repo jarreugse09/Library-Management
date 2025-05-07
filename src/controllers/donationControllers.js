@@ -65,7 +65,7 @@ const createDonation = async (req, res) => {
       return res.status(400).json({ error: 'Donor name is required' });
     }
 
-    if (!title || title.trim() === '') {
+    if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
 
@@ -73,7 +73,7 @@ const createDonation = async (req, res) => {
       return res.status(400).json({ error: 'Authors are required' });
     }
 
-    if (!description || description.trim() === '') {
+    if (!description) {
       return res
         .status(400)
         .json({ error: 'Description is required for books' });
@@ -100,6 +100,15 @@ const createDonation = async (req, res) => {
     let ebookFileUrl;
     let coverImageUrl;
 
+    if (bookType === 'physical') {
+      if (!quantity || Number(quantity) <= 0) {
+        return res
+          .status(400)
+          .json({ error: 'Quantity must be greater than 0' });
+      }
+      req.files = {};
+    }
+
     if (bookType === 'ebook') {
       if (!req.files?.ebookFile?.[0] || !req.files?.coverImage?.[0]) {
         return res
@@ -109,14 +118,6 @@ const createDonation = async (req, res) => {
 
       ebookFileUrl = `/uploads/ebooks/${req.files.ebookFile[0].filename}`;
       coverImageUrl = `/uploads/covers/${req.files.coverImage[0].filename}`;
-    }
-
-    if (bookType === 'physical') {
-      if (!quantity || Number(quantity) <= 0) {
-        return res
-          .status(400)
-          .json({ error: 'Quantity must be greater than 0' });
-      }
     }
 
     const isApprove = donorName === 'ENCODED BY CLERK';
@@ -146,7 +147,7 @@ const createDonation = async (req, res) => {
       donationData.shelfLocation = shelfLocation;
     }
 
-    const donation = new book(donationData);
+    const donation = new book({ donationData });
     await donation.save(); // Don't forget to actually save it
 
     if (isApprove) {
