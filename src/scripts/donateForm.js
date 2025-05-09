@@ -42,15 +42,18 @@ function toggleFields() {
 
   const quantityField = document.getElementById('quantityField');
   const ebookFileField = document.getElementById('ebookFileInput');
+  const ebookImageField = document.getElementById('ebookImageInput');
   const quantityInput = document.getElementById('quantityInput');
 
   if (bookType === 'physical') {
     quantityField.style.display = 'block';
     ebookFileField.style.display = 'none';
+    ebookImageField.style.display = 'none';
     quantityInput.setAttribute('required', 'true'); // Make it required for physical books
   } else if (bookType === 'ebook') {
     quantityField.style.display = 'none';
     ebookFileField.style.display = 'block';
+    ebookImageField.style.display = 'block';
     quantityInput.removeAttribute('required'); // Remove the required attribute for e-books
   }
 }
@@ -67,79 +70,86 @@ function resetForm() {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('donateForm');
+  if (form) {
+    form.addEventListener('submit', handleSubmit);
+  }
+});
+
 async function handleSubmit(event) {
   event.preventDefault();
 
   const form = event.target;
-  const formData = new FormData(form);
-  const bookType = formData.get('bookType');
-
-  // Collect selected genres
-  const checkedGenres = Array.from(
-    document.querySelectorAll('input[name="genre[]"]:checked')
-  ).map(input => input.value);
-
-  // Include custom "Other" genre if provided
-  const otherInput = document.getElementById('other-genre-input');
-  const otherGenre = otherInput?.value.trim();
-  if (otherInput?.style.display !== 'none' && otherGenre) {
-    checkedGenres.push(otherGenre);
-  }
-
-  // Remove previous genre[] entries to avoid duplicates
-  formData.delete('genre[]');
-  formData.delete('genre[]'); // In case "genre" (single string) already exists
-
-  // Combine genres into a single comma-separated string and set it
-  const combinedGenres = checkedGenres.join(', ');
-  formData.set('genre[]', combinedGenres);
-
-  // Remove ebook file if the book is physical
-  if (bookType === 'physical') {
-    formData.delete('ebookFile');
-    formData.delete('coverImage');
-  }
-
-  console.log('Form Data:', formData);
+  const submitBtn = form.querySelector('.btn-submit');
+  submitBtn.disabled = true;
 
   try {
+    const formData = new FormData(form);
+    const bookType = formData.get('bookType');
+
+    // Gather checked genres
+    const checkedGenres = Array.from(
+      document.querySelectorAll('input[name="genre[]"]:checked')
+    ).map(input => input.value);
+
+    // Include 'Other' genre input if visible
+    const otherInput = document.getElementById('other-genre-input');
+    if (
+      otherInput &&
+      otherInput.style.display !== 'none' &&
+      otherInput.value.trim()
+    ) {
+      checkedGenres.push(otherInput.value.trim());
+    }
+
+    // Clear old genre entries, append updated ones
+    formData.delete('genre[]');
+    checkedGenres.forEach(genre => formData.append('genre[]', genre));
+
+    // 🔄 Send all fields including ebookFile (even for physical books)
+    console.log('--- FormData being submitted ---');
     for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
+      console.log(`${key}:`, value);
     }
 
     const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
       method: 'POST',
       body: formData,
     });
-    console.log(response);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error submitting donation');
+      const error = await response.json();
+      console.error('API Error Response:', error);
+      throw new Error(error.message || 'Failed to donate book.');
     }
 
-    const data = await response.json();
-    console.log(data.data);
+    const result = await response.json();
     alert('Donation submitted successfully!');
     form.reset();
 
-    // Reset authors UI
+    // Reset authors section
     const authorsContainer = document.getElementById('authors-container');
     authorsContainer.innerHTML = `
-      <label>Author(s)</label>
+      <label for="authors-1">Author(s)</label>
       <div>
-        <input type="text" name="authors[]" required />
+        <input id="authors-1" type="text" name="authors[]" required />
         <button type="button" class="btn btn-remove" onclick="removeAuthor(this)">Remove</button>
       </div>
     `;
 
-    // Reset "Other genre" input
     if (otherInput) {
       otherInput.style.display = 'none';
       otherInput.value = '';
     }
+
+    toggleFields(); // Reset visibility of conditional fields
+    await loadGenres(); // Reload dynamic genre list
   } catch (error) {
-    console.error('Error submitting donation:', error);
-    alert('An error occurred: ' + error.message);
+    console.error('Submission Error:', error);
+    alert('Error: ' + error.message);
+  } finally {
+    submitBtn.disabled = false;
   }
 }
 

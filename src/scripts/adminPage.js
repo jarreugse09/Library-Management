@@ -644,6 +644,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <td>${ebook.authors.join(', ')}</td>
         <td>${ebook.publishedYear}</td>
         <td>${ebook.genre}</td>
+        <td>⭐ ${ebook.averageRating} (${ebook.ratingCount})</td>
+
         <td>${ebook.status}</td>
         <td><a href="${
           ebook.ebookFileUrl

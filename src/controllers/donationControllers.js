@@ -1,8 +1,15 @@
 const multer = require('multer');
+const express = require('express');
+const bodyParser = require('body-parser');
 const path = require('path');
 const book = require('../models/bookModel');
 const Log = require('../models/logModel');
 const Genre = require('../models/genreModel');
+const app = express();
+
+// 1. Use body-parser for non-file data
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // Multer setup
 const upload = multer({
@@ -60,6 +67,10 @@ const createDonation = async (req, res) => {
       role,
     } = req.body;
     console.log(req.body);
+
+    console.log('Body:', req.body);
+    console.log('Files:', req.files);
+
     // Validate required fields
     if (!donorName) {
       return res.status(400).json({ error: 'Donor name is required' });
@@ -81,19 +92,6 @@ const createDonation = async (req, res) => {
 
     if (!genre || (Array.isArray(genre) && genre.length === 0)) {
       return res.status(400).json({ error: 'Genre is required' });
-    }
-
-    // Handle genre validation and creation
-    const genres = await Genre.find();
-    const allowedGenres = genres.map(g => g.name.toLowerCase());
-
-    const invalidGenres = genre.filter(
-      g => !allowedGenres.includes(g.toLowerCase())
-    );
-
-    if (invalidGenres.length > 0) {
-      const newGenres = invalidGenres.map(g => ({ name: g.toLowerCase() }));
-      await Genre.insertMany(newGenres);
     }
 
     // Handle file upload paths
@@ -131,6 +129,10 @@ const createDonation = async (req, res) => {
       genre: genre.map(g => g.toLowerCase()),
       bookType,
       isApprove,
+      averageRating:
+        bookType === 'physical' || bookType === 'copy' ? undefined : 0,
+      ratingCount:
+        bookType === 'physical' || bookType === 'copy' ? undefined : 0,
       maxQuantity:
         bookType === 'physical' || bookType === 'copy' ? quantity : undefined,
       quantity:
@@ -147,7 +149,7 @@ const createDonation = async (req, res) => {
       donationData.shelfLocation = shelfLocation;
     }
 
-    const donation = new book({ donationData });
+    const donation = new book(donationData);
     await donation.save(); // Don't forget to actually save it
 
     if (isApprove) {
@@ -209,7 +211,6 @@ const getApprove = async (req, res) => {
 
 const updateDonationStatus = async (req, res) => {
   const { id, action } = req.params;
-
   const validActions = ['approve', 'reject', 'rejected', 'done'];
 
   if (!validActions.includes(action)) {
@@ -217,18 +218,12 @@ const updateDonationStatus = async (req, res) => {
   }
 
   try {
-    console.log('Request Headers:', req.headers); // Add this to check headers
     const { role } = req.body;
-    console.log('Request Body:', req.body); // Log req.body to confirm data
-
     if (!role) {
       return res.status(400).json({ message: 'Role is required' });
     }
 
-    // Finding the donation by id
-    let donStat, donation;
-
-    donation = await book.findOne({ _id: id });
+    let donation = await book.findOne({ _id: id });
     if (!donation) {
       return res.status(404).json({ message: 'Donation not found' });
     }
@@ -240,20 +235,13 @@ const updateDonationStatus = async (req, res) => {
       rejected: { update: { isDone: false }, status: 'rejected' },
     };
 
-    const { update, status } = updateMap[action] || {
-      update: {},
-      status: undefined,
-    };
-    donStat = status;
-
-    // Updating the donation status
+    const { update, status: donStat } = updateMap[action];
     donation = await book.findOneAndUpdate(
       { _id: id },
       { $set: update },
       { new: true }
     );
 
-    // Log action based on the donor
     const actionLog = new Log({
       type:
         donation.donorName === 'ENCODED BY CLERK'
@@ -261,37 +249,37 @@ const updateDonationStatus = async (req, res) => {
           : 'DONATION',
       refId: id,
       action: donStat,
-      role: role,
+      role,
     });
-
     await actionLog.save();
 
-    // If donation status is 'done' and donor is not 'clerk', save a new book
-    if (donation.donorName !== 'ENCODED BY CLERK' && donStat === 'done') {
-      const donations = new book({
-        donorName: donation.donorName,
-        title: donation.title,
-        authors: donation.authors,
-        description: donation.description,
-        publishedYear: donation.publishedYear,
-        genre: donation.genre,
-        bookType: donation.bookType,
-        quantity: donation.quantity,
-        ebookFileUrl: donation.ebookFileUrl,
-      });
+    let newBookEntry;
 
-      await donations.save();
+    // Genre handling — if both isDone and isApprove are true
+    if (donation.isDone === true && donation.isApprove === true) {
+      const existingGenres = await Genre.find();
+      const allowedGenres = existingGenres.map(g => g.name.toLowerCase());
+
+      const invalidGenres = donation.genre.filter(
+        g => !allowedGenres.includes(g.toLowerCase())
+      );
+
+      if (invalidGenres.length > 0) {
+        const newGenres = invalidGenres.map(g => ({ name: g.toLowerCase() }));
+        await Genre.insertMany(newGenres);
+      }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       status: 'Success',
       message: `Donation ${action}d successfully`,
       data: donation,
     });
   } catch (error) {
-    res
+    console.error('Error updating donation:', error);
+    return res
       .status(500)
-      .json({ status: 'fail', message: 'Server error', error: error });
+      .json({ status: 'fail', message: 'Server error', error });
   }
 };
 

@@ -6,20 +6,10 @@ const router = express.Router();
 // Create donation with optional eBook upload
 router.post(
   '/donate',
-  (req, res, next) => {
-    const { bookType } = req.body;
-
-    // Apply file upload middleware only if bookType is 'ebook'
-    if (bookType === 'ebook') {
-      return donationController.upload.fields([
-        { name: 'ebookFile', maxCount: 1 },
-        { name: 'coverImage', maxCount: 1 },
-      ])(req, res, next);
-    }
-
-    // Skip file upload and continue to the controller if it's a physical book or copy
-    next();
-  },
+  donationController.upload.fields([
+    { name: 'ebookFile', maxCount: 1 }, // Allow ebook file (if it's an ebook or for physical)
+    { name: 'coverImage', maxCount: 1 }, // Cover image for both book types
+  ]),
   donationController.createDonation
 );
 

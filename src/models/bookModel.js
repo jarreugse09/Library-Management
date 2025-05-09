@@ -58,6 +58,14 @@ const BookSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  averageRating: {
+    type: Number,
+    default: 0,
+  },
+  ratingCount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const book = mongoose.model('book', BookSchema);

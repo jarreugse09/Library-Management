@@ -34,6 +34,7 @@
       <form enctype="multipart/form-data" class="donate-form" id="donateForm">
         <label for="donorName">Donor Name:</label>
         <input
+          type="text"
           id="donorName"
           name="donorName"
           placeholder="e.g. Dante Gulapa"
@@ -121,6 +122,16 @@
             name="ebookFile"
             id="ebookFileField"
             accept=".epub,.pdf,.mobi"
+          />
+        </div>
+
+        <div id="ebookImageInput" style="display: none">
+          <label for="coverImage">Upload E-Book File:</label>
+          <input
+            type="file"
+            name="coverImage"
+            id="coverImage"
+            accept="image/*"
           />
         </div>
 

@@ -289,9 +289,19 @@
                   accept=".epub,.pdf,.mobi"
                 />
               </div>
+              <label for="genre">Genre</label>
+              <div id="genre-checkboxes">
+                <!-- Checkboxes will be injected here -->
+              </div>
 
-              <label for="genre">Genre:</label>
-              <input type="text" id="genre" name="genre" /><br /><br />
+              <input
+                type="text"
+                id="other-genre-input"
+                name="genre[]"
+                placeholder="Enter custom genre"
+                style="display: none; margin-top: 5px"
+              />
+              <br /><br />
 
               <label id="shelf" for="shelfLocation">Shelf Location:</label>
               <input type="text" id="shelfLocation" name="shelfLocation" />

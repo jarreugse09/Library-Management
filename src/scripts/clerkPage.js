@@ -88,6 +88,42 @@ document.addEventListener('DOMContentLoaded', () => {
     showBorrowPending();
   });
 
+  async function loadGenres() {
+    const res = await fetch('/api/books/genre/'); // Replace with your actual route
+    const genres = await res.json(); // Assume it returns an array like ['Fiction', 'Mystery', ...]
+
+    const container = document.getElementById('genre-checkboxes');
+    container.innerHTML = ''; // Clear existing content
+
+    genres.forEach(genre => {
+      const label = document.createElement('label');
+      label.innerHTML = `
+      <input type="checkbox" name="genre[]" value="${
+        genre.name
+      }"> ${genre.name.toUpperCase()}
+    `;
+      container.appendChild(label);
+    });
+
+    // Add the "Other" option
+    const otherLabel = document.createElement('label');
+    otherLabel.innerHTML = `
+    <input type="checkbox" id="genre-other"> Other
+  `;
+    container.appendChild(otherLabel);
+
+    // Add toggle logic for "Other"
+    const otherCheckbox = otherLabel.querySelector('#genre-other');
+    const otherInput = document.getElementById('other-genre-input');
+
+    otherCheckbox.addEventListener('change', () => {
+      otherInput.style.display = otherCheckbox.checked ? 'block' : 'none';
+      if (!otherCheckbox.checked) otherInput.value = '';
+    });
+  }
+
+  loadGenres();
+
   async function loadDonationLogs() {
     try {
       const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
@@ -199,12 +235,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         // Add event listeners to the buttons
-        const approveBtn = table.querySelector('button');
+        const approveBtn = table.querySelector('.approve-btn');
         approveBtn.addEventListener('click', () =>
           handleAction(donation._id, 'approve')
         );
 
-        const rejectBtn = table.querySelector('button');
+        const rejectBtn = table.querySelector('.reject-btn');
         rejectBtn.addEventListener('click', () =>
           handleAction(donation._id, 'reject')
         );
@@ -230,9 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            role: 'clerk', // Ensure this key is included in the body
-          }),
+          body: JSON.stringify({ role: 'clerk' }),
         }
       );
 
@@ -747,6 +781,24 @@ async function handleSubmit(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+
+  const checkedGenres = Array.from(
+    document.querySelectorAll('input[name="genre[]"]:checked')
+  ).map(input => input.value);
+
+  // Include 'Other' genre input if visible
+  const otherInput = document.getElementById('other-genre-input');
+  if (
+    otherInput &&
+    otherInput.style.display !== 'none' &&
+    otherInput.value.trim()
+  ) {
+    checkedGenres.push(otherInput.value.trim());
+  }
+
+  // Clear old genre entries, append updated ones
+  formData.delete('genre[]');
+  checkedGenres.forEach(genre => formData.append('genre[]', genre));
 
   // Optional: Disable submit button
   const submitButton = event.target.querySelector('button[type="submit"]');

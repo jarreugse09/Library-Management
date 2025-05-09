@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const book = require('../models/bookModel');
+const Rating = require('../models/ratingModel');
 const multer = require('multer');
 
 // Ensure upload directories exist
@@ -118,6 +119,71 @@ const getAllEbook = async (req, res) => {
   }
 };
 
+// const getAllEbookAdmin = async (req, res) => {
+//   try {
+//     const search = (req.query.search || '').toLowerCase();
+//     const sortField = req.query.sort || 'title'; // default sort
+//     const sortOrder = req.query.order === 'desc' ? 'desc' : 'asc'; // default asc
+//     const page = parseInt(req.query.page) || 1;
+//     const limit = parseInt(req.query.limit) || 10;
+//     const status = req.query.status || ''; // Filter by status
+
+//     // Build search filters
+//     let query = {
+//       bookType: 'ebook', // Can change this as needed
+//       isApprove: true,
+//       isDone: true,
+//     };
+
+//     if (status) {
+//       query.status = status; // Add status filter if provided
+//     }
+
+//     // Fetch books from DB
+//     let books = await book.find(query); // Get all books based on the filters
+
+//     // Search - modified to match beginning of the string (prefix search)
+//     if (search) {
+//       books = books.filter(book => {
+//         const title = (book.title || '').toLowerCase();
+//         const authors = book.authors.map(author => author.toLowerCase()); // authors is an array
+//         return (
+//           title.startsWith(search) ||
+//           authors.some(author => author.startsWith(search))
+//         ); // Match any author
+//       });
+//     }
+
+//     // Sort
+//     books.sort((a, b) => {
+//       const valA = (a[sortField] || '').toString().toLowerCase();
+//       const valB = (b[sortField] || '').toString().toLowerCase();
+
+//       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+//       if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+//       return 0;
+//     });
+
+//     // Pagination
+//     const totalBooks = books.length;
+//     const start = (page - 1) * limit;
+//     const end = start + limit;
+//     const paginatedBooks = books.slice(start, end);
+
+//     res.json({
+//       books: paginatedBooks,
+//       total: totalBooks,
+//       page,
+//       totalPages: Math.ceil(totalBooks / limit),
+//     });
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// };
+
+// Update ebook details with file upload
+
 const getAllEbookAdmin = async (req, res) => {
   try {
     const search = (req.query.search || '').toLowerCase();
@@ -163,6 +229,32 @@ const getAllEbookAdmin = async (req, res) => {
       return 0;
     });
 
+    // Aggregate ratings for each book
+    const ratingsAggregation = await Rating.aggregate([
+      {
+        $match: {
+          bookId: { $in: books.map(book => book._id) }, // Match books by their IDs
+        },
+      },
+      {
+        $group: {
+          _id: '$bookId',
+          averageRating: { $avg: '$rating' },
+          ratingCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Attach ratings to books
+    books = books.map(book => {
+      const bookRating = ratingsAggregation.find(
+        rating => rating._id.toString() === book._id.toString()
+      );
+      book.averageRating = bookRating ? bookRating.averageRating : 0;
+      book.ratingCount = bookRating ? bookRating.ratingCount : 0;
+      return book;
+    });
+
     // Pagination
     const totalBooks = books.length;
     const start = (page - 1) * limit;
@@ -181,7 +273,6 @@ const getAllEbookAdmin = async (req, res) => {
   }
 };
 
-// Update ebook details with file upload
 const updateEbook = async (req, res) => {
   try {
     const { id } = req.params;

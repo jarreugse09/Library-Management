@@ -27,6 +27,7 @@ app.use('/images', express.static(join(__dirname, 'images')));
 
 app.use('/', appRoutes);
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(mongoSanitize);
 app.use(cors());
