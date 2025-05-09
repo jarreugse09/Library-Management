@@ -15,10 +15,17 @@ router.route('/register').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'register.html'));
 });
 
+router.route('/forgotPassword').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'forgotPassword.html'));
+});
+
+router.route('/resetPassword').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'resetPassword.html'));
+});
+
 router.route('/verify-otp').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'verify-otp.html'));
 });
-
 
 router.route('/dashboard').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'dashboard.html'));

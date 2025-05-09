@@ -1,9 +1,15 @@
 const ebookController = require('../controllers/eBookControllers');
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authControllers');
 
 router.get('/', ebookController.getAllEbook);
-router.get('/admin', ebookController.getAllEbookAdmin);
+router.get(
+  '/admin',
+  // authController.protect,
+  // authController.restrictTo('admin', 'librarian'),
+  ebookController.getAllEbookAdmin
+);
 
 router.patch(
   '/:id',

@@ -151,10 +151,10 @@ function displayBooksByGenre(genre) {
     bookItem.classList.add('book-item');
 
     bookItem.innerHTML = `
-            <img src="${book.image}" alt="${book.title}">
+            <img src="${book.coverImageUrl}" alt="${book.title}">
             <div class="book-meta">
                 <h3 class="book-title">${book.title}</h3>
-                <p class="book-genre">Genre: ${book.genre}</p>
+                <p class="book-genre">Genre: ${book.genre.toUpperCase()}</p>
                 <p class="book-author">Author: ${book.author}</p>
                 <p class="book-description"Description: >${book.description}</p>
             </div>
@@ -173,10 +173,10 @@ function showBookDetails(index) {
   const book = books[index];
 
   bookDetails.innerHTML = `
-        <img src="${book.image}" alt="${book.title}">
+        <img src="${book.coverImageUrl}" alt="${book.title}">
         <h3>${book.title}</h3>
-        <p>Author: ${book.author}</p>
-        <p>Genre: ${book.genre}</p>
+        <p>Author(s): ${book.authors}</p>
+        <p>Genre: [${book.genre.map(genre => genre.toUpperCase()) + ', '}]</p>
         <p>Description: ${book.description}</p>
     `;
 
@@ -214,7 +214,9 @@ function searchBooks() {
         <div class="book-meta">
             <h3 class="book-title">${book.title}</h3>
             <p class="book-author">Author: ${book.author}</p>
-            <p class="book-genre">Genre: ${book.genre}</p>
+            <p class="book-genre">Genre: ${book.genre.map(genre =>
+              genre.toUpperCase()
+            )}</p>
         </div>
     `;
 
@@ -248,3 +250,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+async function loadGenres() {
+  try {
+    const response = await fetch('http://localhost:7001/api/books/genre/');
+    const genres = await response.json();
+
+    const genreList = document.getElementById('genreList');
+    genreList.innerHTML = ''; // Clear any existing content
+
+    // Add "All" option first
+    const allLi = document.createElement('li');
+    const allA = document.createElement('a');
+    allA.href = '#All';
+    allA.textContent = 'ALL';
+    allLi.appendChild(allA);
+    genreList.appendChild(allLi);
+
+    // Convert object to array if necessary
+    const genreArray = Array.isArray(genres) ? genres : Object.values(genres);
+
+    genreArray.forEach(genre => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `?genre=${genre.name}`;
+      a.textContent = genre.name.toUpperCase();
+      li.appendChild(a);
+      genreList.appendChild(li);
+    });
+  } catch (error) {
+    console.error('Failed to load genres:', error);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadGenres);

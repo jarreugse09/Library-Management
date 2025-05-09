@@ -3,6 +3,7 @@ const Genre = require('../models/genreModel');
 const getAllGenre = async (req, res) => {
   try {
     const genres = await Genre.find();
+
     res.status(200).json(genres);
   } catch (error) {
     console.error('Error fetching genres:', error);

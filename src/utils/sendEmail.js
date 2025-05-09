@@ -1,24 +1,23 @@
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
 
+const sendEmail = option => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
 
-const sendEmail = (option) => {
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
-    const mailOptions = {
-        from: "Library OTP <library-access-guide@gmail.com>",
-        to: option.email,
-        subject: option.subject,
-        text: option.text,
-        html: `
+  const mailOptions = {
+    from: 'Library OTP <library-access-guide@gmail.com>',
+    to: option.email,
+    subject: option.subject,
+    text: option.text,
+    html: `
         <div style="
             font-family: Arial, sans-serif;
             padding: 20px;
@@ -44,10 +43,32 @@ const sendEmail = (option) => {
             </div>
             <p>This OTP is valid for 3 minutes. Do not share it with anyone.</p>
         </div>
-    `
-};
-    
-    transporter.sendMail(mailOptions);
-}
+    `,
+  };
 
-module.exports = sendEmail;
+  transporter.sendMail(mailOptions);
+};
+
+const sendEmailReset = async option => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: 'Library OTP <library-access-guide@gmail.com>',
+    to: option.email,
+    subject: option.subject,
+    text: option.message,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+module.exports = { sendEmail, sendEmailReset };

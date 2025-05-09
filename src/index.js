@@ -10,7 +10,6 @@ const mongoSanitize = require('./middlewares/mongoSanitize');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const appRoutes = require('./routes/appRoutes');
-const postRoutes = require('./routes/postRoutes');
 const borrowRoutes = require('./routes/borrowRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const ebookRoutes = require('./routes/ebookRoutes');
@@ -32,7 +31,6 @@ app.use(express.json());
 app.use(mongoSanitize);
 app.use(cors());
 
-app.use('/api/posts', postRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/donations', donationRoutes);
