@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ['deleted', 'active'],
+    },
     otpExpires: {
       type: Date,
       required: false,

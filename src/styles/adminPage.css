@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+:root {
+  --bg: #0d0d0d;
+  --card-bg: #1a1a1a;
+  --accent: #ff4757;
+  --accent-light: #ff6b81;
+  --text: #ffffff;
+  --text-light: #999;
+  --border: rgba(255, 255, 255, 0.1);
+  --input-bg: #1e1e1e;
+  --glow: 0 0 5px var(--accent);
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--bg);
+}
+
+.sidebar {
+  width: 220px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  padding-bottom: 0;
+  height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--glow);
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 12px;
+}
+
+.sidebar a {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  background-color: #262626;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: var(--accent);
+  color: #fff;
+}
+
+.content {
+  flex: 1;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  padding-bottom: 0;
+  box-shadow: var(--glow);
+  height: 80vh;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h1 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.filters input,
+.filters select,
+.filters button {
+  padding: 10px 14px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}
+
+button {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--glow);
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--accent-light);
+}
+
+.table-container {
+  background-color: #111;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background-color: var(--card-bg);
+  color: var(--text-light);
+}
+
+td {
+  color: var(--text);
+}
+
+.button-container {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+#donation,
+#borrow {
+  margin: 20px 0;
+  padding: 20px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: var(--glow);
+}
+
+#donation h1,
+#borrow h1 {
+  color: var(--accent);
+  font-size: 1.6rem;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#donation ul,
+#borrow ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#donation ul li,
+#borrow ul li {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+#donationLogs,
+#borrowedLogs {
+  display: none;
+}
+
+.donation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.donation-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+#donationList table,
+#donationLogList table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#donationList th,
+#donationList td,
+#donationLogList th,
+#donationLogList td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+/* MANAGE MEMBER Modal styles */
+.memberModal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  color: #333;
+}
+
+.memberModalContent {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  min-width: 400px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-content h3 {
+  margin: 0;
+  font-size: 24px;
+  text-align: center;
+}
+
+.close-btn {
+  align-self: flex-end;
+  font-size: 20px;
+  cursor: pointer;
+  color: #fff;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.save-btn {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.save-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .content {
+    width: 100%;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+}

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Pending Donations</title>
-    <link rel="stylesheet" href="/styles/clerkPage.css" />
+    <link rel="stylesheet" href="/styles/adminPage.css" />
   </head>
   <body>
     <nav>
@@ -30,6 +30,9 @@
           <li><a href="#inventory" id="inventoryLink">Book Inventory</a></li>
           <li>
             <a href="#ebookInventory" id="eBookLink">E-Book Inventory</a>
+          </li>
+          <li>
+            <a href="#manageMember" id="manageMemberLink">Manage Members</a>
           </li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
           <li>
@@ -318,6 +321,40 @@
           </form>
         </div>
 
+        <!-- MANAGEMEMBER SECTION -->
+        <div id="manageMember" class="section" style="display: none">
+          <h2>Admin Roles Management</h2>
+          <p>Manage user roles and permissions from this section.</p>
+
+          <h3>Update User</h3>
+          <div id="formMember" style="display: none">
+            <form id="memberForm">
+              <label for="updateMemName">Name:</label>
+              <input
+                type="text"
+                id="updateMemName"
+                name="updateMemmName"
+                required
+              />
+              <label for="updateMemRole">Role:</label>
+              <select id="updateMemRole" name="role" required>
+                <option value="admin">Admin</option>
+                <option value="clerk">Clerk</option>
+                <option value="user">User</option>
+              </select>
+              <label for="updateMemStatus">Status:</label>
+              <select id="updateMemStatus" name="status" required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <button type="submit" class="save-btn">Save</button>
+              <button type="button" id="memberClose">Cancel</button>
+            </form>
+          </div>
+          <div id="memberListTable"></div>
+        </div>
+
+        <!-- DONATION SECTION -->
         <div id="donation" class="section" style="display: none">
           <h1>Book Donations</h1>
           <button id="donationPendingBtn">Pending</button>

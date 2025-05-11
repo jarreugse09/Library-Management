@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     donation: document.getElementById('donation'),
     ebook: document.getElementById('ebookInventory'),
     borrow: document.getElementById('borrow'),
+    manageMember: document.getElementById('manageMember'),
   };
 
   // Link references
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ebook: document.getElementById('eBookLink'),
     donation: document.getElementById('donationLink'),
     borrowed: document.getElementById('borrowedLink'),
+    manageMem: document.getElementById('manageMemberLink'),
   };
 
   // eBook related elements for searching, pagination, and modals
@@ -28,6 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   links.donation.addEventListener('click', () => {
     showSection('donation');
     showDonationPending(); // Show pending donations when the Donation section is shown
+  });
+
+  links.manageMem.addEventListener('click', () => {
+    showSection('manageMember');
+    showUsers();
   });
 
   donationPendingBtn.addEventListener('click', showDonationPending);
@@ -54,6 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ebookUpdateModal.style.display = 'none'; // Hide the modal when close is clicked
   });
 
+  const memberModalBtn = document.getElementById('memberClose');
+  const memberUpdateModal = document.getElementById('formMember');
+
+  memberModalBtn.addEventListener('click', () => {
+    memberUpdateModal.style.display = 'none';
+    showSection('manageMember');
+    showUsers();
+  });
+
   // Function to show the correct section
   function showSection(sectionName) {
     Object.keys(sections).forEach(section => {
@@ -65,12 +81,144 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function showUsers() {
+    fetchUsers();
+  }
+
   // Function to show donation pending list
   function showDonationPending() {
     donationPending.style.display = 'block';
     donationLogs.style.display = 'none';
     fetchPendingDonations();
   }
+
+  async function fetchUsers() {
+    try {
+      const response = await fetch('/api/users/');
+
+      if (!response.ok) throw new Error('Failed to fetch users');
+
+      const data = await response.json();
+      console.log('users: ', data);
+      renderTable(data.users); // Access the `users` array from the response
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      const memberListTable = document.getElementById('memberListTable');
+      memberListTable.innerHTML = '<p>Error loading users.</p>';
+    }
+  }
+  function renderTable(users) {
+    const table = document.createElement('table');
+    table.classList.add('user-table');
+
+    table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${users
+        .map(
+          user => `
+        <tr data-id="${user._id}">
+          <td>${user.username ?? 'N/A'}</td>
+          <td>${user.role}</td>
+          <td>${user.status}</td>
+          <td>
+            <button class="update-btn">Update</button>
+            <button class="delete-btn">Delete</button>
+          </td>
+        </tr>
+      `
+        )
+        .join('')}
+    </tbody>`;
+
+    const memberListTable = document.getElementById('memberListTable');
+    memberListTable.innerHTML = '';
+    memberListTable.appendChild(table);
+
+    // Attach event listeners
+    table
+      .querySelectorAll('.update-btn')
+      .forEach(button => button.addEventListener('click', handleUpdateClick));
+    table
+      .querySelectorAll('.delete-btn')
+      .forEach(button => button.addEventListener('click', handleDeleteClick));
+  }
+
+  function handleUpdateClick(e) {
+    const memberList = document.getElementById('memberListTable');
+    memberList.style.display = 'none';
+    memberUpdateModal.style.display = 'block';
+
+    const row = e.target.closest('tr');
+    const userId = row.getAttribute('data-id');
+    const name = row.children[0].textContent;
+    const role = row.children[1].textContent;
+    const status = row.children[2].textContent;
+
+    const form = document.getElementById('memberForm');
+    form.setAttribute('data-id', userId);
+    document.getElementById('updateMemName').value = name;
+
+    const roleSelect = document.getElementById('updateMemRole');
+    roleSelect.value = ['user', 'admin', 'clerk', 'librarian'].includes(role)
+      ? role
+      : 'user';
+
+    const statusSelect = document.getElementById('updateMemStatus');
+    statusSelect.value = ['active', 'inactive'].includes(status)
+      ? status
+      : 'deleted';
+  }
+
+  function handleDeleteClick(e) {
+    const row = e.target.closest('tr');
+    const userId = row.dataset.id;
+    if (confirm('Are you sure you want to delete this user?')) {
+      // Add delete logic here
+      console.log('Delete user:', userId);
+    }
+  }
+
+  document.getElementById('memberForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const form = e.target;
+    const userId = form.getAttribute('data-id');
+    const username = document.getElementById('updateMemName').value.trim();
+    const role = document.getElementById('updateMemRole').value.trim();
+    let status = document.getElementById('updateMemStatus').value.trim();
+
+    if (!username || !role || !status) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    // Optionally normalize status (depends on your backend logic)
+    if (status === 'inactive') status = 'deleted';
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, role, status }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update user');
+      alert('User updated successfully!');
+      fetchUsers(); // Refresh table
+    } catch (error) {
+      console.error('Update failed:', error);
+      alert('Failed to update user');
+    }
+  });
 
   async function fetchPendingDonations() {
     try {

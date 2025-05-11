@@ -19,12 +19,9 @@ router.post('/send-otp', sendOtp);
 // OTP verification route
 router.post('/verify-otp', verifyOtp);
 
-router.get('/me', authControllers.protect, authControllers.getCurrentUser);
-router.post(
-  '/:id/update-password',
-  authControllers.protect,
-  authControllers.updatePassword
-);
+// router.get('/me', authControllers.protect, authControllers.getCurrentUser);
+router.get('/me', authControllers.getCurrentUser);
+router.post('/:id/update-password', authControllers.updatePassword);
 
 module.exports = router;
 

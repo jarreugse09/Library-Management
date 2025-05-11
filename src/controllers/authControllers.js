@@ -163,6 +163,7 @@ const verifyOtp = async (req, res) => {
       isVerified: true,
       otp: null,
       otpExpires: null,
+      status: 'active',
     });
 
     res

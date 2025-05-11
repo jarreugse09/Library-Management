@@ -5,7 +5,7 @@ const authController = require('../controllers/authControllers');
 
 // Base URL: /api/books/physical
 router.get('/', controller.getAllBooks);
-router.get('/admin', authController.protect, controller.getAllBooksAdmin);
+router.get('/admin', controller.getAllBooksAdmin);
 router.get('/title', controller.getAllBookTitle);
 router.get('/borrowed', controller.getAllBookBorrowed);
 router.get('/filter', controller.getAllBookFilter);
