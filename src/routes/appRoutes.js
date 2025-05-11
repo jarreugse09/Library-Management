@@ -67,4 +67,9 @@ router.route('/borrowForm').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'borrowForm.html'));
 });
 
+router.route('/adminRoles').get(async (req, res, next) => {
+  res.sendFile(join(__dirname, '..', 'pages', 'adminRoles.html'));
+});
+
+
 module.exports = router;
