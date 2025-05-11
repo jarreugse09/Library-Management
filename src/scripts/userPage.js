@@ -101,11 +101,21 @@
 // ];
 
 const books = [];
+const token = localStorage.getItem('jwt');
+
+if (!token) {
+  alert('Not logged in');
+  window.location.href = '/';
+}
 
 async function fetchBooks() {
-  const res = await fetch(`/api/books/ebook/`);
+  const res = await fetch(`/api/books/ebook/`, {
+    headers: {
+      Authorization: `Bearer ${token}`, // Send token in header if applicable
+    },
+  });
   const data = await res.json();
-  books.splice(0, books.length, ...data.books); // clear and repopulate
+  books.splice(0, books.length, ...data.books); // clear and repopulate books array
 }
 
 // Function to display all books
@@ -253,7 +263,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadGenres() {
   try {
-    const response = await fetch('http://localhost:7001/api/books/genre/');
+    const response = await fetch('http://localhost:7001/api/books/genre/', {
+      headers: {
+        Authorization: `Bearer ${token}`, // Send token in header if applicable
+      },
+    });
     const genres = await response.json();
 
     const genreList = document.getElementById('genreList');
@@ -271,6 +285,8 @@ async function loadGenres() {
     const genreArray = Array.isArray(genres) ? genres : Object.values(genres);
 
     genreArray.forEach(genre => {
+      if (!genre || !genre.name) return;
+
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = `?genre=${genre.name}`;

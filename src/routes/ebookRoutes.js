@@ -2,6 +2,7 @@ const ebookController = require('../controllers/eBookControllers');
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authControllers');
+const ratingController = require('../controllers/ratingController');
 
 router.get('/', ebookController.getAllEbook);
 router.get(
@@ -19,6 +20,8 @@ router.patch(
   ]),
   ebookController.updateEbook
 );
+
+router.post('/rate', ratingController.rateBook);
 
 router.delete('/:id/delete', ebookController.softDelete);
 router.delete('/:id/admin', ebookController.deleteBook);

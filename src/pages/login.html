@@ -35,7 +35,7 @@
 
           const data = await response.json();
           if (response.ok) {
-            localStorage.setItem('token', data.token);
+            localStorage.setItem('jwt', data.token);
             alert('Login successful!');
             window.location.href = '/userPage';
           } else {

@@ -7,7 +7,7 @@ const authController = require('../controllers/authControllers');
 const router = express.Router();
 
 // ✅ Get all users (Admin Only)
-router.get('/', verifyToken, authorizeRoles(['admin']), async (req, res) => {
+router.get('/', authorizeRoles(['admin']), async (req, res) => {
   try {
     const users = await User.find({}, 'username role');
     res.json(users);
@@ -19,7 +19,7 @@ router.get('/', verifyToken, authorizeRoles(['admin']), async (req, res) => {
 // ✅ Admin can update user roles
 router.put(
   '/assign-role',
-  verifyToken,
+
   authorizeRoles(['admin']),
   async (req, res) => {
     const { username, role } = req.body;

@@ -15,6 +15,7 @@ const donationRoutes = require('./routes/donationRoutes');
 const ebookRoutes = require('./routes/ebookRoutes');
 const physicalBookRoutes = require('./routes/physicalBookRoutes');
 const genreRoutes = require('./routes/genreRoutes');
+const authControllers = require('./controllers/authControllers');
 
 const app = express();
 
@@ -32,12 +33,23 @@ app.use(mongoSanitize);
 app.use(cors());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/donations', donationRoutes);
-app.use('/api/books/physical', physicalBookRoutes);
-app.use('/api/books/ebook', ebookRoutes);
-app.use('/api/books/genre', genreRoutes);
-app.use('/api/borrows', borrowRoutes);
+
+// app.use(authControllers.protect);
+app.use(
+  '/api/users',
+  // authControllers.protect,
+  // authControllers.getCurrentUser,
+  userRoutes
+);
+
+// app.use(authControllers.protect);
+// app.use(authControllers.getCurrentUser);
+
+app.use('/api/donations', authControllers.protect, donationRoutes);
+app.use('/api/books/physical', authControllers.protect, physicalBookRoutes);
+app.use('/api/books/ebook', authControllers.protect, ebookRoutes);
+app.use('/api/books/genre', authControllers.protect, genreRoutes);
+app.use('/api/borrows', authControllers.protect, borrowRoutes);
 
 const PORT = process.env.PORT || 7002;
 

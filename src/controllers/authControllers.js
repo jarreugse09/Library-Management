@@ -1,6 +1,5 @@
 const User = require('../models/userModel');
 const util = require('util');
-const cryto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto'); // For OTP generation
@@ -10,8 +9,28 @@ const AppError = require('../utils/AppError');
 
 const generateOTP = () => Math.floor(100000 + Math.random() * 900000);
 
-signToken = id => {
+const signToken = id => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
+
+const createSendToken = (user, statusCode, message, res) => {
+  const token = signToken(user._id);
+
+  const cookieOption = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOption.secure = true;
+
+  res.cookie('jwt', token, cookieOption);
+
+  user.password = undefined;
+  res
+    .status(statusCode)
+    .json({ status: 'success', message: message, token, data: { user } });
 };
 
 const register = async (req, res) => {
@@ -47,7 +66,7 @@ const register = async (req, res) => {
       otp,
     });
 
-    res.status(201).json({ message: `User registered. Check email for OTP.` });
+    createSendToken(newUser, 201, 'User registered. Check email for OTP.', res);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong.' });
@@ -76,8 +95,9 @@ const login = async (req, res) => {
         .json({ message: 'Please verify your account before logging in.' });
     }
 
-    const token = signToken(user._id);
-
+    const currentDate = Date.now;
+    user.lastLogin = currentDate;
+    await user.save({ validateBeforeSave: false });
     //Replaced by signToken
     // jwt.sign(
     //   { id: user._id, role: user.role, username: user.username },
@@ -85,7 +105,7 @@ const login = async (req, res) => {
     //   { expiresIn: '1h' }
     // );
 
-    res.status(200).json({ status: 'success', token });
+    createSendToken(user, 200, 'User logged in.', res);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong.' });
@@ -154,6 +174,14 @@ const verifyOtp = async (req, res) => {
   }
 };
 
+const logout = (req, res) => {
+  res.cookie('jwt', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 // Admin can update roles
 const updateUserRole = async (req, res) => {
   try {
@@ -188,17 +216,26 @@ const updateUserRole = async (req, res) => {
 
 // Get current logged-in user
 const getCurrentUser = async (req, res) => {
-  res.json({ username: req.user.username, role: req.user.role });
+  try {
+    const user = await User.findById(req.user.id).select(
+      'username role email isVerified createdAt lastLogin'
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 };
-
 const protect = catchAsync(async (req, res, next) => {
   let token;
   // 1. get token
   if (
     req.headers.authorization &&
-    req.headers.authorization.startWith('Bearer')
+    req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token)
@@ -228,8 +265,39 @@ const protect = catchAsync(async (req, res, next) => {
 
   //Grant access
   req.user = freshUser;
-  next();
+  res.locals.user = freshUser;
+  return next();
 });
+
+const isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 2) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
 
 const restrictTo = (...roles) => {
   return (req, res, next) => {
@@ -299,7 +367,7 @@ const resetPassword = catchAsync(async (req, res, next) => {
 
   if (!user) return next(new AppError('Token is invalid or expires.', 400));
 
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   user.password = hashedPassword;
   user.passwordResetToken = undefined;
@@ -313,6 +381,45 @@ const resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+const updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: 'Invalid Empty fields' });
+    }
+    // Step 1: Get the user from the database
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Step 2: Check if the current password matches
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect current password' });
+    }
+
+    // Step 3: Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    // Step 4: Update passwordChangedAt field
+    user.passwordChangedAt = Date.now();
+
+    // Step 5: Save the updated user
+    await user.save({ validateBeforeSave: false });
+
+    // Step 6: Create and send a new JWT
+    createSendToken(user, 200, 'Password updated successfully', res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -324,4 +431,7 @@ module.exports = {
   restrictTo,
   forgotPassword,
   resetPassword,
+  isLoggedIn,
+  logout,
+  updatePassword,
 };
