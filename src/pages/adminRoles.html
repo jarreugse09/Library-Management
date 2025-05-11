@@ -1,64 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Role Setting</title>
-    <link rel="stylesheet" href="/styles/header.css">
-    <link rel="stylesheet" href="/styles/adminRoles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="/styles/header.css" />
+    <link rel="stylesheet" href="/styles/adminRoles.css" />
+  </head>
+  <body>
     <header class="header">
-        <div class="logo">
-            <img src="../images/OIP.jpg" alt="Logo" />
-            <h1>LibAG</h1>
-        </div>
-        <div class="search-wrapper">
-            <input type="text" placeholder="Search books..." />
-        </div>
-        <nav>
-            <ul>
-                <li><a href="/userpage/library">Library</a></li>
-                <li><a href="/userpage">My Books</a></li>
-                <li class="dropdown">
-                    <a href="#" id="settingsToggle">Settings ▾</a>
-                    <ul class="dropdown-menu" id="settingsDropdown">
-                        <li><a href="/userpage/account">Account</a></li>
-                        <li><a href="/userpage/donateForm">Donate</a></li>
-                        <li><a href="/borrowForm">Borrow</a></li>
-                    </ul>
-                </li>
+      <div class="logo">
+        <img src="../images/OIP.jpg" alt="Logo" />
+        <h1>LibAG</h1>
+      </div>
+      <div class="search-wrapper">
+        <input type="text" placeholder="Search books..." />
+      </div>
+      <nav>
+        <ul>
+          <li><a href="/userpage/library">Library</a></li>
+          <li><a href="/userpage">My Books</a></li>
+          <li class="dropdown">
+            <a href="#" id="settingsToggle">Settings ▾</a>
+            <ul class="dropdown-menu" id="settingsDropdown">
+              <li><a href="/userpage/account">Account</a></li>
+              <li><a href="/userpage/donateForm">Donate</a></li>
+              <li><a href="/borrowForm">Borrow</a></li>
             </ul>
-        </nav>
+          </li>
+        </ul>
+      </nav>
     </header>
     <div class="container">
-        <h2>Admin Roles Management</h2>
-        <p>Manage user roles and permissions from this section.</p>
-        
-        <div id="updateModal" class="modal">
-            <div class="modal-content">
-                <span class="close-btn">&times;</span>
-                <h3>Update User</h3>
-                <form id="updateForm">
-                    <label for="updateName">Name:</label>
-                    <input type="text" id="updateName" name="name" required>
-                    <label for="updateRole">Role:</label>
-                    <select id="updateRole" name="role" required>
-                        <option value="admin">Admin</option>
-                        <option value="clerk">Clerk</option>
-                        <option value="user">User</option>
-                    </select>
-                    <label for="updateStatus">Status:</label>
-                    <select id="updateStatus" name="status" required>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <button type="submit" class="save-btn">Save</button>
-                </form>
-            </div>
+      <h2>Admin Roles Management</h2>
+      <p>Manage user roles and permissions from this section.</p>
+
+      <div id="updateModal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn">&times;</span>
+          <h3>Update User</h3>
+          <form id="updateForm">
+            <label for="updateName">Name:</label>
+            <input type="text" id="updateName" name="name" required />
+            <label for="updateRole">Role:</label>
+            <select id="updateRole" name="role" required>
+              <option value="admin">Admin</option>
+              <option value="clerk">Clerk</option>
+              <option value="user">User</option>
+            </select>
+            <label for="updateStatus">Status:</label>
+            <select id="updateStatus" name="status" required>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+            <button type="submit" class="save-btn">Save</button>
+          </form>
         </div>
+      </div>
     </div>
-</body>
-<script src="/scripts/header.js"></script>
-<script src="/scripts/adminRoles.js"></script>
+  </body>
+  <script src="/scripts/header.js"></script>
+  <script src="/scripts/adminRoles.js"></script>
 </html>
