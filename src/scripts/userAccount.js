@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     user = await response.json();
 
     document.getElementById('username').textContent = user.username || 'N/A';
+    document.getElementById('first-name').textContent = user.firstName || 'N/A';
+    document.getElementById('last-name').textContent = user.lastName || 'N/A';
+
     document.getElementById('email').textContent = user.email || 'N/A';
     document.getElementById('created-at').textContent = user.createdAt
       ? new Date(user.createdAt).toLocaleDateString()

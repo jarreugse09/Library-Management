@@ -7,41 +7,47 @@
     <link rel="stylesheet" href="/styles/styles.css" />
   </head>
   <body>
-    <div class="container">
-      <h2>Login</h2>
-      <form id="loginForm">
-        <input type="text" id="username" placeholder="Username" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-      </form>
-      <p>Forgot password? <a href="/forgotPassword">Reset now</a></p>
-      <p>Don't have an account? <a href="/register">Register</a></p>
+    <div class="wrapper">
+      <div class="left">
+        <img src="/assets/logo.svg" alt="Logo" class="logo" />
+      </div>
+
+      <div class="right">
+        <div class="container">
+          <h2>Login</h2>
+          <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <button type="submit">Login</button>
+          </form>
+          <p>Forgot password? <a href="/forgotPassword">Reset now</a></p>
+          <p>Don't have an account? <a href="/register">Register</a></p>
+        </div>
+      </div>
     </div>
 
     <script>
-      document
-        .getElementById('loginForm')
-        .addEventListener('submit', async e => {
-          e.preventDefault();
+      document.getElementById('loginForm').addEventListener('submit', async e => {
+        e.preventDefault();
 
-          const username = document.getElementById('username').value;
-          const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-          });
-
-          const data = await response.json();
-          if (response.ok) {
-            localStorage.setItem('jwt', data.token);
-            alert('Login successful!');
-            window.location.href = '/userPage';
-          } else {
-            alert(data.message);
-          }
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
         });
+
+        const data = await response.json();
+        if (response.ok) {
+          localStorage.setItem('jwt', data.token);
+          alert('Login successful!');
+          window.location.href = '/userPage';
+        } else {
+          alert(data.message || 'Login failed.');
+        }
+      });
     </script>
   </body>
 </html>
