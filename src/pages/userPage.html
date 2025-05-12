@@ -17,26 +17,26 @@
       </div>
       <div class="search-wrapper">
         <!-- Changed class to match CSS -->
-        <input type="text" placeholder="Search books..." />
+        <input id="search" type="text" placeholder="Search books..." />
         <!-- Consistent placeholder -->
       </div>
       <nav>
         <ul>
-          <li><a href="/userpage" id="Browse">Browse</a></li>
-          <li><a href="/userpage" id="myBooks">My Books</a></li>
-          <li><a href="/userpage/library">Library</a></li>
+          <li><a href="/userPage" id="Browse">Browse</a></li>
+          <li><a href="/userPage" id="myBooks">My Books</a></li>
           <li class="dropdown">
             <a href="#" id="settingsToggle">Settings ▾</a>
             <ul class="dropdown-menu" id="settingsDropdown">
-              <li><a href="/userpage/account">Account</a></li>
-              <li><a href="/userpage/donateForm">Donate</a></li>
-              <li><a href="/borrowForm">Borrow</a></li>
               <li id="clerkBtn" style="display: none">
                 <a href="/clerkPage/">Clerk Page</a>
               </li>
               <li id="adminBtn" style="display: none">
                 <a href="/adminPage/">Admin Page</a>
               </li>
+              <li><a href="/userPage/account">Account</a></li>
+              <li><a href="/userPage/donateForm">Donate</a></li>
+              <li><a href="/borrowForm">Borrow</a></li>
+              <li><a href="#" id="logoutBtn">Logout</a></li>
             </ul>
           </li>
         </ul>
@@ -46,7 +46,7 @@
 
     <main class="container">
       <!-- Changed from div to main -->
-      <aside class="genre">
+      <aside class="genre" style="display: none">
         <!-- Changed from div to aside -->
         <h2>Genres</h2>
         <ul id="genreList"></ul>
@@ -55,8 +55,8 @@
         <h2>My Books</h2>
         <ul id="sidebarList">
           <li><a id="currentBookBtn" href="">Currently Reading</a></li>
-          <li><a id="savedBookBtn" href="">Saved Books</a></li>
           <li><a id="donatedBtn" href="">Donated Books</a></li>
+          <li><a id="savedBookBtn" href="">Saved Books</a></li>
         </ul>
       </aside>
       <!--USER DONATED BOOKS -->
@@ -72,10 +72,19 @@
       <section class="browse" style="display: none">
         <!-- Changed from div to section -->
         <h2>Browse</h2>
+        <button id="physicalBtn">Physical Books</button>
+        <button id="ebookBtn">E-Books</button>
         <div class="book-list" id="browseList">
           <!-- Book items will be dynamically added here -->
         </div>
       </section>
+      <!-- Modal for viewing PDF -->
+      <div id="pdfModal" class="pdf-modal" style="display: none">
+        <div class="pdf-header">
+          <button id="closePdfBtn">Close</button>
+        </div>
+        <iframe id="pdfViewer" class="pdf-viewer" frameborder="0"></iframe>
+      </div>
 
       <aside class="book-info">
         <!-- Changed from div to aside -->
@@ -86,6 +95,7 @@
           <!-- Book details will be dynamically added here -->
         </div>
         <div class="book-actions">
+          <button id="readNowBtn" type="button">Read Now</button>
           <button id="addToLibrary" type="button">Add to Library</button>
           <button id="removeToLibrary" type="button">Remove</button>
         </div>

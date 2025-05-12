@@ -5,12 +5,14 @@ const {
   getCurrentUser,
   sendOtp,
   verifyOtp,
+  logout,
 } = require('../controllers/authControllers');
 const authControllers = require('../controllers/authControllers');
 const router = express.Router();
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/logout', logout);
 
 router.post('/send-otp', sendOtp);
 

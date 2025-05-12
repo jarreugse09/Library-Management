@@ -7,7 +7,6 @@ const ratingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: user,
     required: true,
-    unique: false, // unique per user-book combo instead
   },
   bookId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,7 +24,5 @@ const ratingSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
-ratingSchema.index({ user: 1, book: 1 }, { unique: true }); // enforce one rating per user per book
 
 module.exports = mongoose.model('Rating', ratingSchema);

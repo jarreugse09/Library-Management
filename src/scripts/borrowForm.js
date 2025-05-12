@@ -8,6 +8,32 @@ if (!token) {
   window.location.href = '/';
 }
 
+async function logoutUser() {
+  try {
+    const token = localStorage.getItem('jwt');
+
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem('jwt'); // Remove JWT
+
+    alert('You have been successfully logged out.');
+
+    window.location.href = '/'; // Redirect to login or home page
+  } catch (err) {
+    console.error('Logout failed', err);
+    alert('Logout failed. Please try again.');
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  logoutUser();
+});
+
 // Fetch and populate book titles
 bookSelect.addEventListener('click', async () => {
   if (hasLoadedBooks) return;

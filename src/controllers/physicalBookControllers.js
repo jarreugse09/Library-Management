@@ -59,7 +59,7 @@ exports.getAllBooks = async (req, res) => {
     const end = start + limit;
     const paginatedBooks = books.slice(start, end);
 
-    res.json({
+    res.status(200).json({
       books: paginatedBooks,
       total: totalBooks,
       page,

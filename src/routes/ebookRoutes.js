@@ -8,7 +8,7 @@ const savedBookController = require('../controllers/savedBookController');
 router.get('/', authController.protect, ebookController.getAllEbook);
 router.get('/my-book', authController.protect, ebookController.getMyBook);
 router.get(
-  'admin',
+  '/admin',
   authController.protect,
   authController.restrictTo('admin', 'librarian'),
   ebookController.getAllEbookAdmin
@@ -23,7 +23,7 @@ router.patch(
   ebookController.updateEbook
 );
 
-router.post('/rate', ratingController.rateBook);
+router.post('/:id/rate', ratingController.rateBook);
 
 router.post(
   '/my-book/save-book',

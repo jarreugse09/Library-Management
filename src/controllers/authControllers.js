@@ -35,7 +35,9 @@ const createSendToken = (user, statusCode, message, res) => {
 
 const register = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, firstName, lastName, password } = req.body;
+    if (!username || !email || !firstName || !lastName || !password)
+      return res.status(400).json({ message: 'Invalid empty fields.' });
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
@@ -49,6 +51,8 @@ const register = async (req, res) => {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // expires in 3 minutes
 
     const newUser = await User.create({
+      firstName,
+      lastName,
       username,
       email,
       password: hashedPassword,
@@ -176,11 +180,8 @@ const verifyOtp = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true,
-  });
-  res.status(200).json({ status: 'success' });
+  res.clearCookie('jwt'); // if using cookies
+  res.status(200).json({ message: 'Successfully logged out' });
 };
 
 // Admin can update roles
@@ -219,7 +220,7 @@ const updateUserRole = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select(
-      'username role email isVerified createdAt lastLogin'
+      'username role email firstName lastName isVerified createdAt lastLogin'
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);

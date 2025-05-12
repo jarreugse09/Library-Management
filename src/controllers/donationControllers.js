@@ -65,7 +65,6 @@ const createDonation = async (req, res) => {
       genre,
       bookType,
       quantity,
-      role,
     } = req.body;
     console.log(req.body);
 
@@ -148,12 +147,26 @@ const createDonation = async (req, res) => {
     }
 
     const donation = new book(donationData);
+    if (req.user.role === 'admin') {
+      donation.isApprove = true;
+      donation.isDone = true;
+    }
     await donation.save(); // Don't forget to actually save it
 
     const actionLog = new Log({
-      type: req.user.role === 'clerk' ? 'ENCODED BY CLERK' : 'DONATION',
+      type:
+        req.user.role === 'clerk'
+          ? 'ENCODED BY CLERK'
+          : req.user.role === 'admin'
+          ? 'DONATED BY ADMIN'
+          : 'DONATION',
       refId: donation._id,
-      action: req.user.role === 'clerk' ? 'approve and encode' : 'approved',
+      action:
+        req.user.role === 'clerk'
+          ? 'approve and encode'
+          : req.user.role === 'admin'
+          ? 'donated by admin'
+          : 'approved',
       role: req.user.role,
     });
 
@@ -280,7 +293,7 @@ const getAllUserDonated = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'Success',
     message: `Books retrieved successfully`,
-    data: books,
+    books: books,
   });
 });
 

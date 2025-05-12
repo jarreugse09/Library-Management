@@ -4,10 +4,10 @@ const controller = require('../controllers/physicalBookControllers');
 const authController = require('../controllers/authControllers');
 
 // Base URL: /api/books/physical
-router.get('/', controller.getAllBooks);
-router.get('/admin', controller.getAllBooksAdmin);
-router.get('/title', controller.getAllBookTitle);
-router.get('/borrowed', controller.getAllBookBorrowed);
+router.get('/', authController.protect, controller.getAllBooks);
+router.get('/admin', authController.protect, controller.getAllBooksAdmin);
+router.get('/title', authController.protect, controller.getAllBookTitle);
+router.get('/borrowed', authController.protect, controller.getAllBookBorrowed);
 router.get('/filter', controller.getAllBookFilter);
 router.get('/:id', controller.getBookById);
 router.post('/', controller.createBook);

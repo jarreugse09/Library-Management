@@ -122,7 +122,7 @@ const getAllEbook = async (req, res) => {
 
 const getMyBook = catchAsync(async (req, res, next) => {
   const myBook = await book.find({
-    donorName: req.user.username,
+    donorId: req.user.id,
     isApprove: true,
     isDone: true,
     status: { $ne: 'deleted' },

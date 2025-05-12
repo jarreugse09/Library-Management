@@ -1,9 +1,75 @@
 const token = localStorage.getItem('jwt');
+let user = null;
 
 if (!token) {
   alert('Not logged in');
   window.location.href = '/';
 }
+
+async function logoutUser() {
+  try {
+    const token = localStorage.getItem('jwt');
+
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem('jwt'); // Remove JWT
+
+    alert('You have been successfully logged out.');
+
+    window.location.href = '/'; // Redirect to login or home page
+  } catch (err) {
+    console.error('Logout failed', err);
+    alert('Logout failed. Please try again.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // Fetch user info and set button visibility
+  try {
+    const response = await fetch('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      alert('Session expired. Please log in again.');
+      localStorage.removeItem('jwt');
+      window.location.href = '/';
+      return;
+    }
+
+    if (!response.ok) throw new Error('Fetch failed');
+
+    user = await response.json();
+
+    if (user.role === 'clerk') {
+      document.getElementById('clerkBtn').style.display = 'block';
+      document.getElementById('adminBtn').style.display = 'none';
+    } else if (user.role === 'admin' || user.role === 'librarian') {
+      document.getElementById('adminBtn').style.display = 'block';
+      document.getElementById('clerkBtn').style.display = 'none';
+    } else {
+      document.getElementById('adminBtn').style.display = 'none';
+      document.getElementById('clerkBtn').style.display = 'none';
+      await logoutUser();
+      window.location.href = '/';
+      return;
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Could not load user data.');
+  }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  logoutUser();
+});
 
 function addAuthor() {
   const container = document.getElementById('authors-container');

@@ -16,13 +16,19 @@
       </div>
       <nav>
         <ul>
-          <li><a href="/userpage/library">Library</a></li>
-          <li><a href="/userpage">My Books</a></li>
+          <li><a href="/userPage" id="Browse">Browse</a></li>
+          <li><a href="/userPage" id="myBooks">My Books</a></li>
           <li class="dropdown">
             <a href="#" id="settingsToggle">Settings ▾</a>
             <ul class="dropdown-menu" id="settingsDropdown">
-              <li><a href="/userpage/account">Account</a></li>
-              <li><a href="/userpage/donateForm">Donate</a></li>
+              <li id="clerkBtn" style="display: none">
+                <a href="/clerkPage/">Clerk Page</a>
+              </li>
+              <li id="adminBtn" style="display: none">
+                <a href="/adminPage/">Admin Page</a>
+              </li>
+              <li><a href="/userPage/account">Account</a></li>
+              <li><a href="/userPage/donateForm">Donate</a></li>
               <li><a href="/borrowForm">Borrow</a></li>
             </ul>
           </li>

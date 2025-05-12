@@ -101,7 +101,8 @@
 // ];
 let user;
 let myBooks = [];
-let browseBooks = [];
+let ebooks = [];
+let physicalBooks = [];
 let savedBook = [];
 let donatedBook = [];
 
@@ -117,7 +118,7 @@ const browseBookListEl = document.getElementById('browseList');
 
 async function fetchBooks() {
   try {
-    const res = await fetch(`/api/books/ebook/my-book`, {
+    const res = await fetch(`/api/books/ebook/my-book/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
@@ -129,14 +130,59 @@ async function fetchBooks() {
   }
 }
 
-async function fetchBrowse() {
+async function logoutUser() {
+  try {
+    const token = localStorage.getItem('jwt');
+
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem('jwt'); // Remove JWT
+
+    alert('You have been successfully logged out.');
+
+    window.location.href = '/'; // Redirect to login or home page
+  } catch (err) {
+    console.error('Logout failed', err);
+    alert('Logout failed. Please try again.');
+  }
+}
+
+async function fetchBrowseEbook() {
+  const removeBtn = document.getElementById('removeToLibrary');
+  const addToLibraryBtn = document.getElementById('addToLibrary');
+
+  removeBtn.style.display = 'none';
+  addToLibraryBtn.style.display = 'block';
   try {
     const res = await fetch(`/api/books/ebook/`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
-    browseBooks.splice(0, browseBooks.length, ...(data.books || []));
-    displayBooks(browseBooks, browseBookListEl);
+    ebooks.splice(0, ebooks.length, ...(data.books || []));
+    displayBooks(ebooks, browseBookListEl);
+  } catch (err) {
+    console.error('Error fetching Browse books:', err);
+  }
+}
+
+async function fetchBrowsePhysicalBook() {
+  const removeBtn = document.getElementById('removeToLibrary');
+  const addToLibraryBtn = document.getElementById('addToLibrary');
+
+  removeBtn.style.display = 'none';
+  addToLibraryBtn.style.display = 'block';
+  try {
+    const res = await fetch(`/api/books/physical/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    physicalBooks.splice(0, physicalBooks.length, ...(data.books || []));
+    displayBooks(physicalBooks, browseBookListEl);
   } catch (err) {
     console.error('Error fetching Browse books:', err);
   }
@@ -161,6 +207,12 @@ async function fetchSavedBooks() {
 }
 
 async function fetchDonatedBooks() {
+  const removeBtn = document.getElementById('removeToLibrary');
+  const addToLibraryBtn = document.getElementById('addToLibrary');
+
+  removeBtn.style.display = 'none';
+  addToLibraryBtn.style.display = 'block';
+
   try {
     const res = await fetch(`/api/donations/my-book/`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -184,12 +236,23 @@ function displayBooks(books, container) {
     const bookItem = document.createElement('div');
     bookItem.classList.add('book-item');
     bookItem.innerHTML = `
-      <img src="${book.coverImageUrl}" alt="${book.title}">
+<img 
+  class="book-item-image ${!book.coverImageUrl ? 'no-image' : ''}" 
+  src="${book.coverImageUrl || ''}" 
+  alt="${book.title}">
+
+
       <div class="book-meta">
         <h3 class="book-title">${book.title}</h3>
         <p class="book-genre">Genre: ${book.genre}</p>
         <p class="book-author">Author: ${book.authors}</p>
         <p class="book-description">Description: ${book.description}</p>
+       <p style="display: ${
+         book.averageRating === undefined ? 'none' : 'block'
+       };">
+  Average rating: <strong>${book.averageRating?.toFixed(1) || 'N/A'}</strong> 
+  (${book.ratingCount || 0} ratings)
+</p>
       </div>
     `;
 
@@ -204,20 +267,99 @@ function displayBooks(books, container) {
 function showBookDetails(book) {
   const bookDetails = document.getElementById('bookDetails');
   const bookInfo = document.querySelector('.book-info');
+
   const addToLibraryBtn = document.getElementById('addToLibrary');
   const removeToLibrary = document.getElementById('removeToLibrary');
 
   bookDetails.innerHTML = `
-    <img src="${book.coverImageUrl}" alt="${book.title}">
-    <h3>${book.title}</h3>
-    <p>Author(s): ${book.authors}</p>
-    <p>Genre: ${
-      Array.isArray(book.genre)
-        ? book.genre.map(g => g.toUpperCase()).join(', ')
-        : book.genre
-    }</p>
-    <p>Description: ${book.description}</p>
-  `;
+  <img 
+    class="book-details-image ${!book.coverImageUrl ? 'no-image' : ''}" 
+    src="${book.coverImageUrl || ''}" 
+    alt="${book.title}">
+
+  <h3>${book.title}</h3>
+  <p>Author(s): ${book.authors}</p>
+  <p>Genre: ${
+    Array.isArray(book.genre)
+      ? book.genre.map(g => g.toUpperCase()).join(', ')
+      : book.genre
+  }</p>
+  <p>Description: ${book.description}</p>
+
+  <div class="rating-section" style="display: ${
+    book.averageRating === undefined ? 'none' : 'block'
+  };">
+    <p>Average Rating: <strong>${
+      book.averageRating?.toFixed(1) || 'N/A'
+    }</strong> (${book.ratingCount || 0} ratings)</p>
+
+    <div class="rating-stars" data-book-id="${book._id}">
+      ${[1, 2, 3, 4, 5]
+        .map(
+          star => `
+        <span class="star" data-value="${star}">&#9733;</span>
+      `
+        )
+        .join('')}
+    </div>
+    
+  </div>
+`;
+  if (book.bookType === 'physical') {
+    document.getElementById('readNowBtn').style.display = 'none';
+    document.getElementById('pdfModal').style.display = 'none';
+  }
+  if (book.bookType === 'ebook') {
+    document.getElementById('readNowBtn').style.display = 'block';
+  }
+
+  document.getElementById('readNowBtn').addEventListener('click', function () {
+    const pdfUrl = book.ebookFileUrl; // e.g. from <button id="readNowBtn" data-pdf="/ebooks/book1.pdf">
+
+    const modal = document.getElementById('pdfModal');
+    const viewer = document.getElementById('pdfViewer');
+
+    viewer.src = pdfUrl;
+    modal.style.display = 'flex';
+  });
+
+  document.getElementById('closePdfBtn').addEventListener('click', function () {
+    document.getElementById('pdfModal').style.display = 'none';
+    document.getElementById('pdfViewer').src = '';
+  });
+
+  document.querySelectorAll('.rating-stars').forEach(container => {
+    container.addEventListener('click', async e => {
+      if (!e.target.classList.contains('star')) return;
+      const value = Number(e.target.getAttribute('data-value'));
+      const bookId = container.getAttribute('data-book-id');
+
+      // Highlight selected stars
+      container.querySelectorAll('.star').forEach(star => {
+        star.classList.toggle(
+          'selected',
+          Number(star.getAttribute('data-value')) <= value
+        );
+      });
+
+      try {
+        const res = await fetch(`/api/books/ebook/${bookId}/rate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('jwt')}`,
+          },
+          body: JSON.stringify({ rating: value }),
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Rating submitted!');
+      } catch (err) {
+        document.getElementById('rating-status').textContent = 'Rating failed.';
+      }
+    });
+  });
+
   // Remove any previous event listeners to avoid duplicate calls
   const newBtn = addToLibraryBtn.cloneNode(true);
   addToLibraryBtn.parentNode.replaceChild(newBtn, addToLibraryBtn);
@@ -227,7 +369,7 @@ function showBookDetails(book) {
   const remove = removeToLibrary.cloneNode(true);
   removeToLibrary.parentNode.replaceChild(remove, removeToLibrary);
 
-  remove.addEventListener('click', () => removeToLibrary(book));
+  remove.addEventListener('click', () => removeToLibraryFunc(book));
 
   bookInfo.style.display = 'block';
 }
@@ -259,7 +401,7 @@ async function addToLibrary(book) {
   }
 }
 
-async function removeToLibrary(book) {
+async function removeToLibraryFunc(book) {
   try {
     const response = await fetch(
       `http://localhost:7001/api/books/ebook/my-book/remove-book/${book._id}`,
@@ -278,6 +420,7 @@ async function removeToLibrary(book) {
     }
     alert(data.message);
     console.log(data.message);
+    fetchSavedBooks();
   } catch (error) {
     console.error('Failed to add book to library:', error);
   }
@@ -332,6 +475,9 @@ async function loadGenres() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  let user = null;
+
+  // Fetch user info and set button visibility
   try {
     const response = await fetch('/api/auth/me', {
       headers: {
@@ -349,24 +495,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!response.ok) throw new Error('Fetch failed');
 
     user = await response.json();
+
+    if (user.role === 'clerk') {
+      document.getElementById('clerkBtn').style.display = 'block';
+      document.getElementById('adminBtn').style.display = 'none';
+    } else if (user.role === 'admin' || user.role === 'librarian') {
+      document.getElementById('adminBtn').style.display = 'block';
+      document.getElementById('clerkBtn').style.display = 'none';
+    } else {
+      document.getElementById('clerkBtn').style.display = 'none';
+      document.getElementById('adminBtn').style.display = 'none';
+    }
   } catch (err) {
     console.error(err);
     alert('Could not load user data.');
   }
 
-  if (user.role === 'clerk') {
-    document.getElementById('clerkBtn').style.display = 'block';
-    document.getElementById('adminBtn').style.display = 'none';
-  } else if (user.role === 'admin' || user.role === 'librarian') {
-    document.getElementById('adminBtn').style.display = 'block';
-    document.getElementById('clerkBtn').style.display = 'none';
-  } else {
-    document.getElementById('clerkBtn').style.display = 'none';
-    document.getElementById('adminBtn').style.display = 'none';
-  }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
+  // UI interaction listeners
   document
     .getElementById('closeBookInfo')
     .addEventListener('click', hideBookInfo);
@@ -374,41 +519,76 @@ document.addEventListener('DOMContentLoaded', () => {
     .querySelector('.search-wrapper input')
     .addEventListener('input', searchBooks);
 
-  document.getElementById('Browse').addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector('.browse').style.display = 'block';
-    document.querySelector('.books').style.display = 'none';
-    document.querySelector('.sidebar').style.display = 'none';
-    fetchBrowse();
-  });
+  // Initial load
 
-  document.getElementById('myBooks').addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector('.browse').style.display = 'none';
-    document.querySelector('.book-info').style.display = 'none';
-    document.querySelector('.sidebar').style.display = 'block';
-    document.querySelector('.books').style.display = 'block';
-    fetchBooks();
-  });
-
-  document.getElementById('savedBookBtn').addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector('.book-info').style.display = 'none';
-    document.querySelector('.browse').style.display = 'none';
-    document.querySelector('.sidebar').style.display = 'block';
-    document.querySelector('.books').style.display = 'block';
-    fetchSavedBooks();
-  });
-
-  document.getElementById('donatedBtn').addEventListener('click', e => {
-    e.preventDefault();
-    document.querySelector('.book-info').style.display = 'none';
-    document.querySelector('.browse').style.display = 'none';
-    document.querySelector('.sidebar').style.display = 'block';
-    document.querySelector('.books').style.display = 'block';
-    fetchDonatedBooks();
-  });
-
+  document.querySelector('.browse').style.display = 'none';
+  document.querySelector('.book-info').style.display = 'none';
+  document.querySelector('.genre').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'block';
+  document.querySelector('.books').style.display = 'block';
   fetchBooks();
+});
+
+document.getElementById('Browse').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.books').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'none';
+  document.querySelector('.browse').style.display = 'block';
+  document.querySelector('.genre').style.display = 'block';
+  fetchBrowseEbook();
   loadGenres();
+});
+
+document.getElementById('ebookBtn').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.books').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'none';
+  document.querySelector('.browse').style.display = 'block';
+  document.querySelector('.genre').style.display = 'block';
+  fetchBrowseEbook();
+  loadGenres();
+});
+
+document.getElementById('physicalBtn').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.books').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'none';
+  document.querySelector('.browse').style.display = 'block';
+  document.querySelector('.genre').style.display = 'block';
+  fetchBrowsePhysicalBook();
+  loadGenres();
+});
+
+document.getElementById('myBooks').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.browse').style.display = 'none';
+  document.querySelector('.book-info').style.display = 'none';
+  document.querySelector('.genre').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'block';
+  document.querySelector('.books').style.display = 'block';
+  fetchBooks();
+});
+
+document.getElementById('savedBookBtn').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.book-info').style.display = 'none';
+  document.querySelector('.browse').style.display = 'none';
+  document.querySelector('.genre').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'block';
+  document.querySelector('.books').style.display = 'block';
+  fetchSavedBooks();
+});
+
+document.getElementById('donatedBtn').addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector('.book-info').style.display = 'none';
+  document.querySelector('.browse').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'block';
+  document.querySelector('.genre').style.display = 'none';
+  document.querySelector('.books').style.display = 'block';
+  fetchDonatedBooks();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  logoutUser();
 });
