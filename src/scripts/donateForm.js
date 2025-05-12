@@ -1,3 +1,10 @@
+const token = localStorage.getItem('jwt');
+
+if (!token) {
+  alert('Not logged in');
+  window.location.href = '/';
+}
+
 function addAuthor() {
   const container = document.getElementById('authors-container');
   const div = document.createElement('div');
@@ -116,6 +123,9 @@ async function handleSubmit(event) {
     const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
       method: 'POST',
       body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -154,7 +164,11 @@ async function handleSubmit(event) {
 }
 
 async function loadGenres() {
-  const res = await fetch('/api/books/genre/'); // Replace with your actual route
+  const res = await fetch('/api/books/genre/', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }); // Replace with your actual route
   const genres = await res.json(); // Assume it returns an array like ['Fiction', 'Mystery', ...]
 
   const container = document.getElementById('genre-checkboxes');

@@ -1,6 +1,12 @@
 const bookSelect = document.getElementById('bookTitle');
 const borrowForm = document.getElementById('borrowForm');
 let hasLoadedBooks = false;
+const token = localStorage.getItem('jwt');
+
+if (!token) {
+  alert('Not logged in');
+  window.location.href = '/';
+}
 
 // Fetch and populate book titles
 bookSelect.addEventListener('click', async () => {
@@ -10,7 +16,11 @@ bookSelect.addEventListener('click', async () => {
   bookSelect.innerHTML = '<option>Loading...</option>';
 
   try {
-    const res = await fetch('http://127.0.0.1:7001/api/books/physical/title');
+    const res = await fetch('http://127.0.0.1:7001/api/books/physical/title', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!res.ok) throw new Error('Failed to fetch books');
 
     const data = await res.json();
@@ -50,6 +60,7 @@ borrowForm.addEventListener('submit', async event => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(formData),
     });

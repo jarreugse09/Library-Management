@@ -1,3 +1,10 @@
+const token = localStorage.getItem('jwt');
+
+if (!token) {
+  alert('Not logged in');
+  window.location.href = '/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Section references
   const sections = {
@@ -94,7 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchUsers() {
     try {
-      const response = await fetch('/api/users/');
+      const response = await fetch('/api/users/', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) throw new Error('Failed to fetch users');
 
@@ -207,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ username, role, status }),
       });
@@ -223,7 +235,12 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingDonations() {
     try {
       const response = await fetch(
-        'http://localhost:7001/api/donations/approve/'
+        'http://localhost:7001/api/donations/approve/',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       if (!response.ok) throw new Error('Failed to fetch');
 
@@ -283,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             role: 'librarian', // Ensure this key is included in the body
@@ -310,7 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDonationLogs() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+      const response = await fetch('http://127.0.0.1:7001/api/donations/logs', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error('Failed to fetch logs');
 
       const logs = await response.json();
@@ -351,7 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   async function fetchBorrowedBooks() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -438,7 +464,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showLoader(); // Show loader before fetching
 
-    const res = await fetch(`/api/books/physical/admin?${params.toString()}`);
+    const res = await fetch(`/api/books/physical/admin?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     const data = await res.json();
 
     let books = data.books;
@@ -550,6 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -586,6 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -718,7 +750,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const res = await fetch(`/api/books/physical/${currentBookId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(updatedBook),
     });
 
@@ -764,7 +799,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const search = ebookSearchInput.value;
       const url = `/api/books/ebook/admin?search=${search}&page=${page}&limit=10`; // Modify limit as needed
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       totalPages = data.totalPages;
@@ -889,6 +928,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -914,6 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -937,6 +978,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -1036,6 +1078,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       await fetch(`/api/books/ebook/${ebookId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         method: 'PATCH',
         body: formData,
       });
