@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const user = require('./userModel');
 
 const BookSchema = new mongoose.Schema({
   title: {
@@ -13,10 +14,7 @@ const BookSchema = new mongoose.Schema({
   publishedYear: {
     type: Number,
   },
-  donorName: {
-    type: String,
-    required: false,
-  },
+  donorId: { type: mongoose.Schema.Types.ObjectId, ref: user, required: true },
   bookType: {
     type: String,
     enum: ['physical', 'ebook', 'copy'],

@@ -800,10 +800,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }" target="_blank" class="ebook-link">View PDF</a></td>
         <td>
           <button class="edit-btn" data-id="${ebook._id}">Edit</button>
-          <button class="ebookSoftDeleteBtn" data-id="${
-            ebook._id
-          }">Delete Tag</button>
+          <button class="ebookSoftDeleteBtn"  style='display:${
+            ebook.status === 'deleted' ? 'none' : 'block'
+          }'  data-id="${ebook._id}">Delete Tag</button>
+             <button class="ebookRecover" style='display:${
+               ebook.status === 'deleted' ? 'block' : 'none'
+             }' data-id="${ebook._id}">Recover</button>
           <button class="ebookDeleteBtn" data-id="${ebook._id}">Delete</button>
+       
         </td>
       `;
       ebookList.appendChild(tr);
@@ -833,6 +837,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Soft delete (Delete Tag) button event listener
+    const ebookRecoverBtn = document.querySelectorAll('.ebookRecover');
+    ebookRecoverBtn.forEach(button => {
+      button.addEventListener('click', e => {
+        const row = e.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+        console.log(bookId);
+
+        if (confirm('Are you sure you want to recover this book?')) {
+          recoverEbook(bookId, row);
+        }
+      });
+    });
+
     const ebookSoftDeleteButtons = document.querySelectorAll(
       '.ebookSoftDeleteBtn'
     );
@@ -861,6 +878,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     });
+  }
+
+  //Recover function
+  async function recoverEbook(bookId, row) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:7001/api/books/ebook/${bookId}/recover`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        row.remove(); // Remove row from the table if the request is successful
+        alert('Book tag deleted successfully.');
+      } else {
+        alert('Failed to delete the book tag.');
+      }
+    } catch (error) {
+      console.error('Error deleting book tag:', error);
+      alert('An error occurred while deleting the book tag.');
+    }
   }
 
   // Soft delete function
@@ -955,6 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set the ebookId somewhere (for form submission later)
     ebookUpdateForm.dataset.ebookId = ebook._id;
     document.getElementById('ebookEditId').value = ebook._id;
+    document.getElementById('ebookStatus').value = ebook.status;
 
     // Populate the text inputs
     document.getElementById('ebookEditTitle').value = ebook.title || '';

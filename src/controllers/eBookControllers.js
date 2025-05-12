@@ -3,6 +3,7 @@ const fs = require('fs');
 const book = require('../models/bookModel');
 const Rating = require('../models/ratingModel');
 const multer = require('multer');
+const catchAsync = require('../utils/catchAsync');
 
 // Ensure upload directories exist
 const uploadDirectory = directory => {
@@ -119,70 +120,20 @@ const getAllEbook = async (req, res) => {
   }
 };
 
-// const getAllEbookAdmin = async (req, res) => {
-//   try {
-//     const search = (req.query.search || '').toLowerCase();
-//     const sortField = req.query.sort || 'title'; // default sort
-//     const sortOrder = req.query.order === 'desc' ? 'desc' : 'asc'; // default asc
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = parseInt(req.query.limit) || 10;
-//     const status = req.query.status || ''; // Filter by status
+const getMyBook = catchAsync(async (req, res, next) => {
+  const myBook = await book.find({
+    donorName: req.user.username,
+    isApprove: true,
+    isDone: true,
+    status: { $ne: 'deleted' },
+  });
 
-//     // Build search filters
-//     let query = {
-//       bookType: 'ebook', // Can change this as needed
-//       isApprove: true,
-//       isDone: true,
-//     };
-
-//     if (status) {
-//       query.status = status; // Add status filter if provided
-//     }
-
-//     // Fetch books from DB
-//     let books = await book.find(query); // Get all books based on the filters
-
-//     // Search - modified to match beginning of the string (prefix search)
-//     if (search) {
-//       books = books.filter(book => {
-//         const title = (book.title || '').toLowerCase();
-//         const authors = book.authors.map(author => author.toLowerCase()); // authors is an array
-//         return (
-//           title.startsWith(search) ||
-//           authors.some(author => author.startsWith(search))
-//         ); // Match any author
-//       });
-//     }
-
-//     // Sort
-//     books.sort((a, b) => {
-//       const valA = (a[sortField] || '').toString().toLowerCase();
-//       const valB = (b[sortField] || '').toString().toLowerCase();
-
-//       if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
-//       if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
-//       return 0;
-//     });
-
-//     // Pagination
-//     const totalBooks = books.length;
-//     const start = (page - 1) * limit;
-//     const end = start + limit;
-//     const paginatedBooks = books.slice(start, end);
-
-//     res.json({
-//       books: paginatedBooks,
-//       total: totalBooks,
-//       page,
-//       totalPages: Math.ceil(totalBooks / limit),
-//     });
-//   } catch (error) {
-//     console.error('Error:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-
-// Update ebook details with file upload
+  res.status(200).json({
+    status: 'success',
+    results: myBook.length,
+    books: myBook,
+  });
+});
 
 const getAllEbookAdmin = async (req, res) => {
   try {
@@ -378,6 +329,36 @@ const softDelete = async (req, res) => {
       .json({ success: false, message: 'Server Error', error: error.message });
   }
 };
+const recoverEbook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Fetch the current book details
+    const currentBook = await book.findById({ _id: id });
+    if (!currentBook || currentBook.status === 'good') {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Ebook not found' });
+    }
+
+    const updatedBook = await book.findByIdAndUpdate(
+      { _id: id },
+      { status: 'good' },
+      {
+        new: true,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Ebook recover successfully',
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: 'Server Error', error: error.message });
+  }
+};
 
 const deleteBook = async (req, res) => {
   try {
@@ -412,8 +393,10 @@ const deleteBook = async (req, res) => {
 module.exports = {
   getAllEbookAdmin,
   getAllEbook,
+  getMyBook,
   upload,
   updateEbook,
   softDelete,
   deleteBook,
+  recoverEbook,
 };

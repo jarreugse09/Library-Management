@@ -5,6 +5,8 @@ const path = require('path');
 const book = require('../models/bookModel');
 const Log = require('../models/logModel');
 const Genre = require('../models/genreModel');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/AppError');
 const app = express();
 
 // 1. Use body-parser for non-file data
@@ -55,7 +57,6 @@ const upload = multer({
 const createDonation = async (req, res) => {
   try {
     const {
-      donorName,
       title,
       authors,
       description,
@@ -72,9 +73,6 @@ const createDonation = async (req, res) => {
     console.log('Files:', req.files);
 
     // Validate required fields
-    if (!donorName) {
-      return res.status(400).json({ error: 'Donor name is required' });
-    }
 
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
@@ -118,10 +116,10 @@ const createDonation = async (req, res) => {
       coverImageUrl = `/uploads/covers/${req.files.coverImage[0].filename}`;
     }
 
-    const isApprove = donorName === 'ENCODED BY CLERK';
+    const isApprove = req.user.role === 'clerk';
 
     const donationData = {
-      donorName,
+      donorId: req.user.id,
       title,
       authors,
       description,
@@ -152,18 +150,16 @@ const createDonation = async (req, res) => {
     const donation = new book(donationData);
     await donation.save(); // Don't forget to actually save it
 
-    if (isApprove) {
-      const actionLog = new Log({
-        type: 'ENCODED BY CLERK',
-        refId: donation._id,
-        action: 'approve and encode',
-        role: role || 'clerk',
-      });
+    const actionLog = new Log({
+      type: req.user.role === 'clerk' ? 'ENCODED BY CLERK' : 'DONATION',
+      refId: donation._id,
+      action: req.user.role === 'clerk' ? 'approve and encode' : 'approved',
+      role: req.user.role,
+    });
 
-      await actionLog.save().catch(err => {
-        console.error('Failed to save action log:', err.message);
-      });
-    }
+    await actionLog.save().catch(err => {
+      console.error('Failed to save action log:', err.message);
+    });
 
     return res.status(201).json({
       message: 'Donation created successfully',
@@ -180,7 +176,9 @@ const getPending = async (req, res) => {
   try {
     const pendingDonations = await book
       .find({ isApprove: false, isDone: false })
-      .select('donorName title authors bookType publishedYear');
+
+      .select('title authors bookType publishedYear')
+      .populate('donorId', 'username');
     console.log(pendingDonations);
 
     res.json(pendingDonations);
@@ -198,7 +196,8 @@ const getApprove = async (req, res) => {
         isApprove: true,
         isDone: false,
       })
-      .select('donorName title authors bookType publishedYear'); // Only include these fields
+      .select('title authors bookType publishedYear')
+      .populate('donorId', 'username'); // Only include these fields
 
     console.log(pendingDonations);
 
@@ -218,11 +217,6 @@ const updateDonationStatus = async (req, res) => {
   }
 
   try {
-    const { role } = req.body;
-    if (!role) {
-      return res.status(400).json({ message: 'Role is required' });
-    }
-
     let donation = await book.findOne({ _id: id });
     if (!donation) {
       return res.status(404).json({ message: 'Donation not found' });
@@ -243,13 +237,10 @@ const updateDonationStatus = async (req, res) => {
     );
 
     const actionLog = new Log({
-      type:
-        donation.donorName === 'ENCODED BY CLERK'
-          ? 'ENCODED BY CLERK'
-          : 'DONATION',
+      type: req.user.role === 'clerk' ? 'ENCODED BY CLERK' : 'DONATION',
       refId: id,
       action: donStat,
-      role,
+      role: req.user.role,
     });
     await actionLog.save();
 
@@ -283,10 +274,21 @@ const updateDonationStatus = async (req, res) => {
   }
 };
 
+const getAllUserDonated = catchAsync(async (req, res, next) => {
+  const books = await book.find({ donorId: req.user.id });
+
+  res.status(200).json({
+    status: 'Success',
+    message: `Books retrieved successfully`,
+    data: books,
+  });
+});
+
 module.exports = {
   upload,
   createDonation,
   getPending,
   getApprove,
   updateDonationStatus,
+  getAllUserDonated,
 };

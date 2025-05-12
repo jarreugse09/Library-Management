@@ -17,6 +17,7 @@ router.post(
 router.get('/pending/', donationController.getPending);
 router.get('/logs', logController.getAllDonationLogs);
 router.get('/approve/', donationController.getApprove);
+router.get('/my-book/', donationController.getAllUserDonated);
 
 router.patch('/:id/:action/', donationController.updateDonationStatus);
 

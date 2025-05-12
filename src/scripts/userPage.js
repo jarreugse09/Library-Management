@@ -99,36 +99,90 @@
 //         image: "/images/OIP.jpg",
 //     }
 // ];
+let user;
+let myBooks = [];
+let browseBooks = [];
+let savedBook = [];
+let donatedBook = [];
 
-const books = [];
 const token = localStorage.getItem('jwt');
-
 if (!token) {
   alert('Not logged in');
   window.location.href = '/';
 }
 
+// DOM Elements
+const myBookListEl = document.getElementById('myBookList');
+const browseBookListEl = document.getElementById('browseList');
+
 async function fetchBooks() {
-  const res = await fetch(`/api/books/ebook/`, {
-    headers: {
-      Authorization: `Bearer ${token}`, // Send token in header if applicable
-    },
-  });
-  const data = await res.json();
-  books.splice(0, books.length, ...data.books); // clear and repopulate books array
+  try {
+    const res = await fetch(`/api/books/ebook/my-book`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    myBooks.splice(0, myBooks.length, ...(data.books || []));
+
+    displayBooks(myBooks, myBookListEl);
+  } catch (err) {
+    console.error('Error fetching My Books:', err);
+  }
 }
 
-// Function to display all books
-async function displayBooks() {
-  await fetchBooks(); // Wait for books to be fetched first
+async function fetchBrowse() {
+  try {
+    const res = await fetch(`/api/books/ebook/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    browseBooks.splice(0, browseBooks.length, ...(data.books || []));
+    displayBooks(browseBooks, browseBookListEl);
+  } catch (err) {
+    console.error('Error fetching Browse books:', err);
+  }
+}
 
-  const bookList = document.getElementById('bookList');
-  bookList.innerHTML = '';
+async function fetchSavedBooks() {
+  const removeBtn = document.getElementById('removeToLibrary');
+  const addToLibraryBtn = document.getElementById('addToLibrary');
 
-  books.forEach((book, index) => {
+  removeBtn.style.display = 'block';
+  addToLibraryBtn.style.display = 'none';
+  try {
+    const res = await fetch(`/api/books/ebook/my-book/saved`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    savedBook.splice(0, savedBook.length, ...(data.books || []));
+    displayBooks(savedBook, myBookListEl);
+  } catch (err) {
+    console.error('Error fetching Browse books:', err);
+  }
+}
+
+async function fetchDonatedBooks() {
+  try {
+    const res = await fetch(`/api/donations/my-book/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    donatedBook.splice(0, donatedBook.length, ...(data.books || []));
+    displayBooks(donatedBook, myBookListEl);
+  } catch (err) {
+    console.error('Error fetching Browse books:', err);
+  }
+}
+
+function displayBooks(books, container) {
+  if (!container) {
+    console.error('displayBooks error: container is null');
+    return;
+  }
+  container.innerHTML = '';
+
+  books.forEach(book => {
     const bookItem = document.createElement('div');
     bookItem.classList.add('book-item');
-
     bookItem.innerHTML = `
       <img src="${book.coverImageUrl}" alt="${book.title}">
       <div class="book-meta">
@@ -139,159 +193,137 @@ async function displayBooks() {
       </div>
     `;
 
-    bookItem.addEventListener('click', () => showBookDetails(index));
-    bookList.appendChild(bookItem);
+    bookItem.addEventListener('click', () => {
+      showBookDetails(book);
+    });
+
+    container.appendChild(bookItem);
   });
 }
 
-// Function to display books by genre
-function displayBooksByGenre(genre) {
-  if (genre === 'All') {
-    displayBooks();
-    return;
-  }
-
-  const bookList = document.getElementById('bookList');
-  bookList.innerHTML = '';
-
-  const filteredBooks = books.filter(book => book.genre === genre);
-
-  filteredBooks.forEach(book => {
-    const bookItem = document.createElement('div');
-    bookItem.classList.add('book-item');
-
-    bookItem.innerHTML = `
-            <img src="${book.coverImageUrl}" alt="${book.title}">
-            <div class="book-meta">
-                <h3 class="book-title">${book.title}</h3>
-                <p class="book-genre">Genre: ${book.genre.toUpperCase()}</p>
-                <p class="book-author">Author: ${book.author}</p>
-                <p class="book-description"Description: >${book.description}</p>
-            </div>
-        `;
-
-    const index = books.indexOf(book);
-    bookItem.addEventListener('click', () => showBookDetails(index));
-    bookList.appendChild(bookItem);
-  });
-}
-
-// Function to show book details
-function showBookDetails(index) {
+function showBookDetails(book) {
   const bookDetails = document.getElementById('bookDetails');
   const bookInfo = document.querySelector('.book-info');
-  const book = books[index];
+  const addToLibraryBtn = document.getElementById('addToLibrary');
+  const removeToLibrary = document.getElementById('removeToLibrary');
 
   bookDetails.innerHTML = `
-        <img src="${book.coverImageUrl}" alt="${book.title}">
-        <h3>${book.title}</h3>
-        <p>Author(s): ${book.authors}</p>
-        <p>Genre: [${book.genre.map(genre => genre.toUpperCase()) + ', '}]</p>
-        <p>Description: ${book.description}</p>
-    `;
+    <img src="${book.coverImageUrl}" alt="${book.title}">
+    <h3>${book.title}</h3>
+    <p>Author(s): ${book.authors}</p>
+    <p>Genre: ${
+      Array.isArray(book.genre)
+        ? book.genre.map(g => g.toUpperCase()).join(', ')
+        : book.genre
+    }</p>
+    <p>Description: ${book.description}</p>
+  `;
+  // Remove any previous event listeners to avoid duplicate calls
+  const newBtn = addToLibraryBtn.cloneNode(true);
+  addToLibraryBtn.parentNode.replaceChild(newBtn, addToLibraryBtn);
+
+  newBtn.addEventListener('click', () => addToLibrary(book));
+
+  const remove = removeToLibrary.cloneNode(true);
+  removeToLibrary.parentNode.replaceChild(remove, removeToLibrary);
+
+  remove.addEventListener('click', () => removeToLibrary(book));
 
   bookInfo.style.display = 'block';
 }
 
-// Function to hide the book-info section
+async function addToLibrary(book) {
+  try {
+    const response = await fetch(
+      'http://localhost:7001/api/books/ebook/my-book/save-book',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          bookId: book._id,
+        }),
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to save book.');
+    }
+    alert(data.message);
+    console.log('Book saved to library:', data);
+  } catch (error) {
+    console.error('Failed to add book to library:', error);
+  }
+}
+
+async function removeToLibrary(book) {
+  try {
+    const response = await fetch(
+      `http://localhost:7001/api/books/ebook/my-book/remove-book/${book._id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to save book.');
+    }
+    alert(data.message);
+    console.log(data.message);
+  } catch (error) {
+    console.error('Failed to add book to library:', error);
+  }
+}
+
 function hideBookInfo() {
-  const bookInfo = document.querySelector('.book-info');
-  bookInfo.style.display = 'none';
+  document.querySelector('.book-info').style.display = 'none';
 }
 
-// Function to query books by title
-function queryBookByTitle(title) {
-  const lowerCaseTitle = title.toLowerCase();
-  return books.filter(book =>
-    book.title.toLowerCase().includes(lowerCaseTitle)
-  );
-}
-
-// Function to search books
 function searchBooks() {
-  const searchInput = document.querySelector('.search-wrapper input').value;
-  const results = queryBookByTitle(searchInput);
-
-  const bookList = document.getElementById('bookList');
-  bookList.innerHTML = '';
-
-  results.forEach((book, index) => {
-    const bookItem = document.createElement('div');
-    bookItem.classList.add('book-item-horizontal');
-
-    bookItem.innerHTML = `
-        <img src="${book.image}" alt="${book.title}" class="book-cover">
-        <div class="book-meta">
-            <h3 class="book-title">${book.title}</h3>
-            <p class="book-author">Author: ${book.author}</p>
-            <p class="book-genre">Genre: ${book.genre.map(genre =>
-              genre.toUpperCase()
-            )}</p>
-        </div>
-    `;
-
-    bookItem.addEventListener('click', () => showBookDetails(index));
-    bookList.appendChild(bookItem);
-  });
+  const input = document
+    .querySelector('.search-wrapper input')
+    .value.toLowerCase();
+  const booksToSearch =
+    document.querySelector('.browse').style.display === 'block'
+      ? browseBooks
+      : myBooks;
+  const container =
+    document.querySelector('.browse').style.display === 'block'
+      ? browseBookListEl
+      : myBookListEl;
+  const filtered = booksToSearch.filter(book =>
+    book.title.toLowerCase().includes(input)
+  );
+  displayBooks(filtered, container);
 }
-
-// DOM ready logic
-document.addEventListener('DOMContentLoaded', () => {
-  const exitButton = document.getElementById('closeBookInfo');
-  if (exitButton) {
-    exitButton.addEventListener('click', hideBookInfo);
-  }
-
-  displayBooks(); // Show all books initially
-
-  const searchBar = document.querySelector('.search-wrapper input');
-  if (searchBar) {
-    searchBar.addEventListener('input', searchBooks);
-  }
-
-  // Genre filter click
-  const genreLinks = document.querySelectorAll('#genreList a');
-  genreLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      const genre = link.textContent.trim();
-      displayBooksByGenre(genre);
-      hideBookInfo();
-    });
-  });
-});
 
 async function loadGenres() {
   try {
     const response = await fetch('http://localhost:7001/api/books/genre/', {
-      headers: {
-        Authorization: `Bearer ${token}`, // Send token in header if applicable
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const genres = await response.json();
-
     const genreList = document.getElementById('genreList');
-    genreList.innerHTML = ''; // Clear any existing content
+    genreList.innerHTML = '';
 
-    // Add "All" option first
     const allLi = document.createElement('li');
-    const allA = document.createElement('a');
-    allA.href = '#All';
-    allA.textContent = 'ALL';
-    allLi.appendChild(allA);
+    allLi.innerHTML = `<a href="#All">ALL</a>`;
     genreList.appendChild(allLi);
 
-    // Convert object to array if necessary
-    const genreArray = Array.isArray(genres) ? genres : Object.values(genres);
-
-    genreArray.forEach(genre => {
-      if (!genre || !genre.name) return;
-
+    (Array.isArray(genres) ? genres : Object.values(genres)).forEach(genre => {
+      if (!genre?.name) return;
       const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `?genre=${genre.name}`;
-      a.textContent = genre.name.toUpperCase();
-      li.appendChild(a);
+      li.innerHTML = `<a href="?genre=${
+        genre.name
+      }">${genre.name.toUpperCase()}</a>`;
       genreList.appendChild(li);
     });
   } catch (error) {
@@ -299,4 +331,84 @@ async function loadGenres() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadGenres);
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      alert('Session expired. Please log in again.');
+      localStorage.removeItem('jwt');
+      window.location.href = '/';
+      return;
+    }
+
+    if (!response.ok) throw new Error('Fetch failed');
+
+    user = await response.json();
+  } catch (err) {
+    console.error(err);
+    alert('Could not load user data.');
+  }
+
+  if (user.role === 'clerk') {
+    document.getElementById('clerkBtn').style.display = 'block';
+    document.getElementById('adminBtn').style.display = 'none';
+  } else if (user.role === 'admin' || user.role === 'librarian') {
+    document.getElementById('adminBtn').style.display = 'block';
+    document.getElementById('clerkBtn').style.display = 'none';
+  } else {
+    document.getElementById('clerkBtn').style.display = 'none';
+    document.getElementById('adminBtn').style.display = 'none';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  document
+    .getElementById('closeBookInfo')
+    .addEventListener('click', hideBookInfo);
+  document
+    .querySelector('.search-wrapper input')
+    .addEventListener('input', searchBooks);
+
+  document.getElementById('Browse').addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('.browse').style.display = 'block';
+    document.querySelector('.books').style.display = 'none';
+    document.querySelector('.sidebar').style.display = 'none';
+    fetchBrowse();
+  });
+
+  document.getElementById('myBooks').addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('.browse').style.display = 'none';
+    document.querySelector('.book-info').style.display = 'none';
+    document.querySelector('.sidebar').style.display = 'block';
+    document.querySelector('.books').style.display = 'block';
+    fetchBooks();
+  });
+
+  document.getElementById('savedBookBtn').addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('.book-info').style.display = 'none';
+    document.querySelector('.browse').style.display = 'none';
+    document.querySelector('.sidebar').style.display = 'block';
+    document.querySelector('.books').style.display = 'block';
+    fetchSavedBooks();
+  });
+
+  document.getElementById('donatedBtn').addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('.book-info').style.display = 'none';
+    document.querySelector('.browse').style.display = 'none';
+    document.querySelector('.sidebar').style.display = 'block';
+    document.querySelector('.books').style.display = 'block';
+    fetchDonatedBooks();
+  });
+
+  fetchBooks();
+  loadGenres();
+});

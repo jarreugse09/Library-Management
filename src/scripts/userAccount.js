@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (response.status === 401) {
       alert('Session expired. Please log in again.');
       localStorage.removeItem('jwt');
-      window.location.href = '/login';
+      window.location.href = '/';
       return;
     }
 

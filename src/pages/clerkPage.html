@@ -35,8 +35,9 @@
         <h2>Library Clerk</h2>
         <ul>
           <li>
-            <a href="#inventory" id="inventoryLink">Inventory</a>
+            <a href="#inventory" id="inventoryLink">Book Inventory</a>
           </li>
+          <li><a href="#ebookInventory" id="eBookLink">E-Book Inventory</a></li>
           <li><a href="#newbook" id="newBookLink">Encode New Book</a></li>
           <li><a href="#donations" id="donationLink">Pending Donation</a></li>
           <li><a href="#borrowed" id="borrowedLink">Borrowed</a></li>
@@ -185,6 +186,138 @@
               </form>
             </div>
           </div>
+        </div>
+
+        <!------ EBOOK ---->
+
+        <div id="ebookInventory" class="section" style="display: none">
+          <h2>Ebook Management</h2>
+
+          <div>
+            <input
+              type="text"
+              id="ebookSearchInput"
+              placeholder="Search ebooks..."
+            />
+            <button id="ebookSearchBtn">Search</button>
+            <button id="ebookResetBtn">Reset Filters</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th class="ebook-sortable" data-field="coverImage">
+                  Cover Image
+                </th>
+                <th class="ebook-sortable" data-field="title">Title</th>
+                <th class="ebook-sortable" data-field="authors">Authors</th>
+                <th class="ebook-sortable" data-field="publishedYear">Year</th>
+                <th class="ebook-sortable" data-field="genre">Genre</th>
+                <th class="ebook-sortable" data-field="rating">Rating</th>
+                <th class="ebook-sortable" data-field="status">Status</th>
+                <th class="ebook-sortable" data-field="ebookFileUrl">PDF</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ebookList"></tbody>
+          </table>
+
+          <div>
+            <button id="ebookPrevPage">Previous</button>
+            <span id="ebookPageInfo"></span>
+            <button id="ebookNextPage">Next</button>
+          </div>
+        </div>
+        <div id="pdfViewer" style="display: none">
+          <iframe
+            id="pdfIframe"
+            style="width: 100%; height: 600px"
+            frameborder="0"
+          ></iframe>
+          <button id="closePdfViewer">Close</button>
+        </div>
+
+        <!-- Edit Ebook Modal -->
+        <div id="ebookUpdateModal" style="display: none">
+          <form id="ebookUpdateForm" enctype="multipart/form-data">
+            <h3>Edit Ebook</h3>
+
+            <input type="hidden" id="ebookEditId" />
+
+            <div>
+              <label>Title:</label>
+              <input type="text" id="ebookEditTitle" required />
+            </div>
+
+            <div>
+              <label>Authors (comma separated):</label>
+              <input type="text" id="ebookEditAuthors" required />
+            </div>
+
+            <div>
+              <label>Year:</label>
+              <input type="number" id="ebookEditYear" required />
+            </div>
+
+            <div>
+              <label>Genre:</label>
+              <input type="text" id="ebookEditGenre" required />
+            </div>
+
+            <!-- Current Cover Image Preview -->
+            <div style="margin-top: 10px">
+              <label>Current Cover Image:</label><br />
+              <img
+                id="coverImagePreview"
+                src=""
+                alt="No Cover"
+                style="
+                  width: 120px;
+                  height: 160px;
+                  object-fit: cover;
+                  display: none;
+                  margin-top: 5px;
+                "
+              />
+            </div>
+
+            <div>
+              <label>Upload New Cover Image:</label>
+              <input
+                type="file"
+                id="ebookEditCoverImage"
+                name="ebookEditCoverImage"
+                accept="image/*"
+              />
+            </div>
+
+            <!-- Current Ebook File Preview -->
+            <div>
+              <label>Current Ebook File:</label><br />
+              <a
+                id="ebookFilePreview"
+                href="#"
+                target="_blank"
+                style="display: none"
+                >View Current Ebook</a
+              >
+            </div>
+
+            <div>
+              <label>Upload New Ebook File:</label>
+              <input
+                type="file"
+                id="ebookEditFileUrl"
+                name="ebookEditFileUrl"
+                accept=".pdf,.epub"
+              />
+            </div>
+
+            <div style="margin-top: 10px">
+              <button type="submit">Save Changes</button>
+              <button type="button" id="ebookCloseModal">Cancel</button>
+            </div>
+          </form>
         </div>
 
         <!-- Modal Container -->

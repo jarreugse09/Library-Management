@@ -9,7 +9,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background-color: var(--bg);
   color: var(--text);
 }
@@ -22,7 +22,8 @@ body {
 }
 
 /* Genre sidebar styling */
-.genre {
+.genre,
+.sidebar {
   width: var(--sidebar-width);
   height: 80vh;
   background-color: var(--card-bg);
@@ -32,7 +33,8 @@ body {
   top: 80px;
 }
 
-.genre h2 {
+.genre h2,
+.sidebar h2 {
   margin-top: 0;
   font-size: 1.5rem;
   color: var(--accent);
@@ -40,17 +42,20 @@ body {
   border-bottom: 1px solid var(--accent);
 }
 
-#genreList {
+#genreList,
+#sidebarList {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-#genreList li {
+#genreList li,
+#sidebarList li {
   margin-bottom: 15px;
 }
 
-#genreList a {
+#genreList a,
+#sidebarList a {
   color: var(--text);
   text-decoration: none;
   display: block;
@@ -60,7 +65,8 @@ body {
   font-size: 1rem;
 }
 
-#genreList a:hover {
+#genreList a:hover,
+#sidebarList a:hover {
   background-color: rgba(255, 70, 85, 0.2);
   color: var(--accent);
 }

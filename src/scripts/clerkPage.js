@@ -1,7 +1,14 @@
+const token = localStorage.getItem('jwt');
+if (!token) {
+  alert('Not logged in');
+  window.location.href = '/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const sections = {
     Inventory: document.getElementById('Inventory'),
     donation: document.getElementById('donation'),
+    ebook: document.getElementById('ebookInventory'),
     borrow: document.getElementById('borrow'),
     encodeBookSection: document.getElementById('encodeBookSection'), // Make sure this exists
   };
@@ -9,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const links = {
     inventory: document.getElementById('inventoryLink'),
     donation: document.getElementById('donationLink'),
+    ebook: document.getElementById('eBookLink'),
     encodeNew: document.getElementById('newBookLink'),
     borrowed: document.getElementById('borrowedLink'),
   };
@@ -26,6 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const donationList = document.getElementById('donationList');
   const borrowList = document.getElementById('borrowList');
   const borrowLogsBtn = document.getElementById('borrowedLogsBtn');
+
+  // eBook related elements for searching, pagination, and modals
+  const ebookInventoryDiv = document.getElementById('ebookInventory');
+  const ebookUpdateModal = document.getElementById('ebookUpdateModal');
 
   function showSection(activeSection) {
     Object.keys(sections).forEach(key => {
@@ -69,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   pendingBtn?.addEventListener('click', showBorrowPending);
+
   logsBtn?.addEventListener('click', () => {
     pendingBorrow.style.display = 'none';
     borrowedLogs.style.display = 'block';
@@ -76,20 +89,37 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   links.inventory?.addEventListener('click', () => showSection('Inventory'));
+
   links.encodeNew?.addEventListener('click', () =>
     showSection('encodeBookSection')
   );
+
   links.donation?.addEventListener('click', () => {
     showSection('donation');
     showDonationPending();
   });
+
   links.borrowed?.addEventListener('click', () => {
     showSection('borrow');
     showBorrowPending();
   });
 
+  links.ebook.addEventListener('click', () => {
+    fetchEbooks();
+    showSection('ebook');
+  });
+
+  // Close the ebook update modal
+  const ebookCloseModal = document.getElementById('ebookCloseModal');
+
+  ebookCloseModal.addEventListener('click', () => {
+    ebookUpdateModal.style.display = 'none'; // Hide the modal when close is clicked
+  });
+
   async function loadGenres() {
-    const res = await fetch('/api/books/genre/'); // Replace with your actual route
+    const res = await fetch('/api/books/genre/', {
+      headers: { Authorization: `Bearer ${token}` },
+    }); // Replace with your actual route
     const genres = await res.json(); // Assume it returns an array like ['Fiction', 'Mystery', ...]
 
     const container = document.getElementById('genre-checkboxes');
@@ -126,7 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDonationLogs() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/donations/logs');
+      const response = await fetch('http://127.0.0.1:7001/api/donations/logs', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) throw new Error('Failed to fetch logs');
 
       const logs = await response.json();
@@ -186,7 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingDonations() {
     try {
       const response = await fetch(
-        'http://localhost:7001/api/donations/pending/'
+        'http://localhost:7001/api/donations/pending/',
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error('Failed to fetch');
 
@@ -220,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <tbody>
             <tr>
               <td>${donation.title}</td>
-              <td>${donation.donorName}</td>
+              <td>${donation.username}</td>
               <td>${donation.authors.join(', ')}</td>
               <td>${donation.bookType}</td>
               <td>${donation.publishedYear || 'N/A'}</td>
@@ -265,8 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ role: 'clerk' }),
         }
       );
 
@@ -285,7 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingBorrows() {
     try {
       const response = await fetch(
-        'http://127.0.0.1:7001/api/borrows/pending/'
+        'http://127.0.0.1:7001/api/borrows/pending/',
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error('Failed to fetch borrows');
 
@@ -352,10 +386,8 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            role: 'clerk', // Ensure this key is included in the body
-          }),
         }
       );
       const result = await response.json();
@@ -371,7 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchBorrowedBooks() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs');
+      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -425,6 +459,221 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // EBOOK INVENTORY
+
+  // Fetch ebook data from API
+  async function fetchEbooks(page = 1) {
+    try {
+      const search = ebookSearchInput.value;
+      const url = `/api/books/ebook/admin?search=${search}&page=${page}&limit=10`; // Modify limit as needed
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+
+      totalPages = data.totalPages;
+      currentPage = data.page;
+      ebookPageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+      renderEbooks(data.books);
+    } catch (error) {
+      console.error('Error fetching ebooks:', error);
+    }
+  }
+
+  // Render ebooks in the table
+  function renderEbooks(ebooks) {
+    ebookList.innerHTML = '';
+    ebooks.forEach(ebook => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-id', ebook._id); // Set data-id on the tr for easy access
+
+      tr.innerHTML = `
+        <td><img src="${
+          ebook.coverImageUrl
+        }" alt="Book Cover" width="50" height="75" /></td>
+        <td>${ebook.title}</td>
+        <td>${ebook.authors.join(', ')}</td>
+        <td>${ebook.publishedYear}</td>
+        <td>${ebook.genre}</td>
+        <td>⭐ ${ebook.averageRating} (${ebook.ratingCount})</td>
+
+        <td>${ebook.status}</td>
+        <td><a href="${
+          ebook.ebookFileUrl
+        }" target="_blank" class="ebook-link">View PDF</a></td>
+        <td>
+          <button class="edit-btn" data-id="${ebook._id}">Edit</button>
+          <button class="ebookSoftDeleteBtn" style='display:${
+            ebook.status === 'deleted' ? 'none' : 'block'
+          }'   data-id="${ebook._id}" >Delete</button>
+        </td>
+      `;
+      ebookList.appendChild(tr);
+    });
+
+    // Rebind edit button event listeners
+    const editButtons = document.querySelectorAll('.edit-btn');
+    editButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const ebookId = e.target.getAttribute('data-id');
+        // Find the ebook using the id
+        const ebookData = ebooks.find(book => book._id === ebookId);
+        if (ebookData) {
+          openEditEbook(ebookData); // Pass the found ebook
+        }
+      });
+    });
+
+    // Rebind ebook links
+    const ebookLinks = document.querySelectorAll('.ebook-link');
+    ebookLinks.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault(); // Prevent default behavior (link navigation)
+        const pdfUrl = link.getAttribute('href'); // Get the ebook's file URL
+        displayPdf(pdfUrl); // Call the function to display the PDF
+      });
+    });
+
+    // Soft delete (Delete Tag) button event listener
+    const ebookSoftDeleteButtons = document.querySelectorAll(
+      '.ebookSoftDeleteBtn'
+    );
+    ebookSoftDeleteButtons.forEach(button => {
+      button.addEventListener('click', e => {
+        const row = e.target.closest('tr');
+        const bookId = row.getAttribute('data-id');
+        console.log(bookId);
+
+        if (confirm('Are you sure you want to delete this book tag?')) {
+          deleteEBook(bookId, row);
+        }
+      });
+    });
+  }
+
+  // Soft delete function
+  async function deleteEBook(bookId, row) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:7001/api/books/ebook/${bookId}/delete`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        row.remove(); // Remove row from the table if the request is successful
+        alert('Book tag deleted successfully.');
+      } else {
+        alert('Failed to delete the book tag.');
+      }
+    } catch (error) {
+      console.error('Error deleting book tag:', error);
+      alert('An error occurred while deleting the book tag.');
+    }
+  }
+
+  // Function to display the PDF in the iframe
+  function displayPdf(pdfUrl) {
+    const pdfViewer = document.getElementById('pdfViewer');
+    const iframe = document.getElementById('pdfIframe');
+
+    iframe.src = pdfUrl; // Set the PDF URL in the iframe
+    pdfViewer.style.display = 'block'; // Show the PDF viewer
+
+    // Handle close button click
+    const closePdfButton = document.getElementById('closePdfViewer');
+    closePdfButton.addEventListener('click', () => {
+      pdfViewer.style.display = 'none'; // Hide the PDF viewer
+      iframe.src = ''; // Reset the iframe source to stop the PDF from loading
+    });
+  }
+
+  // Handle search button click
+  ebookSearchBtn.addEventListener('click', () => {
+    fetchEbooks(1); // Reset to first page when searching
+  });
+
+  // Handle reset button click
+  ebookResetBtn.addEventListener('click', () => {
+    ebookSearchInput.value = '';
+    fetchEbooks(1); // Reset to first page when resetting
+  });
+
+  // Handle pagination (Previous and Next buttons)
+  ebookPrevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      fetchEbooks(currentPage - 1);
+    }
+  });
+
+  ebookNextPageBtn.addEventListener('click', () => {
+    if (currentPage < totalPages) {
+      fetchEbooks(currentPage + 1);
+    }
+  });
+
+  // Function to open and populate the edit modal
+  function openEditEbook(ebook) {
+    // Set the ebookId somewhere (for form submission later)
+    ebookUpdateForm.dataset.ebookId = ebook._id;
+    document.getElementById('ebookEditId').value = ebook._id;
+
+    // Populate the text inputs
+    document.getElementById('ebookEditTitle').value = ebook.title || '';
+    document.getElementById('ebookEditAuthors').value =
+      ebook.authors?.join(', ') || '';
+
+    document.getElementById('ebookEditYear').value = ebook.publishedYear || '';
+    document.getElementById('ebookEditGenre').value = ebook.genre || '';
+
+    // Display current cover image
+    const coverPreview = document.getElementById('coverImagePreview');
+    if (coverPreview) {
+      coverPreview.src = ebook.coverImageUrl || '';
+      coverPreview.style.display = ebook.coverImageUrl ? 'block' : 'none';
+    }
+
+    // Display current ebook file link
+    const fileLink = document.getElementById('ebookFilePreview');
+    if (fileLink) {
+      fileLink.href = ebook.ebookFileUrl || '#';
+      fileLink.textContent = ebook.ebookFileUrl ? 'View Current File' : '';
+      fileLink.style.display = ebook.ebookFileUrl ? 'inline-block' : 'none';
+    }
+
+    // Show the modal
+    ebookUpdateModal.style.display = 'block';
+    ebookUpdateForm.style.display = 'block';
+  }
+
+  // Handle ebook update form submission
+  ebookUpdateForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const ebookId = document.getElementById('ebookEditId').value; // get the stored id
+    const formData = new FormData(ebookUpdateForm);
+
+    try {
+      await fetch(`/api/books/ebook/${ebookId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        method: 'PATCH',
+        body: formData,
+      });
+
+      alert('Ebook updated successfully!');
+      ebookUpdateModal.style.display = 'none';
+      fetchEbooks(); // reload ebook list
+    } catch (error) {
+      console.error('Failed to update ebook:', error);
+    }
+  });
+
   // Optional: Load default view
   showSection('Inventory');
 });
@@ -477,7 +726,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     showLoader(); // Show loader before fetching
 
-    const res = await fetch(`/api/books/physical?${params.toString()}`);
+    const res = await fetch(`/api/books/physical?${params.toString()}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await res.json();
 
     let books = data.books;
@@ -553,7 +805,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }</td>
           <td>${book.status === 'good' ? 'available' : book.status}</td>
            <td><button class="edit-btn">Edit</button>
-          <button class="deleteBtn">Tag Delete</button>
+          <button class="deleteBtn" style='display:${
+            book.status === 'deleted' ? 'none' : 'block'
+          }'  >Delete</button>
         </tr>
       `;
       inventoryList.insertAdjacentHTML('beforeend', row);
@@ -580,6 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -706,7 +961,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const res = await fetch(`/api/books/physical/${currentBookId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(updatedBook),
     });
 
@@ -809,6 +1067,7 @@ async function handleSubmit(event) {
     const response = await fetch(
       'http://127.0.0.1:7001/api/donations/donate/',
       {
+        headers: { Authorization: `Bearer ${token}` },
         method: 'POST',
         body: formData,
       }
