@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { join } = path;
+const authController = require('../controllers/authControllers');
 
 var __filename = __filename;
 var __dirname = path.dirname(__filename);
@@ -26,6 +27,10 @@ router.route('/resetPassword').get(async (req, res, next) => {
 router.route('/verify-otp').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'verify-otp.html'));
 });
+
+//PROTECT
+
+router.use(authController.protect);
 
 router.route('/dashboard').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'dashboard.html'));
