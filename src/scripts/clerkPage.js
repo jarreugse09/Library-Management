@@ -3,6 +3,7 @@ if (!token) {
   alert('Not logged in');
   window.location.href = '/';
 }
+
 let user = null;
 
 
