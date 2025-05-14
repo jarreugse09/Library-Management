@@ -1,104 +1,4 @@
-// Array of books
-// const books = [
-//     {
-//         title: "The Silent Echo",
-//         author: "Emily Winters",
-//         genre: "Mystery",
-//         description: "A detective uncovers dark secrets in a small coastal town where everyone hears whispers but no one speaks the truth.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Book Title 4",
-//         author: "Author Name 4",
-//         genre: "Fiction",
-//         description: "This is a brief description of Book Title 4.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Culinary Journeys",
-//         author: "Sophia Laurent",
-//         genre: "Non-Fiction",
-//         description: "This is a brief description of Book Title 5.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Book Title 6",
-//         author: "Author Name 6",
-//         genre: "Mystery",
-//         description: "This is a brief description of Book Title 6.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Book Title 7",
-//         author: "Author Name 7",
-//         genre: "Fantasy",
-//         description: "This is a brief description of Book Title 5.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Book Title 8",
-//         author: "Author Name 8",
-//         genre: "Science",
-//         description: "This is a brief description of Book Title 6.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Neon Shadows",
-//         author: "Jax Teller",
-//         genre: "Cyberpunk",
-//         description: "In a dystopian megacity, a hacker and a rogue AI team up to take down a corrupt corporate empire.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Love in Transit",
-//         author: "Clara Bennett",
-//         genre: "Romance",
-//         description: "Two strangers meet on a cross-country train and find their lives intertwined in unexpected ways.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Mind Over Matter",
-//         author: "Dr. Rebecca Stone",
-//         genre: "Psychology",
-//         description: "Groundbreaking research on how thoughts influence physical reality, with case studies from top neuroscientists.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "The Last Expedition",
-//         author: "Captain Henry Walsh",
-//         genre: "Adventure",
-//         description: "The harrowing true story of a 19th-century Arctic expedition that vanished for three years.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Codebreaker",
-//         author: "Lisa Zhang",
-//         genre: "Thriller",
-//         description: "A cryptanalyst races against time to stop a terrorist plot hidden in plain sight within social media algorithms.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Petals in the Storm",
-//         author: "Eleanor Hart",
-//         genre: "Historical Fiction",
-//         description: "A WWII nurse and a resistance fighter risk everything to smuggle Jewish children out of occupied France.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "Zero Gravity",
-//         author: "Neil Cosmos",
-//         genre: "Hard Sci-Fi",
-//         description: "The first manned mission to Europa uncovers evidence of extraterrestrial life beneath the ice.",
-//         image: "/images/OIP.jpg",
-//     },
-//     {
-//         title: "The Alchemist's Kitchen",
-//         author: "Genevieve LeFevre",
-//         genre: "Magical Realism",
-//         description: "A Parisian chef discovers her grandmother's recipe book can alter reality through flavors and memories.",
-//         image: "/images/OIP.jpg",
-//     }
-// ];
+
 let user;
 let myBooks = [];
 let ebooks = [];
@@ -434,17 +334,19 @@ function searchBooks() {
   const input = document
     .querySelector('.search-wrapper input')
     .value.toLowerCase();
-  const booksToSearch =
-    document.querySelector('.browse').style.display === 'block'
-      ? browseBooks
-      : myBooks;
-  const container =
-    document.querySelector('.browse').style.display === 'block'
-      ? browseBookListEl
-      : myBookListEl;
+
+  // Determine which books to search based on the active section
+  const isBrowseActive =
+    document.querySelector('.browse').style.display === 'block';
+  const booksToSearch = isBrowseActive ? ebooks.concat(physicalBooks) : myBooks;
+  const container = isBrowseActive ? browseBookListEl : myBookListEl;
+
+  // Filter books based on the input
   const filtered = booksToSearch.filter(book =>
     book.title.toLowerCase().includes(input)
   );
+
+  // Display the filtered books
   displayBooks(filtered, container);
 }
 
@@ -457,21 +359,55 @@ async function loadGenres() {
     const genreList = document.getElementById('genreList');
     genreList.innerHTML = '';
 
+    // Add "ALL" option at the top
     const allLi = document.createElement('li');
     allLi.innerHTML = `<a href="#All">ALL</a>`;
+    allLi.addEventListener('click', () => {
+      // Highlight the selected genre
+      setSelectedGenre(allLi);
+
+      // Show all books
+      displayBooks(ebooks.concat(physicalBooks), browseBookListEl);
+    });
     genreList.appendChild(allLi);
 
-    (Array.isArray(genres) ? genres : Object.values(genres)).forEach(genre => {
-      if (!genre?.name) return;
+    // Sort genres alphabetically by name
+    const sortedGenres = (Array.isArray(genres) ? genres : Object.values(genres))
+      .filter(genre => genre?.name) // Ensure the genre has a name
+      .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+
+    // Append sorted genres to the list
+    sortedGenres.forEach(genre => {
       const li = document.createElement('li');
-      li.innerHTML = `<a href="?genre=${
-        genre.name
-      }">${genre.name.toUpperCase()}</a>`;
+      li.innerHTML = `<a href="#${genre.name}">${genre.name.toUpperCase()}</a>`;
+      li.addEventListener('click', () => {
+        // Highlight the selected genre
+        setSelectedGenre(li);
+
+        // Filter books by genre
+        const filteredBooks = ebooks.concat(physicalBooks).filter(book =>
+          Array.isArray(book.genre)
+            ? book.genre.includes(genre.name)
+            : book.genre === genre.name
+        );
+        displayBooks(filteredBooks, browseBookListEl);
+      });
       genreList.appendChild(li);
     });
   } catch (error) {
     console.error('Failed to load genres:', error);
   }
+}
+
+// Function to highlight the selected genre
+function setSelectedGenre(selectedLi) {
+  // Remove the 'selected' class from all list items
+  document.querySelectorAll('#genreList li').forEach(li => {
+    li.classList.remove('selected');
+  });
+
+  // Add the 'selected' class to the clicked list item
+  selectedLi.classList.add('selected');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
