@@ -30,8 +30,6 @@ router.route('/verify-otp').get(async (req, res, next) => {
 
 //PROTECT
 
-router.use(authController.protect);
-
 router.route('/dashboard').get(async (req, res, next) => {
   res.sendFile(join(__dirname, '..', 'pages', 'dashboard.html'));
 });

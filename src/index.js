@@ -39,7 +39,7 @@ app.use('/api/books/ebook', authControllers.protect, ebookRoutes);
 app.use('/api/books/genre', authControllers.protect, genreRoutes);
 app.use('/api/borrows', authControllers.protect, borrowRoutes);
 
-// app.use('/api/users', userRoutes);
+app.use('/api/users', authControllers.protect, userRoutes);
 // app.use('/api/donations', donationRoutes);
 // app.use('/api/books/physical', physicalBookRoutes);
 // app.use('/api/books/ebook', ebookRoutes);
