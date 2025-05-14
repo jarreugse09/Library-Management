@@ -107,11 +107,11 @@ let savedBook = [];
 let donatedBook = [];
 
 const token = localStorage.getItem('jwt');
+
 if (!token) {
-  alert('Not logged in');
+  alert('You must be logged in to view this page.');
   window.location.href = '/';
 }
-
 // DOM Elements
 const myBookListEl = document.getElementById('myBookList');
 const browseBookListEl = document.getElementById('browseList');

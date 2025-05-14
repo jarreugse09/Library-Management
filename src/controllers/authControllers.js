@@ -99,7 +99,7 @@ const login = async (req, res) => {
         .json({ message: 'Please verify your account before logging in.' });
     }
 
-    const currentDate = Date.now;
+    const currentDate = Date.now();
     user.lastLogin = currentDate;
     await user.save({ validateBeforeSave: false });
     //Replaced by signToken
@@ -228,6 +228,7 @@ const getCurrentUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 const protect = catchAsync(async (req, res, next) => {
   let token;
   // 1. get token
@@ -236,8 +237,6 @@ const protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
   }
 
   if (!token)
@@ -267,7 +266,6 @@ const protect = catchAsync(async (req, res, next) => {
 
   //Grant access
   req.user = freshUser;
-  res.locals.user = freshUser;
   return next();
 });
 
