@@ -133,6 +133,7 @@ body {
   padding: 1em;
   min-height: 200px;
   max-width: 400px;
+  border: solid 1px var(--text-light);
 }
 
 .book-item:hover {

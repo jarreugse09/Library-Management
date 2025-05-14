@@ -5,6 +5,7 @@ if (!token) {
 }
 let user = null;
 
+
 async function logoutUser() {
   try {
     const token = localStorage.getItem('jwt');
@@ -26,6 +27,28 @@ async function logoutUser() {
     alert('Logout failed. Please try again.');
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Simulate fetching the user's role (replace this with actual logic)
+  const userRole = 'admin'; // Example: Replace with the actual role from your backend or session
+
+  // Update the sidebar if the user is an admin
+  if (userRole === 'admin') {
+    // Change the <h2> to "Librarian"
+    const sidebarHeading = document.querySelector('.sidebar h2');
+    if (sidebarHeading) {
+      sidebarHeading.textContent = 'Librarian';
+    }
+
+    // Change the "Encode New Book" link to "Manage Members"
+    const newBookLink = document.getElementById('newBookLink');
+    if (newBookLink) {
+      newBookLink.textContent = 'Manage Members';
+      newBookLink.href = '#members'; // Update the href attribute
+      newBookLink.id = 'manageMembersLink'; // Update the id
+    }
+  }
+});
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Fetch user info and set button visibility
