@@ -6,6 +6,11 @@
     <title>Home Page</title>
     <link rel="stylesheet" href="/styles/header.css" />
     <link rel="stylesheet" href="../styles/userPage.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+    </script>
   </head>
   <body>
     <header class="header">
@@ -66,6 +71,16 @@
         <div class="book-list" id="myBookList">
           <!-- Book items will be dynamically added here -->
         </div>
+        <!-- Modal for viewing PDF -->
+      </section>
+      <section id="pdfModal" class="pdfModal" style="display: none">
+        <div class="pdf-header">
+          <button id="prevPage">◀</button>
+          <span id="pageNum"></span> / <span id="pageCount"></span>
+          <button id="nextPage">▶</button>
+          <button id="closePdfModal">Close</button>
+        </div>
+        <canvas id="pdfCanvas"></canvas>
       </section>
 
       <!-- BROWSE SECTION -->
@@ -78,13 +93,6 @@
           <!-- Book items will be dynamically added here -->
         </div>
       </section>
-      <!-- Modal for viewing PDF -->
-      <div id="pdfModal" class="pdf-modal" style="display: none">
-        <div class="pdf-header">
-          <button id="closePdfBtn">Close</button>
-        </div>
-        <iframe id="pdfViewer" class="pdf-viewer" frameborder="0"></iframe>
-      </div>
 
       <aside class="book-info">
         <!-- Changed from div to aside -->

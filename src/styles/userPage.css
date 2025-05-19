@@ -283,13 +283,11 @@ body {
 }
 
 /*---------------- PDF DIV---------------- */
-.pdf-modal {
-  position: fixed;
+.pdfModal {
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -301,7 +299,7 @@ body {
   background: #111;
 }
 
-#closePdfBtn {
+.pdf-header button {
   background: #f44336;
   color: white;
   border: none;
@@ -309,10 +307,10 @@ body {
   cursor: pointer;
 }
 
-.pdf-viewer {
+#pdfCanvas {
   flex: 1;
-  width: 100%;
-  height: 100%;
+  max-width: 90%;
+  max-height: 80vh;
   border: none;
 }
 

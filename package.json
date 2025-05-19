@@ -24,6 +24,7 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.1",
     "path": "^0.12.7",
+    "pdfjs-dist": "^5.2.133",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

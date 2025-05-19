@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require('../controllers/authControllers');
 const ratingController = require('../controllers/ratingController');
 const savedBookController = require('../controllers/savedBookController');
+const readBookController = require('../controllers/readBookController');
 
 router.get('/', authController.protect, ebookController.getAllEbook);
 router.get('/my-book', authController.protect, ebookController.getMyBook);
@@ -30,6 +31,14 @@ router.post(
   authController.protect,
   savedBookController.savedBook
 );
+
+router.post(
+  '/savePageNumber',
+  authController.protect,
+  readBookController.createBookRead
+);
+router.get('/read', authController.protect, readBookController.getAllUserRead);
+router.delete('/pageNumber/:id', readBookController.removeBookRead);
 
 router.delete('/my-book/remove-book/:id', savedBookController.removeBook);
 router.get(

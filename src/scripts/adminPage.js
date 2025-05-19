@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // eBook related elements for searching, pagination, and modals
   const ebookInventoryDiv = document.getElementById('ebookInventory');
   const ebookUpdateModal = document.getElementById('ebookUpdateModal');
+  const ebookForm = document.getElementById('ebookUpdateForm');
 
   // Handle link clicks to show corresponding sections
   links.inventory.addEventListener('click', () => {
@@ -106,7 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showDonationPending(); // Show pending donations when the Donation section is shown
   });
 
+  const memberListTable = document.getElementById('memberListTable');
+
   links.manageMem.addEventListener('click', () => {
+    memberListTable.style.display = 'block';
+    memberUpdateModal.style.display = 'none';
     showSection('manageMember');
     showUsers();
   });
@@ -137,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const memberModalBtn = document.getElementById('memberClose');
   const memberUpdateModal = document.getElementById('formMember');
+  const form = document.getElementById('memberForm');
 
   memberModalBtn.addEventListener('click', () => {
     memberUpdateModal.style.display = 'none';
@@ -146,6 +152,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Function to show the correct section
   function showSection(sectionName) {
+    memberUpdateModal.style.display = 'none';
+    updateBookModal.style.display = 'none';
+    updateBookForm.style.display = 'none';
+    ebookForm.style.display = 'none';
     Object.keys(sections).forEach(section => {
       if (section === sectionName) {
         sections[section].style.display = 'block'; // Show selected section
@@ -494,10 +504,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetFiltersBtn = document.getElementById('resetFiltersBtn');
   const inventoryLink = document.querySelector('.inventoryLink');
 
-  const updateBookModal = document.getElementById('updateBookModal');
   const closeUpdateModalBtn = document.getElementById('closeUpdateModal');
+  const editEbookBtn = document.querySelector('.edit-btn');
   const updateBookForm = document.getElementById('updateBookForm');
-  const editEbookBtn = document.getElementById('ebook-edit-btn');
+  const updateBookModal = document.getElementById('updateBookModal');
 
   let currentPage = 1;
   let totalPages = 1;
@@ -601,29 +611,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     books.forEach(book => {
-      const row = `
-        <tr data-id="${book._id}">
-          <td>${book.title}</td>
-          <td>${book.authors.join(', ')}</td>
-          <td>${book.publishedYear}</td>
-          <td>${book.genre}</td>
-          <td>${book.quantity}</td>
-          <td>${book.bookType.toUpperCase()}</td>
-          <td>${book.condition.toUpperCase()}</td>
-          <td>${
-            book.shelfLocation == null
-              ? 'NOT SET'
-              : book.shelfLocation.toUpperCase()
-          }</td>
-          <td>${
-            book.status === 'good' ? 'AVAILABLE' : book.status.toUpperCase()
-          }</td>
-          <td><button id="ebook-edit-btn">Edit</button>
-          <button class="deleteBtn">Tag Delete</button>
-          <button class="finalDeleteBtn">Delete</button></td>
-        </tr>
-      `;
-      inventoryList.insertAdjacentHTML('beforeend', row);
+      if (!book) return; // skip null entries
+
+      const row = document.createElement('tr');
+      row.dataset.id = book._id;
+      row.innerHTML = `
+      <td>${book.title}</td>
+      <td>${book.authors.join(', ')}</td>
+      <td>${book.publishedYear || 'N/A'}</td>
+      <td>${book.genre.join(', ')}</td>
+      <td>${book.quantity || 'N/A'}</td>
+      <td>${book.bookType?.toUpperCase()}</td>
+      <td>${book.condition?.toUpperCase()}</td>
+      <td>${
+        book.shelfLocation ? book.shelfLocation.toUpperCase() : 'NOT SET'
+      }</td>
+      <td>${
+        book.status === 'good' ? 'AVAILABLE' : book.status.toUpperCase()
+      }</td>
+      <td>
+        <button class="ebook-edit-btn">Edit</button>
+        <button class="deleteBtn">Tag Delete</button>
+        <button class="finalDeleteBtn">Delete</button>
+      </td>
+    `;
+
+      inventoryList.appendChild(row);
+
+      const editBtn = row.querySelector('.ebook-edit-btn');
+      editBtn.addEventListener('click', () => {
+        updateBookModal.style.display = 'block';
+        updateBookForm.style.display = 'block';
+        openUpdateModal(book);
+      });
     });
   }
 
@@ -726,11 +746,6 @@ document.addEventListener('DOMContentLoaded', () => {
     currentPage = 1;
     fetchBooks();
   }
-
-  editEbookBtn.addEventListener('click', () => {
-    updateBookModal.style.display = 'block';
-    openUpdateModal();
-  });
 
   function openUpdateModal(book) {
     console.log('Opening modal for book:', book);
