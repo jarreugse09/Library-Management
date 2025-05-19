@@ -274,50 +274,118 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  document.getElementById('memberForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const form = e.target;
-    const userId = form.getAttribute('data-id');
-    const username = document.getElementById('updateMemName').value.trim();
-    const role = document.getElementById('updateMemRole').value.trim();
-    let status = document.getElementById('updateMemStatus').value.trim();
+// Hide the update form and show the member list
+function closeMemberForm() {
+  const memberListTable = document.getElementById('memberListTable');
+  memberListTable.style.display = 'block';
+  // Optionally refresh the member list
+  if (typeof fetchUsers === 'function') fetchUsers();
+}
 
-    if (!username || !role || !status) {
-      alert('Please fill in all fields.');
-      return;
-    }
+// Handle Save (submit)
+document.getElementById('memberForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const userId = form.getAttribute('data-id');
+  const username = document.getElementById('updateMemName').value.trim();
+  const role = document.getElementById('updateMemRole').value.trim();
+  let status = document.getElementById('updateMemStatus').value.trim();
 
-    // Optionally normalize status (depends on your backend logic)
-    if (status === 'inactive') status = 'deleted';
+  if (!username || !role || !status) {
+    alert('Please fill in all fields.');
+    return;
+  }
 
+  // Optionally normalize status (depends on your backend logic)
+  if (status === 'inactive') status = 'deleted';
+
+  try {
+    const response = await fetch(`/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ username, role, status }),
+    });
+
+    if (!response.ok) throw new Error('Failed to update user');
+    alert('User updated successfully!');
+  } catch (error) {
+    console.error('Update failed:', error);
+    alert('Failed to update user');
+  }
+});
+
+// Handle Cancel
+document.getElementById('memberClose').addEventListener('click', closeMemberForm);
+
+  async function loadDonationLogs() {
     try {
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ username, role, status }),
+      const response = await fetch('http://127.0.0.1:7001/api/donations/logs', {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      if (!response.ok) throw new Error('Failed to fetch logs');
 
-      if (!response.ok) throw new Error('Failed to update user');
-      alert('User updated successfully!');
-      fetchUsers(); // Refresh table
+      const logs = await response.json();
+      const logList = document.getElementById('donationLogList');
+      logList.innerHTML = ''; // Clear previous logs
+      const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
+      const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
+
+      if (donationLogs.length === 0) {
+        logList.innerHTML = '<li>No donation logs found.</li>';
+      } else {
+        // Create a table for the donation logs
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>User</th>
+              <th>Action</th>
+              <th>Donated Book ID</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        `;
+
+        // Append the table to the log list container
+        logList.appendChild(table);
+
+        // Populate the table with log data
+        const tbody = table.querySelector('tbody');
+        donationLogs.forEach(log => {
+          const date = new Date(log.timestamp).toLocaleString();
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${date}</td>
+            <td>${log.type}</td>
+            <td>${log.role.toUpperCase()}</td>
+            <td>${
+              log.action === 'approve and encode'
+                ? 'ENCODE'
+                : log.action.toUpperCase()
+            }</td>
+            <td>${log.refId}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      document.getElementById('donationLogs').style.display = 'block';
     } catch (error) {
-      console.error('Update failed:', error);
-      alert('Failed to update user');
+      console.error('Error fetching donation logs:', error);
     }
-  });
+  }
 
   async function fetchPendingDonations() {
     try {
       const response = await fetch(
-        'http://localhost:7001/api/donations/approve/',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        'http://localhost:7001/api/donations/pending/',
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error('Failed to fetch');
 
@@ -334,34 +402,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
       donations.forEach(donation => {
         const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>${donation.title}</strong><br>
-          Donated by: ${donation.donorId.username}<br>
-          Authors: ${donation.authors.join(', ')}<br>
-          Book Type: ${donation.bookType}<br>
-          Published Year: ${donation.publishedYear || 'N/A'}<br>
+
+        // Create a table for the donation data
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Donated By</th>
+              <th>Authors</th>
+              <th>Book Type</th>
+              <th>Published Year</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${donation.title}</td>
+              <td>${donation.username}</td>
+              <td>${donation.authors.join(', ')}</td>
+              <td>${donation.bookType}</td>
+              <td>${donation.publishedYear || 'N/A'}</td>
+              <td>
+                <div class="button-container">
+                  <button class="approve-btn">Approve</button>
+                  <button class="reject-btn">Reject</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
         `;
 
-        // Create approve button and attach event listener
-        const approveBtn = document.createElement('button');
-        approveBtn.textContent = 'Approve';
+        // Add event listeners to the buttons
+        const approveBtn = table.querySelector('.approve-btn');
         approveBtn.addEventListener('click', () =>
-          handleAction(donation._id, 'done')
+          handleAction(donation._id, 'approve')
         );
 
-        // Create reject button and attach event listener
-        const rejectBtn = document.createElement('button');
-        rejectBtn.textContent = 'Reject';
+        const rejectBtn = table.querySelector('.reject-btn');
         rejectBtn.addEventListener('click', () =>
-          handleAction(donation._id, 'rejected')
+          handleAction(donation._id, 'reject')
         );
 
-        // Append buttons to the list item
-        li.appendChild(approveBtn);
-        li.appendChild(rejectBtn);
+        // Append the table to the list item
+        li.appendChild(table);
         li.appendChild(document.createElement('hr'));
 
-        // Append list item to the list
+        // Append the list item to the list
         list.appendChild(li);
       });
     } catch (err) {
@@ -372,88 +459,118 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleAction(donationId, action) {
     try {
       const response = await fetch(
-        `http://localhost:7001/api/donations/${donationId}/${action}/`,
+        `http://127.0.0.1:7001/api/donations/${donationId}/${action}`,
         {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({
-            role: 'librarian', // Ensure this key is included in the body
-          }),
         }
       );
 
       const result = await response.json();
-      console.log('result::', result);
-      if (response.ok || response.status === 200) {
+      if (response.ok) {
         alert(result.message);
         fetchPendingDonations(); // reload list
       } else {
-        // Only display result.error if it exists
-        const errorMessage = result.error
-          ? result.error
-          : 'No additional error info available';
-        alert(`Error: ${result}, ${errorMessage}`);
-        console.log(`Error: ${result}, ${errorMessage}`);
+        alert(`Error: ${result.message}`);
       }
     } catch (err) {
       console.error(`Error trying to ${action} donation:`, err);
     }
   }
 
-  async function loadDonationLogs() {
+async function fetchPendingBorrows() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/donations/logs', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch logs');
+      const response = await fetch(
+        'http://127.0.0.1:7001/api/borrows/pending/',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!response.ok) throw new Error('Failed to fetch borrows');
 
-      const logs = await response.json();
-      const logList = document.getElementById('donationLogList');
-      logList.innerHTML = ''; // Clear previous logs
-      const allowedTypes = ['DONATION', 'ENCODED BY CLERK'];
-      const donationLogs = logs.filter(log => allowedTypes.includes(log.type));
+      const data = await response.json();
 
-      if (donationLogs.length === 0) {
-        logList.innerHTML = '<li>No donation logs found.</li>';
-      } else {
-        donationLogs.forEach(log => {
-          const listItem = document.createElement('li');
-          const date = new Date(log.timestamp).toLocaleString();
-
-          listItem.textContent = `DATE: [${date}] TYPE: ${
-            log.type
-          } USER: ${log.role.toUpperCase()} ACTION: ${
-            log.action === 'approve and encode'
-              ? 'ENCODE'
-              : log.action.toUpperCase()
-          }
-        
-        ${
-          log.action === 'approve and encode'
-            ? 'ENCODED BY CLERK '
-            : 'DONATED BOOK '
-        }ID: ${log.refId}`;
-
-          logList.appendChild(listItem);
-        });
+      // Ensure the data is an array
+      if (!Array.isArray(data)) {
+        throw new Error('Expected data to be an array');
       }
 
-      document.getElementById('donationLogs').style.display = 'block';
-    } catch (error) {
-      console.error('Error fetching donation logs:', error);
+      borrowList.innerHTML = ''; // Clear any previous data
+
+      // Check if there are no pending borrow requests
+      if (data.length === 0) {
+        borrowList.innerHTML = '<li>No pending borrow requests found.</li>';
+        return;
+      }
+
+      data.forEach(borrow => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+          <strong>Book ID: ${borrow.borrowedBookId}</strong><br>
+           <strong>Book Title: ${borrow.bookTitle}</strong><br>
+          Borrowed by: ${borrow.borrowerName}<br>
+          Contact Info: ${borrow.contactInfo}<br>
+          Borrow Date: ${new Date(borrow.borrowDate).toLocaleDateString()}<br>
+          Expected Return Date: ${new Date(
+            borrow.returnDate
+          ).toLocaleDateString()}<br><br>
+      
+        `;
+        // Create approve button and attach event listener
+        const approveBtn = document.createElement('button');
+        approveBtn.textContent = 'Approve';
+        approveBtn.addEventListener('click', () =>
+          handleActionBorrow(borrow._id, 'approve')
+        );
+
+        // Create reject button and attach event listener
+        const rejectBtn = document.createElement('button');
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', () =>
+          handleActionBorrow(borrow._id, 'reject')
+        );
+
+        // Append buttons to the list item
+        listItem.appendChild(approveBtn);
+        listItem.appendChild(rejectBtn);
+        listItem.appendChild(document.createElement('hr'));
+
+        borrowList.appendChild(listItem);
+      });
+    } catch (err) {
+      console.error('Error loading borrows:', err);
+      borrowList.innerHTML = '<li>Error loading borrow requests.</li>';
     }
   }
+
+  async function handleActionBorrow(_id, action) {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:7001/api/borrows/${_id}/${action}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message);
+        fetchPendingBorrows(); // reload list
+      }
+    } catch (err) {
+      console.error(`Error trying to ${action} borrow:`, err);
+    }
+  }
+
   async function fetchBorrowedBooks() {
     try {
       const response = await fetch('http://127.0.0.1:7001/api/borrows/logs', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -469,24 +586,39 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!borrowedBooks.length) {
         borrowLog.innerHTML = '<li>No borrowed books found.</li>';
       } else {
+        // Create a table for the borrowed books
+        const table = document.createElement('table');
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Borrower</th>
+              <th>Borrowed At</th>
+              <th>Will Return</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        `;
+
+        // Append the table to the borrow log container
+        borrowLog.appendChild(table);
+
+        // Populate the table with borrowed book data
+        const tbody = table.querySelector('tbody');
         borrowedBooks.forEach(book => {
-          const li = document.createElement('li');
-          li.innerHTML = `
-            <strong>TITLE: ${book.bookTitle}</strong> — Borrower: ${
-            book.borrowerName
-          } |
-            Borrowed At: ${new Date(book.borrowDate).toLocaleDateString()} |
-           Will Return: ${new Date(
-             book.returnDate
-           ).toLocaleDateString()} | User: ${book.role}
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${book.bookTitle}</td>
+            <td>${book.borrowerName}</td>
+            <td>${new Date(book.borrowDate).toLocaleDateString()}</td>
+            <td>${new Date(book.returnDate).toLocaleDateString()}</td>
+            <td>${book.role.toUpperCase()}</td>
           `;
-          borrowLog.appendChild(li);
+          tbody.appendChild(row);
         });
       }
-
-      // Reveal the borrowed books section
-      document.getElementById('borrow').style.display = 'block';
-      document.getElementById('borrowedLogs').style.display = 'block';
     } catch (error) {
       console.error('Error fetching borrowed books:', error);
       alert('Failed to fetch borrowed books. Please try again.');
