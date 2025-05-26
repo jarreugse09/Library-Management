@@ -217,6 +217,84 @@ const getMonthlyBorrowed = catchAsync(
   }
 );
 
+const getMonthlyUser = catchAsync(
+  async (req, res, next) => {
+    const stats = await user.aggregate([
+      {
+        $match: {
+          createdAt: { $ne: null },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: {
+          '_id.year': 1,
+          '_id.month': 1,
+        },
+      },
+    ]);
+
+    const formattedStats = stats.map(item => ({
+      label: `${monthNames[item._id.month]} ${
+        item._id.year
+      }`,
+      value: item.count,
+    }));
+
+    res.status(200).json({
+      status: 'success',
+      results: formattedStats.length,
+      books: formattedStats,
+    });
+  }
+);
+
+const getTop20Borrowed = catchAsync(
+  async (req, res, next) => {
+    const topBooks = await borrow.aggregate([
+      {
+        $match: {
+          status: {
+            $in: ['borrowed', 'returned'],
+          }, // consider only successful borrows
+        },
+      },
+      {
+        $group: {
+          _id: '$borrowedBookId',
+          borrowCount: { $sum: 1 },
+          title: { $first: '$bookTitle' }, // get the first title per group
+        },
+      },
+      {
+        $sort: { borrowCount: -1 },
+      },
+      {
+        $limit: 20,
+      },
+      {
+        $project: {
+          label: '$title',
+          value: '$borrowCount',
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      results: topBooks.length,
+      books: topBooks,
+    });
+  }
+);
 const getTop20 = catchAsync(
   async (req, res, next) => {
     const topBooks = await book
@@ -276,4 +354,6 @@ module.exports = {
   getMonthlyBorrowed,
   getTop20,
   getRoles,
+  getTop20Borrowed,
+  getMonthlyUser,
 };

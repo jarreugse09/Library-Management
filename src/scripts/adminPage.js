@@ -291,13 +291,34 @@ document.addEventListener(
       document.getElementById('borrowedStatBtn');
     const donatedStatBtn =
       document.getElementById('donatedStatBtn');
+    const registeredUserBtn =
+      document.getElementById(
+        'registeredUserBtn'
+      );
 
     let currentChart;
     let allDonatedData = [];
     let allBorrowedData = [];
+    let allUserData = [];
 
     //buttons
+    function setActiveButton(clickedButton) {
+      const allButtons = [
+        statsBtn,
+        monthlyBtn,
+        borrowedStatBtn,
+        donatedStatBtn,
+        registeredUserBtn,
+      ];
+
+      allButtons.forEach(btn =>
+        btn.classList.remove('active')
+      );
+      clickedButton.classList.add('active');
+    }
+
     statsBtn.addEventListener('click', () => {
+      setActiveButton(statsBtn);
       bookStats.style.display = 'block';
       monthlyStatContainer.style.display = 'none';
       currentChart.destroy();
@@ -305,6 +326,7 @@ document.addEventListener(
     });
 
     monthlyBtn.addEventListener('click', () => {
+      setActiveButton(monthlyBtn);
       bookStats.style.display = 'none';
       monthlyStatContainer.style.display =
         'block';
@@ -317,6 +339,7 @@ document.addEventListener(
     donatedStatBtn.addEventListener(
       'click',
       () => {
+        setActiveButton(donatedStatBtn);
         bookStats.style.display = 'none';
         monthlyStatContainer.style.display =
           'block';
@@ -330,6 +353,7 @@ document.addEventListener(
     borrowedStatBtn.addEventListener(
       'click',
       () => {
+        setActiveButton(borrowedStatBtn);
         bookStats.style.display = 'none';
         monthlyStatContainer.style.display =
           'block';
@@ -337,6 +361,20 @@ document.addEventListener(
           currentChart.destroy();
         }
         loadMonthlyBorrowedStats();
+      }
+    );
+
+    registeredUserBtn.addEventListener(
+      'click',
+      () => {
+        setActiveButton(registeredUserBtn);
+        bookStats.style.display = 'none';
+        monthlyStatContainer.style.display =
+          'block';
+        if (currentChart) {
+          currentChart.destroy();
+        }
+        loadMonthlyUsers();
       }
     );
 
@@ -411,6 +449,10 @@ document.addEventListener(
             fetchBookTotal();
             fetchTop20();
             break;
+          case 'top20Borrowed':
+            fetchBookTotal();
+            fetchTop20Borrowed();
+            break;
           case 'roles':
             fetchBookTotal();
             fetchRoleUser();
@@ -432,12 +474,39 @@ document.addEventListener(
 
         const data = await res.json();
         allDonatedData = data.books;
-
+        console.log(allDonatedData);
         populateYearFilter(allDonatedData);
         createChart(
           allDonatedData,
-          'bar',
+          'line',
           'Monthly Donated Books'
+        ); // default chart
+      } catch (err) {
+        console.error(
+          'Error fetching donated stats:',
+          err
+        );
+      }
+    }
+    async function loadMonthlyUsers() {
+      try {
+        const res = await fetch(
+          '/api/dashboard/monthly/users',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // include this if using JWT
+            },
+          }
+        );
+
+        const data = await res.json();
+        allUserData = data.books;
+        console.log(allUserData);
+        populateYearFilter(allUserData);
+        createChart(
+          allUserData,
+          'bar',
+          'Monthly Registered User'
         ); // default chart
       } catch (err) {
         console.error(
@@ -464,7 +533,7 @@ document.addEventListener(
         populateYearFilter(allBorrowedData);
         createChart(
           allBorrowedData,
-          'bar',
+          'line',
           'Monthly Borrowed Books'
         ); // default chart
       } catch (err) {
@@ -500,18 +569,30 @@ document.addEventListener(
 
     yearFilter.addEventListener('change', () => {
       const selectedYear = yearFilter.value;
+      const dataset =
+        borrowedStatBtn.classList.contains(
+          'active'
+        )
+          ? allBorrowedData
+          : allDonatedData;
 
       const filteredData =
         selectedYear === 'All'
-          ? allBorrowedData
-          : allBorrowedData.filter(item =>
+          ? dataset
+          : dataset.filter(item =>
               item.label.endsWith(selectedYear)
             );
 
       createChart(
         filteredData,
         'bar',
-        'Monthly Donated'
+        `Monthly ${
+          borrowedStatBtn.classList.contains(
+            'active'
+          )
+            ? 'Borrowed'
+            : 'Donated'
+        } Books`
       );
     });
 
@@ -573,6 +654,36 @@ document.addEventListener(
           data.books,
           'bar',
           'Top 20 Books'
+        );
+      } catch (error) {
+        console.error(
+          'Error fetching totals:',
+          error
+        );
+      }
+    }
+    async function fetchTop20Borrowed() {
+      try {
+        const response = await fetch(
+          '/api/dashboard/top-20-borrowed',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok)
+          throw new Error(
+            'Failed to fetch book totals'
+          );
+
+        const data = await response.json();
+
+        createChart(
+          data.books,
+          'bar',
+          'Top 20 Borrowed Books'
         );
       } catch (error) {
         console.error(

@@ -5,8 +5,10 @@ const {
   getMonthlyDonated,
   getPhysicalBooksByCondition,
   getMonthlyBorrowed,
+  getMonthlyUser,
   getTop20,
   getRoles,
+  getTop20Borrowed,
 } = require('../controllers/dashboardControllers');
 const router = express.Router();
 
@@ -26,7 +28,11 @@ router.get(
   getMonthlyBorrowed
 );
 
+router.get('/monthly/users', getMonthlyUser);
+
 router.get('/top-20', getTop20);
+
+router.get('/top-20-borrowed', getTop20Borrowed);
 
 router.get('/roles', getRoles);
 
