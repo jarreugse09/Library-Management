@@ -20,9 +20,7 @@ async function logoutUser() {
 
     localStorage.removeItem('jwt'); // Remove JWT
 
-    alert(
-      'You have been successfully logged out.'
-    );
+    alert('You have been successfully logged out.');
 
     window.location.href = '/'; // Redirect to login or home page
   } catch (err) {
@@ -795,33 +793,6 @@ document.addEventListener(
       donationPending.style.display = 'block';
       donationLogs.style.display = 'none';
       fetchPendingDonations();
-    }
-
-    // Get references to the buttons and containers
-    const pendingBorrowBtn = document.getElementById('pendingBorrowBtn');
-    const borrowedLogsBtn = document.getElementById('borrowedLogsBtn');
-    const pendingBorrowDiv = document.getElementById('pending-borrow');
-    const borrowedLogsDiv = document.getElementById('borrowedLogs');
-
-    // Pending button: show pending borrows
-    pendingBorrowBtn.addEventListener('click', () => {
-      pendingBorrowDiv.style.display = 'block';
-      borrowedLogsDiv.style.display = 'none';
-      showBorrowedPending();
-    });
-
-    // Logs button: show borrow logs
-    borrowedLogsBtn.addEventListener('click', () => {
-      pendingBorrowDiv.style.display = 'none';
-      borrowedLogsDiv.style.display = 'block';
-      fetchBorrowedBooks();
-    });
-
-    // Function to show pending borrows
-    function showBorrowedPending() {
-      pendingBorrowDiv.style.display = 'block';
-      borrowedLogsDiv.style.display = 'none';
-      fetchPendingBorrows();
     }
 
     async function fetchUsers() {

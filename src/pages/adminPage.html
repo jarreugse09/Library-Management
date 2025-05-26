@@ -22,7 +22,7 @@
       <!-- Changed from div to header -->
       <div class="logo">
         <img src="../images/OIP.jpg" alt="Logo" />
-        <h1>LibAG</h1>
+        <h1>LibraLink</h1>
         <!-- Added missing h1 -->
       </div>
       <nav>
@@ -75,7 +75,7 @@
                 <a href="/borrowForm">Borrow</a>
               </li>
               <li>
-                <a href="#" id="logoutBtn"
+                <a href="/" id="logoutBtn"
                   >Logout</a
                 >
               </li>
@@ -125,6 +125,7 @@
             <a
               href="#borrowed"
               id="borrowedLink"
+              onclick="fetchBorrowedBooks()"
               >Borrowed</a
             >
           </li>
@@ -837,5 +838,6 @@
     </div>
     <script src="/scripts/adminPage.js"></script>
     <script src="/scripts/header.js"></script>
+    <script src="/scripts/clerkPage.js"></script>
   </body>
 </html>
