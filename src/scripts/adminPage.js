@@ -1,4 +1,4 @@
-const token = localStorage.getItem('jwt');
+let token = localStorage.getItem('jwt');
 
 let user = null;
 
@@ -9,7 +9,7 @@ if (!token) {
 
 async function logoutUser() {
   try {
-    const token = localStorage.getItem('jwt');
+     token = localStorage.getItem('jwt');
 
     await fetch('/api/auth/logout', {
       method: 'POST',
@@ -190,7 +190,10 @@ document.addEventListener(
         showUsers();
       }
     );
-
+    const borrowedPendingBtn = document.getElementById('pendingBorrowBtn' );
+    const borrowedLogsBtn = document.getElementById('borrowedLogsBtn' );
+const borrowedPendingStyle = document.getElementById('pending-borrow');
+const borrowedLogsStyle = document.getElementById('borrowedLogs');
     donationPendingBtn.addEventListener(
       'click',
       showDonationPending
@@ -204,10 +207,30 @@ document.addEventListener(
       }
     );
 
+
+        borrowedPendingBtn.addEventListener(
+          
+      'click',()=>{
+        borrowedPendingStyle.style.display='block';
+borrowedLogsStyle.style.display= 'none';
+    fetchPendingBorrows();
+showSection('borrow');
+  }
+    );
+    borrowedLogsBtn.addEventListener(
+      'click',
+      () => {
+           borrowedPendingStyle.style.display='none';
+borrowedLogsStyle.style.display= 'block';
+       fetchBorrowedBooks();
+        showSection('borrow');
+      }
+    );
     links.borrowed.addEventListener(
       'click',
       () => {
         fetchBorrowedBooks();
+        fetchPendingBorrows();
         showSection('borrow');
       }
     );
