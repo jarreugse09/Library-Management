@@ -31,31 +31,42 @@
       </div>
     </div>
 
-    <script>
-      document
-        .getElementById('loginForm')
-        .addEventListener('submit', async e => {
-          e.preventDefault();
+  <script>
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', async e => {
+      e.preventDefault();
 
-          const username = document.getElementById('username').value;
-          const password = document.getElementById('password').value;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
 
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password }),
-            credentials: 'include',
-          });
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      const phTime = new Date(utc + 8 * 60 * 60000);
+      const hour = phTime.getHours();
 
-          const data = await response.json();
-          if (response.ok) {
-            localStorage.setItem('jwt', data.token);
-            alert('Login successful!');
-            window.location.href = '/userPage';
-          } else {
-            alert(data.message || 'Login failed.');
-          }
-        });
-    </script>
+      if (username.toLowerCase() !== 'admin' && (hour >= 22 || hour < 5)) {
+        alert('Logins are only allowed from 5AM to 10PM');
+        return;
+      }
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('jwt', data.token);
+        alert('Login successful!');
+        window.location.href = '/userPage';
+      } else {
+        alert(data.message || 'Login failed.');
+      }
+    });
+</script>
+
   </body>
 </html>
