@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function loadDonationLogs() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/donations/logs', {
+      const response = await fetch('/api/donations/logs', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error('Failed to fetch logs');
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleAction(donationId, action) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:7001/api/donations/${donationId}/${action}`,
+        `/api/donations/${donationId}/${action}`,
         {
           method: 'PATCH',
           headers: {
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingBorrows() {
     try {
       const response = await fetch(
-        'http://127.0.0.1:7001/api/borrows/pending/',
+        '/api/borrows/pending/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error('Failed to fetch borrows');
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleActionBorrow(_id, action) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:7001/api/borrows/${_id}/${action}`,
+        `/api/borrows/${_id}/${action}`,
         {
           method: 'PATCH',
           headers: {
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchBorrowedBooks() {
     try {
-      const response = await fetch('http://127.0.0.1:7001/api/borrows/logs', {
+      const response = await fetch('/api/borrows/logs', {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) {
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function deleteEBook(bookId, row) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:7001/api/books/ebook/${bookId}/delete`,
+        `/api/books/ebook/${bookId}/delete`,
         {
           method: 'DELETE',
           headers: {
@@ -896,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function deleteBook(bookId, row) {
     try {
       const response = await fetch(
-        `http://127.0.0.1:7001/api/books/physical/${bookId}/delete`,
+        `/api/books/physical/${bookId}/delete`,
         {
           method: 'DELETE',
           headers: {
@@ -1148,7 +1148,7 @@ async function handleSubmit(event) {
 
   try {
     const response = await fetch(
-      'http://127.0.0.1:7001/api/donations/donate/',
+      '/api/donations/donate/',
       {
         headers: { Authorization: `Bearer ${token}` },
         method: 'POST',

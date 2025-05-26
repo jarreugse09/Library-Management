@@ -94,7 +94,7 @@ bookSelect.addEventListener('click', async () => {
 
   try {
     const res = await fetch(
-      'http://127.0.0.1:7001/api/books/physical/title',
+      '/api/books/physical/title',
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -146,7 +146,7 @@ borrowForm.addEventListener(
     }
     try {
       const res = await fetch(
-        'http://127.0.0.1:7001/api/borrows/create',
+        '/api/borrows/create',
         {
           method: 'POST',
           headers: {

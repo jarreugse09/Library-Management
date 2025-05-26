@@ -186,7 +186,7 @@ async function handleSubmit(event) {
       console.log(`${key}:`, value);
     }
 
-    const response = await fetch('http://127.0.0.1:7001/api/donations/donate', {
+    const response = await fetch('/api/donations/donate', {
       method: 'POST',
       body: formData,
       headers: {
