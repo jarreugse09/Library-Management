@@ -66,7 +66,8 @@ body {
 }
 
 /* Highlight the selected genre */
-#genreList li.selected a {
+#genreList li.selected a, 
+#sidebarList li.selected a {
   background-color: var(--accent);
   color: white;
 }

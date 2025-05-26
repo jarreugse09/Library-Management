@@ -748,6 +748,19 @@ function setSelectedGenre(selectedLi) {
   selectedLi.classList.add('selected');
 }
 
+function setSelectedSidebar(selectedLi) {
+  document.querySelectorAll('#sidebarList li').forEach(li => {
+    li.classList.remove('selected');
+  });
+  selectedLi.classList.add('selected');
+}
+
+document.querySelectorAll('#sidebarList li').forEach(li => {
+  li.addEventListener('click', function() {
+    setSelectedSidebar(this);
+  });
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
   let user = null;
 
