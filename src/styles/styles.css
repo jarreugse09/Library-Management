@@ -40,13 +40,13 @@ html {
 }
 
 .left {
-  background-color: var(--accent);
+  background-color: var(--card-bg);
   flex-direction: column;
   padding: 2rem;
 }
 
 .logo {
-  width: 200px;
+  width: 500px;
   height: auto;
 }
 

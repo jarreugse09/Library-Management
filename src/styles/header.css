@@ -35,8 +35,8 @@
 .logo img {
   height: 50px;
   width: 50px;
-  border-radius: 50%;
-  border: 2px solid var(--header-accent);
+  /* border-radius: 50%;
+  border: 2px solid var(--header-accent); */
   transition: transform 0.3s ease;
 }
 
