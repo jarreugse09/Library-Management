@@ -2,12 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
     <title>Borrow a Book</title>
-    <link rel="stylesheet" href="/styles/borrowForm.css" />
-    <link rel="stylesheet" href="../styles/header.css" />
-    <script src="../scripts/header.js" defer></script>
-    <script src="../scripts/borrowForm.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="/styles/borrowForm.css"
+    />
+    <link
+      rel="stylesheet"
+      href="../styles/header.css"
+    />
+    <script
+      src="../scripts/header.js"
+      defer
+    ></script>
+    <script
+      src="../scripts/borrowForm.js"
+      defer
+    ></script>
   </head>
   <body>
     <div class="header">
@@ -17,21 +32,58 @@
       </div>
       <nav>
         <ul>
-          <li><a href="/userPage" id="Browse">Browse</a></li>
-          <li><a href="/userPage" id="myBooks">My Books</a></li>
+          <li>
+            <a href="/userPage" id="Browse"
+              >Browse</a
+            >
+          </li>
+          <li>
+            <a href="/userPage" id="myBooks"
+              >My Books</a
+            >
+          </li>
           <li class="dropdown">
-            <a href="#" id="settingsToggle">Settings ▾</a>
-            <ul class="dropdown-menu" id="settingsDropdown">
-              <li id="clerkBtn" style="display: none">
-                <a href="/clerkPage/">Clerk Page</a>
+            <a href="#" id="settingsToggle"
+              >Settings ▾</a
+            >
+            <ul
+              class="dropdown-menu"
+              id="settingsDropdown"
+            >
+              <li
+                id="clerkBtn"
+                style="display: none"
+              >
+                <a href="/clerkPage/"
+                  >Clerk Page</a
+                >
               </li>
-              <li id="adminBtn" style="display: none">
-                <a href="/adminPage/">Admin Page</a>
+              <li
+                id="adminBtn"
+                style="display: none"
+              >
+                <a href="/adminPage/"
+                  >Admin Page</a
+                >
               </li>
-              <li><a href="/userPage/account">Account</a></li>
-              <li><a href="/userPage/donateForm">Donate</a></li>
-              <li><a href="/borrowForm">Borrow</a></li>
-              <li><a href="#" id="logoutBtn">Logout</a></li>
+              <li>
+                <a href="/userPage/account"
+                  >Account</a
+                >
+              </li>
+              <li>
+                <a href="/userPage/donateForm"
+                  >Donate</a
+                >
+              </li>
+              <li>
+                <a href="/borrowForm">Borrow</a>
+              </li>
+              <li>
+                <a href="#" id="logoutBtn"
+                  >Logout</a
+                >
+              </li>
             </ul>
           </li>
         </ul>
@@ -43,29 +95,59 @@
         <h2>Borrow a Physical Book</h2>
 
         <label for="bookTitle">Book Title</label>
-        <select id="bookTitle" name="bookId" required>
-          <option value="">Select book title</option>
+        <select
+          id="bookTitle"
+          name="bookId"
+          required
+        >
+          <option value="">
+            Select book title
+          </option>
         </select>
 
-        <label for="borrowerName">Your Full Name</label>
-        <input type="text" id="borrowerName" name="borrowerName" required />
+        <label for="borrowerName"
+          >Your Full Name</label
+        >
+        <input
+          type="text"
+          id="borrowerName"
+          name="borrowerName"
+          readonly
+        />
 
-        <label for="contactInfo">Contact Information</label>
+        <label for="contactInfo"
+          >Contact Information</label
+        >
         <input
           type="text"
           id="contactInfo"
           name="contactInfo"
-          placeholder="Email or Phone"
+          readonly
+        />
+
+        <label for="borrowDate"
+          >Borrow Date</label
+        >
+        <input
+          type="date"
+          id="borrowDate"
+          name="borrowDate"
           required
         />
 
-        <label for="borrowDate">Borrow Date</label>
-        <input type="date" id="borrowDate" name="borrowDate" required />
+        <label for="returnDate"
+          >Expected Return Date</label
+        >
+        <input
+          type="date"
+          id="returnDate"
+          name="returnDate"
+          required
+        />
 
-        <label for="returnDate">Expected Return Date</label>
-        <input type="date" id="returnDate" name="returnDate" required />
-
-        <label for="notes">Additional Notes (optional)</label>
+        <label for="notes"
+          >Additional Notes (optional)</label
+        >
         <textarea
           id="notes"
           name="notes"
@@ -73,7 +155,9 @@
           placeholder="Any special instructions or requests..."
         ></textarea>
 
-        <button type="submit">Submit Request</button>
+        <button type="submit">
+          Submit Request
+        </button>
       </form>
     </div>
   </body>

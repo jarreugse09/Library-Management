@@ -20,7 +20,9 @@ async function logoutUser() {
 
     localStorage.removeItem('jwt'); // Remove JWT
 
-    alert('You have been successfully logged out.');
+    alert(
+      'You have been successfully logged out.'
+    );
 
     window.location.href = '/'; // Redirect to login or home page
   } catch (err) {
@@ -503,7 +505,7 @@ document.addEventListener(
         populateYearFilter(allUserData);
         createChart(
           allUserData,
-          'bar',
+          'line',
           'Monthly Registered User'
         ); // default chart
       } catch (err) {
