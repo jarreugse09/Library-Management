@@ -14,7 +14,7 @@ router.post(
 );
 
 // View eBook by filename
-router.get('/pending/', donationController.getPending);
+router.get('/pending', donationController.getPending);
 router.get('/logs', logController.getAllDonationLogs);
 router.get('/approve/', donationController.getApprove);
 router.get('/my-book/', donationController.getAllUserDonated);

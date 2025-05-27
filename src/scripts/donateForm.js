@@ -1,4 +1,4 @@
-const token = localStorage.getItem('jwt');
+ let token = localStorage.getItem('jwt');
 let user = null;
 
 if (!token) {
@@ -8,7 +8,7 @@ if (!token) {
 
 async function logoutUser() {
   try {
-    const token = localStorage.getItem('jwt');
+     token = localStorage.getItem('jwt');
 
     await fetch('/api/auth/logout', {
       method: 'POST',
@@ -67,8 +67,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-  logoutUser();
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logoutBtn');
+  
+  // Check if logoutBtn exists before adding event listener
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+    });
+  } else {
+    console.error('Logout button not found.');
+  }
 });
 
 function addAuthor() {

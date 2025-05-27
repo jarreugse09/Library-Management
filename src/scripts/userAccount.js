@@ -124,6 +124,145 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
+let token = localStorage.getItem('jwt'); // Declare token here to use throughout the script
+
+async function logoutUser() {
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    localStorage.removeItem('jwt'); // Remove JWT
+
+    alert('You have been successfully logged out.');
+
+    window.location.href = '/'; // Redirect to login or home page
+  } catch (err) {
+    console.error('Logout failed', err);
+    alert('Logout failed. Please try again.');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!token) {
+    alert('Not logged in');
+    return (window.location.href = '/');
+  }
+
+  try {
+    const response = await fetch('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 401) {
+      alert('Session expired. Please log in again.');
+      localStorage.removeItem('jwt');
+      window.location.href = '/';
+      return;
+    }
+
+    if (!response.ok) throw new Error('Fetch failed');
+
+    user = await response.json();
+
+    // Update button visibility based on user role
+    if (user.role === 'clerk') {
+      document.getElementById('clerkBtn').style.display = 'block';
+      document.getElementById('adminBtn').style.display = 'none';
+    } else if (user.role === 'admin' || user.role === 'librarian') {
+      document.getElementById('adminBtn').style.display = 'block';
+      document.getElementById('clerkBtn').style.display = 'none';
+    } else {
+      document.getElementById('adminBtn').style.display = 'none';
+      document.getElementById('clerkBtn').style.display = 'none';
+      await logoutUser();
+      window.location.href = '/';
+      return;
+    }
+
+    // Set user info for the profile page or wherever needed
+    document.getElementById('username').textContent = user.username || 'N/A';
+    document.getElementById('first-name').textContent = user.firstName || 'N/A';
+    document.getElementById('last-name').textContent = user.lastName || 'N/A';
+    document.getElementById('email').textContent = user.email || 'N/A';
+    document.getElementById('created-at').textContent = user.createdAt
+      ? new Date(user.createdAt).toLocaleDateString()
+      : 'N/A';
+    document.getElementById('status').textContent = user.isVerified
+      ? 'Active'
+      : 'Not Verified';
+    document.getElementById('last-login').textContent = user.lastLogin
+      ? new Date(user.lastLogin).toLocaleString()
+      : 'Never';
+  } catch (err) {
+    console.error(err);
+    alert('Could not load user data.');
+  }
+
+  // Handle "Change Password" button
+  document.getElementById('change-password').addEventListener('click', () => {
+    document.getElementById('user-info').style.display = 'none';
+    document.getElementById('user-password-container').style.display = 'block';
+  });
+
+  // Handle Password Update Form Submission
+  document
+    .getElementById('update-password-form')
+    .addEventListener('submit', async e => {
+      e.preventDefault(); // Prevent form from submitting through URL
+
+      const currentPassword = document.getElementById('currentPassword').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!currentPassword || !password || !confirmPassword) {
+        alert('Please fill out all fields');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/auth/${user._id}/update-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword: password,
+          }),
+        });
+
+        const data = await response.json();
+        if (data.status === 'success') {
+          alert('Password updated successfully!');
+          window.location.href = '/';
+        } else {
+          alert(data.message || 'Failed to update password.');
+        }
+      } catch (error) {
+        console.error(error);
+        alert('Error updating password. Please try again.');
+      }
+    });
+
+  // Handle Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    logoutUser();
+  });
+});
+
+
 // Optional: Utility function for formatting relative time
 function timeAgo(date) {
   const now = new Date();

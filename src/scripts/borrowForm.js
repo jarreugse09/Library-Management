@@ -8,6 +8,69 @@ const token = localStorage.getItem('jwt');
 document.addEventListener(
   'DOMContentLoaded',
   async () => {
+    // Fetch user info and set button visibility
+    try {
+      const response = await fetch(
+        '/api/auth/me',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 401) {
+        alert(
+          'Session expired. Please log in again.'
+        );
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+        return;
+      }
+
+      if (!response.ok)
+        throw new Error('Fetch failed');
+
+      user = await response.json();
+
+      if (user.role === 'clerk') {
+        document.getElementById(
+          'clerkBtn'
+        ).style.display = 'block';
+        document.getElementById(
+          'adminBtn'
+        ).style.display = 'none';
+      } else if (
+        user.role === 'admin' ||
+        user.role === 'librarian'
+      ) {
+        document.getElementById(
+          'adminBtn'
+        ).style.display = 'block';
+        document.getElementById(
+          'clerkBtn'
+        ).style.display = 'none';
+      } else {
+        document.getElementById(
+          'adminBtn'
+        ).style.display = 'none';
+        document.getElementById(
+          'clerkBtn'
+        ).style.display = 'none';
+        await logoutUser();
+        window.location.href = '/';
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Could not load user data.');
+    }
+  }
+);
+
+document.addEventListener(
+  'DOMContentLoaded',
+  async () => {
     const token = localStorage.getItem('jwt');
 
     if (!token) {

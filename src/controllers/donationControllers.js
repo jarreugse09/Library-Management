@@ -194,7 +194,7 @@ const getPending = async (req, res) => {
       .populate('donorId', 'username');
     console.log(pendingDonations);
 
-    res.json(pendingDonations);
+    res.status(200).json({data:pendingDonations});
   } catch (error) {
     console.error('Error retrieving pending donations:', error);
     res.status(500).json({ message: 'Server error' });
@@ -214,7 +214,7 @@ const getApprove = async (req, res) => {
 
     console.log(pendingDonations);
 
-    res.json(pendingDonations);
+    res.status(200).json({data:pendingDonations});
   } catch (error) {
     console.error('Error retrieving pending donations:', error);
     res.status(500).json({ message: 'Server error' });

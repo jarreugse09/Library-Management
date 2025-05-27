@@ -1105,7 +1105,7 @@ document.addEventListener(
     async function fetchPendingDonations() {
       try {
         const response = await fetch(
-          'http://localhost:7001/api/donations/pending/',
+          '/api/donations/approve/',
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -1129,7 +1129,7 @@ document.addEventListener(
           return; // Optional: prevent further code from running
         }
 
-        donations.forEach(donation => {
+        donations.data.forEach(donation => {
           const li = document.createElement('li');
 
           // Create a table for the donation data
@@ -1176,7 +1176,7 @@ document.addEventListener(
             () =>
               handleAction(
                 donation._id,
-                'approve'
+                'done'
               )
           );
 
@@ -1212,7 +1212,7 @@ document.addEventListener(
     ) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:7001/api/donations/${donationId}/${action}`,
+          `/api/donations/${donationId}/${action}`,
           {
             method: 'PATCH',
             headers: {

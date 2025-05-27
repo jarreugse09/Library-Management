@@ -1,4 +1,4 @@
-const token = localStorage.getItem('jwt');
+let token = localStorage.getItem('jwt');
 if (!token) {
   alert('Not logged in');
   window.location.href = '/';
@@ -8,8 +8,6 @@ let user = null;
 
 async function logoutUser() {
   try {
-    const token = localStorage.getItem('jwt');
-
     await fetch('/api/auth/logout', {
       method: 'POST',
       headers: {
@@ -285,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function fetchPendingDonations() {
     try {
       const response = await fetch(
-        'http://localhost:7001/api/donations/pending/',
+        '/api/donations/pending/',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!response.ok) throw new Error('Failed to fetch');
