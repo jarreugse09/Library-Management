@@ -68,7 +68,7 @@ const getBorrowRequest = async (req, res) => {
 const updateBorrowStatus = async (req, res) => {
   try {
     const { id, action } = req.params;
-    const { role } = req.body;
+    const { role } = req.user
     console.log(req.params);
     console.log(req.body);
     if (!['approve', 'reject'].includes(action)) {
