@@ -32,7 +32,7 @@ body {
 .genre,
 .sidebar {
   width: var(--sidebar-width);
-  height: 80vh;
+  max-height: 80vh;
   background: var(--card-bg);
   border-radius: 18px;
   padding: 22px;
@@ -41,6 +41,7 @@ body {
   backdrop-filter: blur(14px);
   border: 1px solid var(--border);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
 }
 
 .genre h2,

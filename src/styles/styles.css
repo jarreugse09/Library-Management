@@ -2,7 +2,7 @@
 
 :root {
   --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
-  --card-bg: rgba(40, 40, 48, 0.85);
+  --card-bg: rgba(44, 44, 54, 0.9);
   --accent: #ff4655;
   --accent-glow: rgba(255, 70, 85, 0.35);
   --text: #ffffff;

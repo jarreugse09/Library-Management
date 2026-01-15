@@ -1,11 +1,13 @@
 #encodeBookSection {
-  background-color: var(--card-bg);
-  border-radius: 16px;
+  background: var(--card-bg);
+  border-radius: 22px;
   padding: 30px;
   max-width: 800px;
   margin: auto;
   color: var(--text);
-  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); */
+  backdrop-filter: blur(16px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border);
   display: none;
 }
 
@@ -27,14 +29,27 @@
 #encodeBookSection input[type="file"],
 #encodeBookSection textarea,
 #encodeBookSection select {
-  background-color: var(--input-bg);
+  background: var(--input-bg);
   color: var(--text);
   border: 1px solid var(--border);
-  padding: 10px 14px;
-  border-radius: 8px;
+  padding: 0 18px;
+  border-radius: 999px;
+  height: 48px;
   width: 100%;
-  font-size: 0.95rem;
-  transition: border 0.3s ease, background-color 0.3s ease;
+  font-size: 14.5px;
+  transition: all 0.25s ease;
+}
+
+#encodeBookSection input::placeholder,
+#encodeBookSection textarea::placeholder,
+#encodeBookSection select::placeholder {
+  color: var(--text-light);
+}
+
+#encodeBookSection input:hover,
+#encodeBookSection textarea:hover,
+#encodeBookSection select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 #encodeBookSection input:focus,
@@ -42,7 +57,8 @@
 #encodeBookSection select:focus {
   border-color: var(--accent);
   outline: none;
-  background-color: #303035;
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
 }
 
 #authors-container > div {
@@ -52,18 +68,23 @@
 }
 
 #encodeBookSection button {
-  padding: 12px 20px;
-  background-color: var(--accent);
+  height: 48px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   color: var(--text);
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #encodeBookSection button:hover {
-  background-color: #e03a4e;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px rgba(255, 70, 85, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 #encodeBookSection button.btn-remove {
@@ -71,10 +92,14 @@
   color: #fff;
   font-size: 0.8rem;
   padding: 8px 12px;
+  height: auto;
+  box-shadow: none;
 }
 
 #encodeBookSection button.btn-remove:hover {
   background-color: #333;
+  transform: none;
+  box-shadow: none;
 }
 
 #encodeBookSection input[type="radio"] {

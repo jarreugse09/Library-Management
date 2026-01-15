@@ -1,149 +1,176 @@
 :root {
-    --bg: #1b1b1f;
-    --card-bg: #2c2c31;
-    --accent: #ff4655;
-    --text: #fff;
-    --text-light: #aaa;
-    --border: rgba(255, 255, 255, 0.1);
-    --input-bg: #242428;
+  --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
+  --card-bg: rgba(44, 44, 54, 0.9);
+  --accent: #ff4655;
+  --accent-glow: rgba(255, 70, 85, 0.35);
+  --text: #ffffff;
+  --text-light: #b5b5c3;
+  --border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(20, 20, 25, 0.9);
 }
 
 /* Flex container for heading and buttons */
-.donation-header, .borrow-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    text-align: center;
-  }
-  
-  /* Make buttons stay together on the right */
-  .donation-buttons, .borrow-buttons {
-    display: flex;
-    gap: 40px;
-  }
+.donation-header,
+.borrow-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+/* Make buttons stay together on the right */
+.donation-buttons,
+.borrow-buttons {
+  display: flex;
+  gap: 40px;
+}
 
 /* Style for the table */
 #donationList table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-  }
-  
-  #donationList th,
-  #donationList td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #fff;
-    color: var(--text);
-  }
-  
-  #donationList th {
-    background-color: var(--card-bg);
-  }
-  
-  /* Align buttons horizontally */
-  .button-container {
-    display: flex;
-    justify-content: space-evenly;
-    gap: 10px;
-  }
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+#donationList th,
+#donationList td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+#donationList th {
+  background-color: var(--card-bg);
+}
+
+/* Align buttons horizontally */
+.button-container {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 10px;
+}
 
 /* Style for the logs table */
-#donationLogList table, #borrowLog table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  
-  #donationLogList th,
-  #donationLogList td, #borrowLog th, #borrowLog td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ccc;
-  }
-  
-  #donationLogList th, #borrowLog th {
-    background-color: var(--card-bg);
-    font-weight: bold;
-  }
-  
+#donationLogList table,
+#borrowLog table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+#donationLogList th,
+#donationLogList td,
+#borrowLog th,
+#borrowLog td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+#donationLogList th,
+#borrowLog th {
+  background-color: var(--card-bg);
+  font-weight: bold;
+}
+
 /* Donation Section Styling */
-#donation, #borrow {
-    margin: 20px;
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background-color: var(--card-bg);
+#donation,
+#borrow {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--card-bg);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+}
+
+#donation h1,
+#borrow h1 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: var(--text);
+  text-align: center;
+}
+
+/* Buttons in Donation Section */
+#donation button,
+#borrow button {
+  height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  gap: 20px;
+}
+
+#donation button:hover,
+#borrow button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px rgba(255, 70, 85, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+#donation button:active,
+#borrow button:active {
+  transform: translateY(0);
+}
+
+/* Donation Lists */
+#donation ul,
+#borrow ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+#donation ul li,
+#borrow ul li {
+  padding: 10px;
+}
+
+#donation ul li:last-child,
+#borrow ul li:last-child {
+  border-bottom: none;
+}
+
+/* Hidden Sections */
+#donationPending,
+#pending-borrow {
+  display: block;
+}
+
+#donationLogs ul li,
+#borrowedLogs ul li {
+  padding: 10px;
+  border-bottom: 1px solid #fff;
+}
+
+#donationLogs,
+#borrowedLogs {
+  display: none;
+}
+
+/* Responsive Design for Donation Section */
+@media (max-width: 768px) {
+  #donation {
+    padding: 15px;
   }
-  
-  #donation h1, #borrow h1 {
-    font-size: 24px;
-    margin-bottom: 15px;
-    color: var(--text);
-    text-align: center;
+
+  #donation button {
+    font-size: 12px;
+    padding: 8px 12px;
   }
-  
-  /* Buttons in Donation Section */
-  #donation button, #borrow button{
-    padding: 15px 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: var(--accent);
-    color: var(--text);
-    cursor: pointer;
-    font-size: 14px;
-    gap: 20px;
+
+  #donation h1 {
+    font-size: 20px;
   }
-  
-  #donation button:hover, #borrow button:hover {
-    background-color: #e03a4e;
-  }
-  
-  #donation button:active, #borrow button:active {
-    background-color: var(--accent);
-  }
-  
-  /* Donation Lists */
-  #donation ul, #borrow ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 10px 0;
-  }
-  
-  #donation ul li, #borrow ul li {
-    padding: 10px;
-  }
-  
-  #donation ul li:last-child, #borrow ul li:last-child {
-    border-bottom: none;
-  }
-  
-  /* Hidden Sections */
-  #donationPending, #pending-borrow {
-    display: block;
-  }
-  
-  #donationLogs ul li, #borrowedLogs ul li {
-    padding: 10px;
-    border-bottom: 1px solid #fff;
-  }
-  
-  #donationLogs, #borrowedLogs {
-    display: none;
-  }
-  
-  /* Responsive Design for Donation Section */
-  @media (max-width: 768px) {
-    #donation {
-      padding: 15px;
-    }
-  
-    #donation button {
-      font-size: 12px;
-      padding: 8px 12px;
-    }
-  
-    #donation h1 {
-      font-size: 20px;
-    }
-  }
+}
