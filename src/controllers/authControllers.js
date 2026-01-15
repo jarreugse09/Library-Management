@@ -64,11 +64,16 @@ const register = async (req, res) => {
 
     console.log("OTP for verification (send via email in real app):", otp);
 
-    sendEmail({
-      email,
-      subject: "LibAG OTP",
-      otp,
-    });
+    try {
+      await sendEmail({
+        email,
+        subject: "LibAG OTP",
+        otp,
+      });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Continue with registration even if email fails
+    }
 
     createSendToken(newUser, 201, "User registered. Check email for OTP.", res);
   } catch (err) {
@@ -134,11 +139,16 @@ const sendOtp = async (req, res) => {
     user.isVerified = false; // Mark as not verified
     await user.save();
 
-    sendEmail({
-      email,
-      subject: "LibAG OTP",
-      otp,
-    });
+    try {
+      await sendEmail({
+        email,
+        subject: "LibAG OTP",
+        otp,
+      });
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Continue even if email fails
+    }
 
     res.status(200).json({ message: "OTP sent to your email!" });
   } catch (error) {
