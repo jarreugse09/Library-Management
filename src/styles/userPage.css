@@ -1,45 +1,56 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 :root {
-  --bg: #1b1b1f;
-  --card-bg: #2c2c31;
+  --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
+  --card-bg: rgba(44, 44, 54, 0.9);
   --accent: #ff4655;
-  --text: #fff;
-  --text-light: #aaa;
+  --accent-glow: rgba(255, 70, 85, 0.35);
+  --text: #ffffff;
+  --text-light: #b5b5c3;
+  --border: rgba(255, 255, 255, 0.08);
   --sidebar-width: 250px;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: var(--bg);
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background: var(--bg);
   color: var(--text);
 }
 
+/* ---------- LAYOUT ---------- */
+
 .container {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: 24px;
+  padding: 24px;
   align-items: flex-start;
 }
 
-/* Genre sidebar styling */
+/* ---------- SIDEBARS ---------- */
+
 .genre,
 .sidebar {
   width: var(--sidebar-width);
   height: 80vh;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 20px;
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 22px;
   position: sticky;
   top: 80px;
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 .genre h2,
 .sidebar h2 {
-  margin-top: 0;
-  font-size: 1.5rem;
+  margin: 0 0 18px;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: var(--accent);
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 1px solid rgba(255, 70, 85, 0.4);
 }
 
 #genreList,
@@ -51,7 +62,7 @@ body {
 
 #genreList li,
 #sidebarList li {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 #genreList a,
@@ -59,95 +70,98 @@ body {
   color: var(--text);
   text-decoration: none;
   display: block;
-  padding: 10px 15px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-  font-size: 1rem;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
-/* Highlight the selected genre */
-#genreList li.selected a, 
+#genreList li.selected a,
 #sidebarList li.selected a {
-  background-color: var(--accent);
-  color: white;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 8px 24px var(--accent-glow);
 }
 
 #genreList a:hover,
 #sidebarList a:hover {
-  background-color: rgba(255, 70, 85, 0.2);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--accent);
 }
 
-/* Browse Section */
+/* ---------- BROWSE SECTION ---------- */
+
 .browse {
   flex: 3 1 600px;
-  background-color: var(--card-bg);
-  border-radius: 15px;
-  padding: 15px;
+  background: var(--card-bg);
+  border-radius: 22px;
+  padding: 24px;
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
 }
 
 .browse h2 {
-  font-size: 30px;
+  font-size: 32px;
   margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .browse button {
   margin-right: 10px;
   margin-bottom: 20px;
-  padding: 8px 12px 10px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 4px;
-  background-color: var(--accent);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   color: white;
   cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 8px 24px var(--accent-glow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .browse button:hover {
-  background-color: var(--text-light);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px var(--accent-glow);
 }
 
-/* Books section styling */
-.books {
-  flex: 1;
-}
-
-.books h2 {
-  font-size: 1.5rem;
-  color: var(--accent);
-  margin-top: 0;
-  margin-bottom: 20px;
-}
+/* ---------- BOOK GRID ---------- */
 
 .book-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 22px;
 }
+
+/* ---------- BOOK CARD ---------- */
 
 .book-item {
   display: flex;
-  background-color: var(--card-bg);
-  border-radius: 8px;
+  background: rgba(30, 30, 36, 0.95);
+  border-radius: 18px;
   overflow: hidden;
-  transition: transform 0.2s;
   cursor: pointer;
-  padding: 1em;
-  min-height: 200px;
-  max-width: 400px;
-  border: solid 1px var(--text-light);
+  padding: 16px;
+  min-height: 210px;
+  max-width: 420px;
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .book-item:hover {
-  transform: scale(1.02);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .book-item-image {
-  width: 150px;
+  width: 140px;
   height: 200px;
   object-fit: cover;
   align-self: center;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 10px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
 }
 
 .book-item-image.no-image {
@@ -155,36 +169,39 @@ body {
 }
 
 .book-meta {
-  padding: 15px 20px;
+  padding: 12px 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .book-meta h3 {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 8px;
-  color: var(--text);
 }
 
 .book-meta p {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: var(--text-light);
   margin: 4px 0;
 }
 
-/* Book info sidebar styling */
+/* ---------- BOOK INFO SIDEBAR ---------- */
+
 .book-info {
-  width: 300px;
-  background-color: var(--card-bg);
-  border-radius: 8px;
-  padding: 20px;
+  width: 320px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 22px;
   position: sticky;
   top: 80px;
   display: none;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
 }
 
 .book-info h2 {
@@ -193,33 +210,37 @@ body {
   color: var(--accent);
 }
 
+/* ---------- EXIT BUTTON ---------- */
+
 .exit-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--accent);
+  top: 14px;
+  right: 14px;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   color: white;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 1;
+  box-shadow: 0 8px 20px var(--accent-glow);
 }
+
+/* ---------- DETAILS ---------- */
 
 .book-details {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
 .book-details-image {
   width: 100%;
-  max-width: 250px;
-  border-radius: 4px;
-  margin: 0 auto 15px;
-  display: block;
+  max-width: 260px;
+  border-radius: 14px;
+  margin: 0 auto 16px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
 }
 
 .book-details-image.no-image {
@@ -228,62 +249,47 @@ body {
 
 .book-actions button {
   width: 100%;
-  padding: 12px;
-  background-color: var(--accent);
+  padding: 14px;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 999px;
   cursor: pointer;
-  margin-top: 15px;
-  font-weight: bold;
-  transition: opacity 0.2s;
+  font-weight: 700;
+  box-shadow: 0 10px 28px var(--accent-glow);
+  transition: transform 0.15s ease;
 }
 
 .book-actions button:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
 }
+
+/* ---------- RATING ---------- */
 
 .rating-stars {
   display: flex;
-  gap: 5px;
-  margin-top: 5px;
+  gap: 6px;
+  margin-top: 6px;
   cursor: pointer;
-  font-size: 20px;
-  color: #ccc;
+  font-size: 22px;
+  color: #666;
 }
 
 .rating-stars .star {
-  transition: color 0.2s;
-}
-
-/* Hover effect: highlight all previous (and current) stars */
-.rating-stars .star:hover,
-.rating-stars .star:hover ~ .star {
-  color: #ccc; /* reset right-side stars */
+  transition: color 0.15s ease, transform 0.15s ease;
 }
 
 .rating-stars .star:hover {
+  transform: scale(1.15);
   color: gold;
 }
 
-.rating-stars .star:hover ~ .star {
-  color: #ccc;
-}
-
-.rating-stars:hover .star {
-  color: gold;
-}
-
-.rating-stars:hover .star:hover ~ .star {
-  color: #ccc;
-}
-
-/* Selected stars */
 .rating-stars .star.selected {
   color: gold;
 }
 
-/*---------------- PDF DIV---------------- */
+/* ---------- PDF VIEW ---------- */
+
 .pdfModal {
   top: 0;
   left: 0;
@@ -296,7 +302,7 @@ body {
 
 .pdf-header {
   text-align: right;
-  padding: 10px;
+  padding: 12px;
   background: #111;
 }
 
@@ -304,7 +310,8 @@ body {
   background: #f44336;
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 14px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
@@ -312,10 +319,11 @@ body {
   flex: 1;
   max-width: 90%;
   max-height: 80vh;
-  border: none;
+  margin: auto;
 }
 
-/* Responsive adjustments */
+/* ---------- RESPONSIVE ---------- */
+
 @media (max-width: 1200px) {
   .container {
     flex-direction: column;
@@ -325,26 +333,22 @@ body {
   .book-info {
     position: static;
     width: 100%;
-    margin-bottom: 20px;
   }
 
   .book-list {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
   .book-item {
     flex-direction: column;
-    min-height: auto;
+    align-items: center;
+    text-align: center;
   }
 
   .book-item-image {
     width: 100%;
-    height: auto;
-    max-height: 300px;
-  }
-  .book-item-image.no-image {
-    display: none;
+    max-height: 280px;
   }
 }

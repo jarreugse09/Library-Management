@@ -1,49 +1,62 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --bg: #0d0d0d;
-  --card-bg: #1a1a1a;
-  --accent: #ff4757;
-  --accent-light: #ff6b81;
+  --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
+  --card-bg: rgba(40, 40, 48, 0.85);
+  --accent: #ff4655;
+  --accent-light: #ff5f6d;
+  --accent-glow: rgba(255, 70, 85, 0.35);
   --text: #ffffff;
-  --text-light: #999;
-  --border: rgba(255, 255, 255, 0.1);
-  --input-bg: #1e1e1e;
-  --glow: 0 0 5px var(--accent);
+  --text-light: #b5b5c3;
+  --border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(20, 20, 25, 0.9);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background-color: var(--bg);
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
+/* ---------- LAYOUT ---------- */
+
 .container {
   display: flex;
-  flex-wrap: nowrap;
   gap: 20px;
   padding: 20px;
-  background-color: var(--bg);
 }
+
+/* ---------- SIDEBAR ---------- */
 
 .sidebar {
   width: 220px;
-  background-color: var(--card-bg);
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: 22px;
   padding: 20px;
-  padding-bottom: 0;
   height: 80vh;
   overflow-y: auto;
-  box-shadow: var(--glow);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: fadeUp 0.7s ease forwards;
 }
 
 .sidebar h2 {
   font-size: 1.4rem;
   margin-bottom: 20px;
   text-align: center;
+  font-weight: 700;
+  letter-spacing: -0.3px;
 }
 
 .sidebar ul {
@@ -60,37 +73,50 @@ body {
   display: block;
   text-decoration: none;
   color: var(--text);
-  background-color: #262626;
+  background: rgba(255, 255, 255, 0.04);
   padding: 10px 15px;
-  border-radius: 8px;
-  transition: background 0.3s, color 0.3s;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  font-size: 14.5px;
 }
 
 .sidebar a:hover {
-  background-color: var(--accent);
-  color: #fff;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45);
+  transform: translateY(-1px);
 }
+
+/* ---------- MAIN CONTENT ---------- */
 
 .content {
   flex: 1;
-  background-color: var(--card-bg);
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: 22px;
   padding: 20px;
-  padding-bottom: 0;
-  box-shadow: var(--glow);
   height: 80vh;
   overflow-y: auto;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: fadeUp 0.7s ease forwards;
 }
+
+/* ---------- SECTIONS ---------- */
 
 .section {
   margin-bottom: 30px;
 }
 
 .section h1 {
-  font-size: 1.8rem;
+  font-size: 28px;
+  font-weight: 700;
   margin-bottom: 15px;
   text-align: center;
+  letter-spacing: -0.3px;
 }
+
+/* ---------- FILTERS ---------- */
 
 .filters {
   display: flex;
@@ -100,35 +126,69 @@ body {
 }
 
 .filters input,
-.filters select,
-.filters button {
-  padding: 10px 14px;
-  background-color: var(--input-bg);
+.filters select {
+  height: 48px;
+  padding: 0 18px;
+  background: var(--input-bg);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 999px;
   color: var(--text);
+  font-size: 14.5px;
+  transition: all 0.25s ease;
 }
 
+.filters input::placeholder,
+.filters select::placeholder {
+  color: var(--text-light);
+}
+
+.filters input:hover,
+.filters select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.filters input:focus,
+.filters select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
+}
+
+/* ---------- BUTTONS ---------- */
+
 button {
-  background-color: var(--accent);
-  color: white;
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 1rem;
   cursor: pointer;
-  box-shadow: var(--glow);
-  transition: background 0.3s ease;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 button:hover {
-  background-color: var(--accent-light);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px rgba(255, 70, 85, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
+button:active {
+  transform: translateY(0);
+}
+
+/* ---------- TABLE ---------- */
+
 .table-container {
-  background-color: #111;
-  border-radius: 10px;
+  background: rgba(16, 16, 20, 0.95);
+  border-radius: 16px;
   overflow-x: auto;
+  border: 1px solid var(--border);
 }
 
 table {
@@ -145,13 +205,161 @@ td {
 }
 
 th {
-  background-color: var(--card-bg);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-light);
+  font-weight: 600;
+  font-size: 14px;
 }
 
 td {
   color: var(--text);
+  font-size: 14.5px;
 }
 
+/* ---------- DONATION / BORROW SECTIONS ---------- */
 
+#donation,
+#borrow {
+  margin: 20px 0;
+  padding: 24px;
+  background: var(--card-bg);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
 
+#donation h1,
+#borrow h1 {
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- MODAL ---------- */
+
+.memberModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.memberModalContent {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  border-radius: 22px;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+  animation: fadeUp 0.3s ease forwards;
+}
+
+/* ---------- FORM ---------- */
+
+#formMember form {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 22px;
+  padding: 28px 24px;
+  min-width: 340px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#formMember input,
+#formMember select {
+  height: 48px;
+  padding: 0 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 14.5px;
+  transition: all 0.25s ease;
+}
+
+#formMember input::placeholder {
+  color: var(--text-light);
+}
+
+#formMember input:hover,
+#formMember select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+#formMember input:focus,
+#formMember select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
+}
+
+/* ---------- CHART ---------- */
+
+#chartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+canvas {
+  width: 100%;
+  max-width: 1200px;
+  max-height: 600px;
+  border-radius: 16px;
+}
+
+/* ---------- ANIMATIONS ---------- */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .content {
+    width: 100%;
+    height: auto;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .memberModalContent {
+    min-width: 90%;
+    margin: 0 20px;
+  }
+}

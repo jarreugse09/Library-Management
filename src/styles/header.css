@@ -1,27 +1,363 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
 :root {
-  /* Color Palette */
-  --header-bg: #1b1b1f;
-  --header-text: #ecf0f1;
-  --header-accent: #2ecc71;
-  --search-bg: rgba(255, 255, 255, 0.2);
-  --search-text: #fff;
-  --search-placeholder: rgba(255, 255, 255, 0.7);
-  --dropdown-bg: #34495e;
-  --dropdown-hover: #2c3e50;
-  --shadow: 0 1px 6px rgba(255, 253, 253, 0.1);
-  --transition: all 0.3s ease;
+  --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
+  --card-bg: rgba(40, 40, 48, 0.85);
+  --accent: #ff4655;
+  --accent-light: #ff5f6d;
+  --accent-glow: rgba(255, 70, 85, 0.35);
+  --text: #ffffff;
+  --text-light: #b5b5c3;
+  --border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(20, 20, 25, 0.9);
 }
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ---------- LAYOUT ---------- */
+
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+  width: 220px;
+  background: var(--card-bg);
+  border-radius: 22px;
+  padding: 20px;
+  height: 80vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: fadeUp 0.7s ease forwards;
+}
+
+.sidebar h2 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  margin-bottom: 12px;
+}
+
+.sidebar a {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px 15px;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+  font-size: 14.5px;
+}
+
+.sidebar a:hover {
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ---------- MAIN CONTENT ---------- */
+
+.content {
+  flex: 1;
+  background: var(--card-bg);
+  border-radius: 22px;
+  padding: 20px;
+  height: 80vh;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: fadeUp 0.7s ease forwards;
+}
+
+/* ---------- SECTIONS ---------- */
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- FILTERS ---------- */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.filters input,
+.filters select {
+  height: 48px;
+  padding: 0 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 14.5px;
+  transition: all 0.25s ease;
+}
+
+.filters input::placeholder,
+.filters select::placeholder {
+  color: var(--text-light);
+}
+
+.filters input:hover,
+.filters select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.filters input:focus,
+.filters select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
+}
+
+/* ---------- BUTTONS ---------- */
+
+button {
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px rgba(255, 70, 85, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* ---------- TABLE ---------- */
+
+.table-container {
+  background: rgba(16, 16, 20, 0.95);
+  border-radius: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+td {
+  color: var(--text);
+  font-size: 14.5px;
+}
+
+/* ---------- DONATION / BORROW SECTIONS ---------- */
+
+#donation,
+#borrow {
+  margin: 20px 0;
+  padding: 24px;
+  background: var(--card-bg);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#donation h1,
+#borrow h1 {
+  color: var(--accent);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+}
+
+/* ---------- MODAL ---------- */
+
+.memberModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+.memberModalContent {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 28px 24px;
+  border-radius: 22px;
+  min-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+  animation: fadeUp 0.3s ease forwards;
+}
+
+/* ---------- FORM ---------- */
+
+#formMember form {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 22px;
+  padding: 28px 24px;
+  min-width: 340px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#formMember input,
+#formMember select {
+  height: 48px;
+  padding: 0 18px;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 14.5px;
+  transition: all 0.25s ease;
+}
+
+#formMember input::placeholder {
+  color: var(--text-light);
+}
+
+#formMember input:hover,
+#formMember select:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+#formMember input:focus,
+#formMember select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
+}
+
+/* ---------- CHART ---------- */
+
+#chartContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+}
+
+canvas {
+  width: 100%;
+  max-width: 1200px;
+  max-height: 600px;
+  border-radius: 16px;
+}
+
+/* ---------- ANIMATIONS ---------- */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- HEADER ---------- */
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 5%;
-  background-color: var(--header-bg);
-  color: var(--header-text);
-  box-shadow: var(--shadow);
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  margin: 20px;
+  backdrop-filter: blur(16px);
   position: sticky;
-  top: 0;
+  top: 20px;
   z-index: 1000;
 }
 
@@ -35,9 +371,8 @@
 .logo img {
   height: 50px;
   width: 50px;
-  /* border-radius: 50%;
-  border: 2px solid var(--header-accent); */
   transition: transform 0.3s ease;
+  filter: drop-shadow(0 4px 12px rgba(255, 70, 85, 0.3));
 }
 
 .logo:hover img {
@@ -48,10 +383,11 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(to right, var(--header-accent), #3498db);
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  letter-spacing: -0.3px;
 }
 
 .search-wrapper {
@@ -63,24 +399,29 @@
 
 .search-wrapper input {
   width: 100%;
-  padding: 12px 20px;
-  padding-left: 45px;
-  border: none;
-  border-radius: 30px;
-  font-size: 1rem;
-  background-color: var(--search-bg);
-  color: var(--search-text);
-  transition: var(--transition);
+  height: 48px;
+  padding: 0 20px 0 45px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 14.5px;
+  background: var(--input-bg);
+  color: var(--text);
+  transition: all 0.25s ease;
 }
 
 .search-wrapper input::placeholder {
-  color: var(--search-placeholder);
+  color: var(--text-light);
+}
+
+.search-wrapper input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 .search-wrapper input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px var(--header-accent);
-  background-color: rgba(255, 255, 255, 0.3);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(18, 18, 22, 0.95);
 }
 
 .search-wrapper::before {
@@ -110,16 +451,16 @@ nav ul li a {
   gap: 5px;
   padding: 10px 15px;
   text-decoration: none;
-  color: var(--header-text);
-  font-size: 1.1rem;
+  color: var(--text);
+  font-size: 14.5px;
   font-weight: 600;
-  border-radius: 6px;
-  transition: var(--transition);
+  border-radius: 999px;
+  transition: all 0.25s ease;
 }
 
 nav ul li a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--header-accent);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent);
 }
 
 .dropdown-menu {
@@ -127,17 +468,21 @@ nav ul li a:hover {
   top: 100%;
   right: 0;
   width: 200px;
-  background-color: var(--dropdown-bg);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
   padding: 10px 0;
+  margin-top: 8px;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-10px);
-  transition: var(--transition);
-  display: flex; /* Changed to flex */
-  flex-direction: column; /* Stack items vertically */
-  z-index: 1001; /* Ensure it appears above other elements */
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
 }
 
 #settingsToggle::after {
@@ -151,7 +496,6 @@ nav ul li a:hover {
   transform: translateY(0);
 }
 
-/* Dropdown list items */
 .dropdown-menu li {
   width: 100%;
   margin: 0;
@@ -160,21 +504,24 @@ nav ul li a:hover {
 .dropdown-menu li a {
   display: block;
   padding: 12px 20px;
-  color: var(--header-text);
-  font-size: 1rem;
+  color: var(--text);
+  font-size: 14.5px;
   text-decoration: none;
-  transition: var(--transition);
-  white-space: nowrap; /* Prevent text wrapping */
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  border-radius: 8px;
+  margin: 0 8px;
 }
 
 .dropdown-menu li a:hover {
-  background-color: var(--dropdown-hover);
-  color: var(--header-accent);
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
+  box-shadow: 0 4px 12px rgba(255, 70, 85, 0.35);
+  color: #fff;
   padding-left: 25px;
 }
-/* Active State Indicator */
+
 nav ul li.active a {
-  color: var(--header-accent);
+  color: var(--accent);
   position: relative;
 }
 
@@ -186,6 +533,48 @@ nav ul li.active a::after {
   transform: translateX(-50%);
   width: 5px;
   height: 5px;
-  background-color: var(--header-accent);
+  background: linear-gradient(135deg, #ff5f6d, #ff2e44);
   border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .content {
+    width: 100%;
+    height: auto;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .memberModalContent {
+    min-width: 90%;
+    margin: 0 20px;
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .search-wrapper {
+    order: 3;
+    width: 100%;
+    margin: 0;
+    max-width: 100%;
+  }
+
+  nav ul {
+    gap: 20px;
+  }
 }
