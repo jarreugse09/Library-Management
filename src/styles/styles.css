@@ -73,8 +73,15 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-  50% { transform: scale(1.1) rotate(5deg); opacity: 0.8; }
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 0.8;
+  }
 }
 
 .logo-container {
@@ -119,7 +126,8 @@ body {
   border-radius: 24px;
   border: 1px solid var(--border);
   backdrop-filter: blur(20px);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -259,7 +267,8 @@ button {
   font-weight: 600;
   color: #fff;
   background: linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow: 0 10px 25px var(--accent-glow),
+  box-shadow:
+    0 10px 25px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
   transition: all 0.2s ease;
   display: inline-flex;
@@ -270,7 +279,8 @@ button {
 
 button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(239, 68, 68, 0.4),
+  box-shadow:
+    0 14px 30px rgba(239, 68, 68, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
@@ -319,8 +329,12 @@ a:hover {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
@@ -352,7 +366,7 @@ a:hover {
   .left {
     display: none;
   }
-  
+
   .right {
     flex: 1;
     min-width: 100%;
@@ -373,7 +387,7 @@ a:hover {
   .logo {
     width: 180px;
   }
-  
+
   .logo-tagline {
     font-size: 0.875rem;
     margin-top: 1rem;
@@ -388,7 +402,7 @@ a:hover {
     padding: 2rem 1.5rem;
     max-width: 100%;
   }
-  
+
   .auth-header h2 {
     font-size: 1.5rem;
   }
@@ -398,12 +412,12 @@ a:hover {
   .container {
     padding: 1.5rem 1.25rem;
   }
-  
+
   input,
   button {
     height: 46px;
   }
-  
+
   .auth-header h2 {
     font-size: 1.375rem;
   }

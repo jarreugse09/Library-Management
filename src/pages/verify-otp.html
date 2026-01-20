@@ -1,50 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Verify OTP - LibraLink</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/modern-base.css">
-    <link rel="stylesheet" href="/styles/styles.css">
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/modern-base.css" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+  </head>
+  <body>
     <div class="wrapper">
       <div class="left">
         <div class="logo-container animate-fade-in-up">
-          <img src="/images/LibraLinkLogo.png" alt="LibraLink Logo" class="logo" />
+          <img
+            src="/images/LibraLinkLogo.png"
+            alt="LibraLink Logo"
+            class="logo"
+          />
           <h1 class="logo-tagline">Email Verification</h1>
         </div>
       </div>
-      
+
       <div class="right">
         <div class="container animate-scale-in">
           <div class="auth-header">
             <h2 class="heading-2">Verify Your Email</h2>
             <p class="text-muted">Enter the code we sent to your email</p>
           </div>
-          
+
           <form id="otpForm" class="auth-form">
             <div class="input-group">
               <label for="emailInput" class="input-label">Email Address</label>
-              <input type="email" id="emailInput" class="input" placeholder="your.email@example.com" required>
+              <input
+                type="email"
+                id="emailInput"
+                class="input"
+                placeholder="your.email@example.com"
+                required
+              />
             </div>
-            
+
             <div class="input-group">
-              <label for="otpInput" class="input-label">Verification Code</label>
-              <input type="text" id="otpInput" class="input" placeholder="Enter 6-digit OTP" maxlength="6" required style="letter-spacing: 0.5em; font-size: 1.25rem; text-align: center;">
+              <label for="otpInput" class="input-label"
+                >Verification Code</label
+              >
+              <input
+                type="text"
+                id="otpInput"
+                class="input"
+                placeholder="Enter 6-digit OTP"
+                maxlength="6"
+                required
+                style="
+                  letter-spacing: 0.5em;
+                  font-size: 1.25rem;
+                  text-align: center;
+                "
+              />
             </div>
-            
+
             <button type="submit" class="btn btn-primary btn-lg w-full">
               <span>Verify Email</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"
+                />
               </svg>
             </button>
           </form>
-          
+
           <div class="auth-footer">
             <p class="text-muted text-center mt-4">
-              Didn't receive the code? 
+              Didn't receive the code?
               <a href="/resend-otp" class="auth-link">Resend</a>
             </p>
             <p class="text-muted text-center mt-2">
@@ -56,31 +89,33 @@
     </div>
 
     <script>
-        document.getElementById("otpForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+      document
+        .getElementById("otpForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            const email = document.getElementById("emailInput").value.trim();
-            const otp = document.getElementById("otpInput").value.trim();
+          const email = document.getElementById("emailInput").value.trim();
+          const otp = document.getElementById("otpInput").value.trim();
 
-            if (otp.length !== 6 || isNaN(otp)) {
-                alert("Please enter a valid 6-digit OTP.");
-                return;
-            }
+          if (otp.length !== 6 || isNaN(otp)) {
+            alert("Please enter a valid 6-digit OTP.");
+            return;
+          }
 
-            const response = await fetch("/api/auth/verify-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp })
-            });
+          const response = await fetch("/api/auth/verify-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, otp }),
+          });
 
-            const data = await response.json();
-            if (response.ok) {
-                alert(data.message || "Email verified successfully!");
-                window.location.href = "/";
-            } else {
-                alert(data.message || "OTP verification failed.");
-            }
+          const data = await response.json();
+          if (response.ok) {
+            alert(data.message || "Email verified successfully!");
+            window.location.href = "/";
+          } else {
+            alert(data.message || "OTP verification failed.");
+          }
         });
     </script>
-</body>
+  </body>
 </html>

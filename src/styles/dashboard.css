@@ -379,7 +379,7 @@ body {
   body {
     grid-template-columns: 280px 1fr;
   }
-  
+
   .right-section {
     display: none;
   }
@@ -389,7 +389,7 @@ body {
   body {
     grid-template-columns: 1fr;
   }
-  
+
   .sidebar {
     position: fixed;
     left: 0;
@@ -399,11 +399,11 @@ body {
     transition: transform 0.3s ease;
     z-index: 1000;
   }
-  
+
   .sidebar.show {
     transform: translateX(0);
   }
-  
+
   .main-content {
     padding: 1rem;
   }
@@ -536,7 +536,8 @@ body {
   height: 45%;
   border: 1px solid var(--border);
   backdrop-filter: blur(16px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transition: all 0.25s ease;
 }
@@ -544,7 +545,9 @@ body {
 .card:hover {
   border-color: var(--accent);
   transform: scale(1.02);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--accent);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--accent);
 }
 
 #addPageBtn {
@@ -558,7 +561,9 @@ body {
   font-size: 1rem;
   font-weight: 600;
   box-shadow: 0 10px 30px var(--accent-glow);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 #addPageBtn:hover {
@@ -649,7 +654,9 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   box-shadow: 0 8px 24px var(--accent-glow);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
   margin-bottom: 10px;
 }
 
@@ -687,7 +694,8 @@ body {
   margin-right: auto;
   border: 1px solid var(--border);
   backdrop-filter: blur(16px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -748,7 +756,9 @@ body {
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 #discardPost {
@@ -790,7 +800,8 @@ body {
   border-radius: 22px;
   border: 1px solid var(--border);
   backdrop-filter: blur(16px);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+  box-shadow:
+    0 25px 50px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transition: transform 0.2s ease;
 }

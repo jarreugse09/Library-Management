@@ -1,100 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register - LibraLink</title>
-  <link rel="stylesheet" href="/styles/modern-base.css" />
-  <link rel="stylesheet" href="/styles/styles.css" />
-</head>
-<body>
-  <div class="wrapper">
-    <div class="left">
-      <div class="logo-container animate-fade-in-up">
-        <img src="/images/LibraLinkLogo.png" alt="LibraLink Logo" class="logo" />
-        <h1 class="logo-tagline">Join Our Library Community</h1>
-      </div>
-    </div>
-    <div class="right">
-      <div class="container animate-scale-in">
-        <div class="auth-header">
-          <h2 class="heading-2">Create Account</h2>
-          <p class="text-muted">Start your reading journey today</p>
-        </div>
-        
-        <form id="registerForm" class="auth-form">
-          <div class="flex gap-3">
-            <div class="input-group" style="flex: 1;">
-              <label for="firstName" class="input-label">First Name</label>
-              <input type="text" id="firstName" class="input" placeholder="John" required />
-            </div>
-            <div class="input-group" style="flex: 1;">
-              <label for="lastName" class="input-label">Last Name</label>
-              <input type="text" id="lastName" class="input" placeholder="Doe" required />
-            </div>
-          </div>
-          
-          <div class="input-group">
-            <label for="username" class="input-label">Username</label>
-            <input type="text" id="username" class="input" placeholder="Choose a unique username" required />
-          </div>
-          
-          <div class="input-group">
-            <label for="email" class="input-label">Email Address</label>
-            <input type="email" id="email" class="input" placeholder="your.email@example.com" required />
-          </div>
-          
-          <div class="input-group">
-            <label for="password" class="input-label">Password</label>
-            <input type="password" id="password" class="input" placeholder="Create a strong password" required />
-          </div>
-          
-          <button type="submit" class="btn btn-primary btn-lg w-full">
-            <span>Create Account</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </button>
-        </form>
-        
-        <div class="auth-footer">
-          <p class="text-muted text-center mt-6">
-            Already have an account? 
-            <a href="/" class="auth-link-primary">Sign in</a>
-          </p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - LibraLink</title>
+    <link rel="stylesheet" href="/styles/modern-base.css" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="left">
+        <div class="logo-container animate-fade-in-up">
+          <img
+            src="/images/LibraLinkLogo.png"
+            alt="LibraLink Logo"
+            class="logo"
+          />
+          <h1 class="logo-tagline">Join Our Library Community</h1>
         </div>
       </div>
+      <div class="right">
+        <div class="container animate-scale-in">
+          <div class="auth-header">
+            <h2 class="heading-2">Create Account</h2>
+            <p class="text-muted">Start your reading journey today</p>
+          </div>
+
+          <form id="registerForm" class="auth-form">
+            <div class="flex gap-3">
+              <div class="input-group" style="flex: 1">
+                <label for="firstName" class="input-label">First Name</label>
+                <input
+                  type="text"
+                  id="firstName"
+                  class="input"
+                  placeholder="John"
+                  required
+                />
+              </div>
+              <div class="input-group" style="flex: 1">
+                <label for="lastName" class="input-label">Last Name</label>
+                <input
+                  type="text"
+                  id="lastName"
+                  class="input"
+                  placeholder="Doe"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="username" class="input-label">Username</label>
+              <input
+                type="text"
+                id="username"
+                class="input"
+                placeholder="Choose a unique username"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="email" class="input-label">Email Address</label>
+              <input
+                type="email"
+                id="email"
+                class="input"
+                placeholder="your.email@example.com"
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="password" class="input-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                class="input"
+                placeholder="Create a strong password"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-full">
+              <span>Create Account</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+
+          <div class="auth-footer">
+            <p class="text-muted text-center mt-6">
+              Already have an account?
+              <a href="/" class="auth-link-primary">Sign in</a>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <script>
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const firstName = document.getElementById("firstName").value;
-      const lastName = document.getElementById("lastName").value;
-      const username = document.getElementById("username").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const firstName = document.getElementById("firstName").value;
+          const lastName = document.getElementById("lastName").value;
+          const username = document.getElementById("username").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
 
-      localStorage.setItem("firstName", firstName);
-      localStorage.setItem("lastName", lastName);
-      localStorage.setItem("username", username);
-      localStorage.setItem("email", email);
+          localStorage.setItem("firstName", firstName);
+          localStorage.setItem("lastName", lastName);
+          localStorage.setItem("username", username);
+          localStorage.setItem("email", email);
 
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, username, email, password })
-      });
+          const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              firstName,
+              lastName,
+              username,
+              email,
+              password,
+            }),
+          });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Registration successful! Please check your email for the OTP.");
-        window.location.href = "/verify-otp";
-      } else {
-        alert(data.message || "Registration failed.");
-      }
-    });
-  </script>
-</body>
+          const data = await response.json();
+          if (response.ok) {
+            alert(
+              "Registration successful! Please check your email for the OTP.",
+            );
+            window.location.href = "/verify-otp";
+          } else {
+            alert(data.message || "Registration failed.");
+          }
+        });
+    </script>
+  </body>
 </html>

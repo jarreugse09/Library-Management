@@ -92,7 +92,7 @@
 }
 
 .search-wrapper::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -149,7 +149,7 @@ nav a {
 }
 
 nav a::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -321,15 +321,15 @@ nav a.active {
     padding: 0 1rem;
     height: 60px;
   }
-  
+
   .logo h1 {
     font-size: 1.25rem;
   }
-  
+
   .logo img {
     height: 36px;
   }
-  
+
   .search-wrapper {
     position: absolute;
     top: calc(100% + 1rem);
@@ -340,16 +340,16 @@ nav a.active {
     visibility: hidden;
     transition: all 0.3s ease;
   }
-  
+
   .search-wrapper.show {
     opacity: 1;
     visibility: visible;
   }
-  
+
   .mobile-menu-toggle {
     display: flex;
   }
-  
+
   nav {
     position: fixed;
     top: 60px;
@@ -365,28 +365,28 @@ nav a.active {
     transition: all 0.3s ease;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
   }
-  
+
   nav.show {
     transform: translateY(0);
     opacity: 1;
     visibility: visible;
   }
-  
+
   nav ul {
     flex-direction: column;
     width: 100%;
     gap: 0.25rem;
   }
-  
+
   nav li {
     width: 100%;
   }
-  
+
   nav a {
     width: 100%;
     justify-content: flex-start;
   }
-  
+
   .dropdown-menu {
     position: static;
     transform: none;
@@ -395,7 +395,7 @@ nav a.active {
     margin-top: 0.5rem;
     background: rgba(18, 18, 22, 0.8);
   }
-  
+
   .dropdown button,
   #settingsToggle {
     width: 100%;
@@ -407,7 +407,7 @@ nav a.active {
   .logo h1 {
     display: none;
   }
-  
+
   .header-inner {
     gap: 1rem;
   }
