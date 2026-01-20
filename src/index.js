@@ -20,19 +20,19 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
-app.use("/styles", checkReferer, express.static(join(__dirname, "styles")));
-
-app.use("/scripts", checkReferer, express.static(join(__dirname, "scripts")));
-app.use("/uploads", express.static(join(__dirname, "uploads")));
-app.use("/images", express.static(join(__dirname, "images")));
-
-app.use("/", appRoutes);
-
+// Body parsers and middleware MUST come before routes
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(mongoSanitize);
 app.use(cors());
 
+// Static file serving
+app.use("/styles", checkReferer, express.static(join(__dirname, "styles")));
+app.use("/scripts", checkReferer, express.static(join(__dirname, "scripts")));
+app.use("/uploads", express.static(join(__dirname, "uploads")));
+app.use("/images", express.static(join(__dirname, "images")));
+
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/donations", authControllers.protect, donationRoutes);
 app.use("/api/books/physical", authControllers.protect, physicalBookRoutes);
@@ -41,13 +41,21 @@ app.use("/api/books/genre", genreRoutes);
 app.use("/api/borrows", authControllers.protect, borrowRoutes);
 app.use("/api/dashboard/", dashboardRoutes);
 app.use("/api/users", userRoutes);
-// app.use('/api/donations', donationRoutes);
-// app.use('/api/books/physical', physicalBookRoutes);
-// app.use('/api/books/ebook', ebookRoutes);
-// app.use('/api/books/genre', genreRoutes);
-// app.use('/api/borrows', borrowRoutes);
 
-const PORT = process.env.PORT || 7002;
+// Page Routes (must come after API routes)
+app.use("/", appRoutes);
+
+// 404 handler for debugging
+app.use((req, res, next) => {
+  console.log(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    error: "Route not found",
+    method: req.method,
+    path: req.originalUrl,
+  });
+});
+
+const PORT = process.env.PORT || 7001;
 
 mongoose
   .connect(process.env.CONNECTION_STRING)
