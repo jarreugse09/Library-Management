@@ -1,152 +1,493 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
 
-:root {
-  --bg: radial-gradient(1200px circle at top left, #23232a 0%, #0f0f12 45%);
-  --card-bg: rgba(40, 40, 48, 0.85);
-  --accent: #ff4655;
-  --accent-light: #ff5f6d;
-  --accent-glow: rgba(255, 70, 85, 0.35);
-  --text: #ffffff;
-  --text-light: #b5b5c3;
-  --border: rgba(255, 255, 255, 0.08);
-  --input-bg: rgba(20, 20, 25, 0.9);
-  --logout-btn: #ff2e44;
-  --logout-hover: #d32f2f;
-  --discard-button: rgba(120, 120, 130, 0.6);
-  --border-radius: 16px;
-}
-
-body.light-mode {
-  --bg: radial-gradient(1200px circle at top left, #f0f0f5 0%, #e5e5ea 45%);
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --accent: #ff4655;
-  --accent-light: #ff5f6d;
-  --accent-glow: rgba(255, 70, 85, 0.2);
-  --text: #1a1a1f;
-  --text-light: #6a6a75;
-  --border: rgba(0, 0, 0, 0.08);
-  --input-bg: rgba(240, 240, 245, 0.9);
-  --logout-btn: #ff4655;
-  --logout-hover: #ff2e44;
-  --discard-button: rgba(100, 100, 110, 0.4);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", sans-serif;
-}
+/* ============================================
+   DASHBOARD LAYOUT
+   ============================================ */
 
 body {
-  display: flex;
+  display: grid;
+  grid-template-columns: 300px 1fr 320px;
+  gap: 0;
   height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  transition: background 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
+  background: var(--dark-bg);
+  color: var(--dark-text);
   overflow: hidden;
 }
 
-/* ---------- SIDEBAR ---------- */
+/* ============================================
+   LEFT SIDEBAR - Profile & Users
+   ============================================ */
 
 .sidebar {
+  background: rgba(26, 26, 31, 0.95);
+  border-right: 1px solid var(--dark-border);
+  backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100vh;
-  width: 27vw;
-  background: var(--card-bg);
-  padding: 24px;
-  border-right: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
-  transition: width 0.3s ease, padding 0.3s ease;
-  position: relative;
+  overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
 }
 
-.sidebar.collapsed {
+.sidebar-inside {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem;
+}
+
+.sidebar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Profile Card */
+.profile-card {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius-xl);
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.profile-avatar {
   width: 80px;
-  padding: 24px 12px;
-}
-
-.sidebar.collapsed .sidebar-inside {
-  margin-left: 0;
-  align-items: center;
-}
-
-.sidebar.collapsed h2,
-.sidebar.collapsed p,
-.sidebar.collapsed .logout-btn {
-  display: none;
-}
-
-.toggle-sidebar {
-  position: absolute;
-  top: 20px;
-  right: -15px;
-  width: 30px;
-  height: 30px;
-  background: linear-gradient(135deg, var(--accent-light), var(--accent));
-  border: 1px solid var(--border);
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: var(--gradient-sunset);
   border-radius: 50%;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0 8px 24px var(--accent-glow);
-  transition: all 0.25s ease;
-  z-index: 10;
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
 }
 
-.toggle-sidebar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 12px 30px var(--accent-glow);
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--dark-text);
 }
 
-.sidebar.collapsed .toggle-sidebar::after {
-  content: "→";
+.profile-role {
+  margin: 0;
 }
 
-.toggle-sidebar::after {
-  content: "←";
+/* Users Section */
+.manage-users {
+  flex: 1;
 }
 
-.sidebar-inside {
-  margin-left: 20%;
+.manage-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--dark-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.users-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-between;
+  gap: 0.5rem;
 }
 
-.sidebar h2 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  letter-spacing: -0.3px;
+.users-list li {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--dark-border);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  color: var(--dark-text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.sidebar p {
-  font-size: 1rem;
-  color: var(--text-light);
+.users-list li:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(239, 68, 68, 0.3);
+  transform: translateX(4px);
 }
 
 .logout-btn {
-  background: linear-gradient(135deg, var(--logout-btn), var(--logout-hover));
-  color: white;
-  border: none;
-  padding: 12px;
-  cursor: pointer;
-  width: 70%;
-  border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: 0 10px 30px rgba(255, 70, 85, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
   margin-top: auto;
+  padding: 0.875rem 1.5rem;
+}
+
+/* ============================================
+   MAIN CONTENT - Posts Feed
+   ============================================ */
+
+.main-content {
+  height: 100vh;
+  overflow-y: auto;
+  padding: 2rem;
+  background: rgba(15, 15, 18, 0.4);
+}
+
+/* Create Post Card */
+.create-post {
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease;
+}
+
+.create-post-header {
+  margin-bottom: 1.5rem;
+}
+
+.create-post-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  color: var(--dark-text);
+}
+
+.create-post-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.image-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.image-upload-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed var(--dark-border);
+  border-radius: var(--radius-lg);
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.image-upload-label:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary-500);
+  color: var(--primary-400);
+}
+
+.image-preview {
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.3s ease;
+}
+
+.post-buttons {
+  padding-top: 1rem;
+  border-top: 1px solid var(--dark-border);
+}
+
+/* Posts Feed */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.post-card {
+  background: var(--dark-card);
+  border: 1px solid var(--dark-border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.5s ease;
+}
+
+.post-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.post-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--gradient-sunset);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.post-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.post-author-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--dark-text);
+}
+
+.post-date {
+  font-size: 0.75rem;
+  color: var(--dark-text-muted);
+}
+
+.post-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.post-action-btn {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--dark-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.post-action-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--dark-text);
+  transform: none;
+  box-shadow: none;
+}
+
+.post-action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--primary-400);
+}
+
+.post-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--dark-text);
+}
+
+.post-description {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--dark-text-muted);
+  margin-bottom: 1rem;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  margin-top: 1rem;
+  box-shadow: var(--shadow-md);
+}
+
+.post-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--dark-border);
+}
+
+.post-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--dark-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ============================================
+   RIGHT SIDEBAR - Search & Info
+   ============================================ */
+
+.right-section {
+  background: rgba(26, 26, 31, 0.95);
+  border-left: 1px solid var(--dark-border);
+  backdrop-filter: blur(20px);
+  padding: 2rem;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+.search-container {
+  position: relative;
+}
+
+.site-details {
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+}
+
+.site-info {
+  padding-top: 1rem;
+  border-top: 1px solid var(--dark-border);
+}
+
+.site-info p {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 1200px) {
+  body {
+    grid-template-columns: 280px 1fr;
+  }
+  
+  .right-section {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.empty-feed {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--dark-text-muted);
+}
+
+.empty-feed svg {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1.5rem;
+  opacity: 0.3;
+}
+
+.empty-feed h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--dark-text);
+}
+
+.empty-feed p {
+  font-size: 0.9375rem;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+.sidebar::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.right-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track,
+.right-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+.right-section::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
+.right-section::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .logout-btn:hover {

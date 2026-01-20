@@ -3,30 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Login - LibraLink</title>
+    <link rel="stylesheet" href="/styles/modern-base.css" />
     <link rel="stylesheet" href="/styles/styles.css" />
   </head>
   <body>
     <div class="wrapper">
       <div class="left">
-        <img src="/images/LibraLinkLogo.png" alt="Logo" class="logo" />
+        <div class="logo-container animate-fade-in-up">
+          <img src="/images/LibraLinkLogo.png" alt="LibraLink Logo" class="logo" />
+          <h1 class="logo-tagline">Your Digital Library Companion</h1>
+        </div>
       </div>
 
       <div class="right">
-        <div class="container">
-          <h2>Login</h2>
-          <form id="loginForm">
-            <input type="text" id="username" placeholder="Username" required />
-            <input
-              type="password"
-              id="password"
-              placeholder="Password"
-              required
-            />
-            <button type="submit">Login</button>
+        <div class="container animate-scale-in">
+          <div class="auth-header">
+            <h2 class="heading-2">Welcome Back</h2>
+            <p class="text-muted">Sign in to your LibraLink account</p>
+          </div>
+          
+          <form id="loginForm" class="auth-form">
+            <div class="input-group">
+              <label for="username" class="input-label">Username</label>
+              <input 
+                type="text" 
+                id="username" 
+                class="input" 
+                placeholder="Enter your username" 
+                required 
+                autocomplete="username"
+              />
+            </div>
+            
+            <div class="input-group">
+              <label for="password" class="input-label">Password</label>
+              <input
+                type="password"
+                id="password"
+                class="input"
+                placeholder="Enter your password"
+                required
+                autocomplete="current-password"
+              />
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-full">
+              <span>Sign In</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
           </form>
-          <p>Forgot password? <a href="/forgotPassword">Reset now</a></p>
-          <p>Don't have an account? <a href="/register">Register</a></p>
+          
+          <div class="auth-footer">
+            <a href="/forgotPassword" class="auth-link">Forgot password?</a>
+            <p class="text-muted text-center mt-6">
+              Don't have an account? 
+              <a href="/register" class="auth-link-primary">Create one</a>
+            </p>
+          </div>
         </div>
       </div>
     </div>
