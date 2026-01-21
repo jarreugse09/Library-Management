@@ -16,12 +16,12 @@ body {
 
 /* Main Container */
 .container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem;
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr var(--sidebar-width);
-  gap: 2rem;
+  grid-template-columns: 240px 1fr;
+  gap: 1rem;
   align-items: start;
 }
 
@@ -29,19 +29,22 @@ body {
    SIDEBARS
    ============================================ */
 
-.genre,
-.sidebar {
+.genre {
   position: sticky;
-  top: calc(var(--header-height) + 2rem);
+  top: calc(var(--header-height) + 1rem);
   background: var(--dark-card);
   border: 1px solid var(--dark-border);
   border-radius: var(--radius-xl);
   padding: 1.5rem;
-  max-height: calc(100vh - var(--header-height) - 4rem);
+  max-height: calc(100vh - var(--header-height) - 2rem);
   overflow-y: auto;
   backdrop-filter: blur(20px);
   box-shadow: var(--shadow-xl);
   animation: fadeInUp 0.5s ease;
+}
+
+.sidebar {
+  display: none;
 }
 
 .genre h2,
@@ -152,9 +155,10 @@ body {
   background: var(--dark-card);
   border: 1px solid var(--dark-border);
   border-radius: var(--radius-xl);
-  padding: 2rem;
+  padding: 2rem 1rem;
   backdrop-filter: blur(20px);
   box-shadow: var(--shadow-2xl);
+  width: 100%;
 }
 
 .browse h2 {
@@ -214,7 +218,7 @@ body {
 
 .book-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--book-card-width), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
   animation: fadeIn 0.5s ease;
 }

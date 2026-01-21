@@ -811,11 +811,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initial load
 
   document.querySelector(".book-info").style.display = "none";
-  document.querySelector(".browse").style.display = "none";
-  document.querySelector(".sidebar").style.display = "block";
-  document.querySelector(".genre").style.display = "none";
-  document.querySelector(".books").style.display = "block";
-  fetchBookRead();
+  document.querySelector(".browse").style.display = "block";
+  document.querySelector(".sidebar").style.display = "none";
+  document.querySelector(".genre").style.display = "block";
+  document.querySelector(".books").style.display = "none";
+  fetchBrowsePhysicalBook();
+  loadGenres();
 });
 
 document.getElementById("Browse").addEventListener("click", (e) => {

@@ -240,8 +240,40 @@ async function convertToBase64(file) {
 
 // Fetch and Display Posts
 async function fetchPosts() {
-  const posts = JSON.parse(localStorage.getItem("posts")) || [];
-  displayPosts(posts);
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const response = await fetch("/api/books/physical", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Failed to fetch books");
+    const books = await response.json();
+
+    // Convert books to posts format
+    const posts = books.map((book, index) => ({
+      id: book._id || index,
+      title: book.title || "Untitled",
+      description:
+        book.description || book.summary || "No description available",
+      image: book.coverImage ? `/uploads/covers/${book.coverImage}` : null,
+      username: book.donor || "Library",
+      likes: 0,
+      comments: [],
+      author: book.author || "Unknown Author",
+      isbn: book.isbn,
+      genre: book.genre,
+      condition: book.condition,
+      availability: book.availability,
+    }));
+
+    displayPosts(posts);
+  } catch (error) {
+    console.error("Error fetching books:", error);
+    displayPosts([]);
+  }
 }
 
 async function displayPosts(posts) {
@@ -257,64 +289,45 @@ async function displayPosts(posts) {
     const postElement = document.createElement("div");
     postElement.classList.add("post");
 
+    // Add click handler to show rating/review UI
+    postElement.addEventListener("click", (e) => {
+      // Don't trigger if clicking on buttons or inputs
+      if (e.target.tagName === "BUTTON" || e.target.tagName === "INPUT") {
+        return;
+      }
+      showPostDetail(post, user);
+    });
+
     let likeButton =
       user.role !== "user"
-        ? `<button onclick="likePost(${post.id})">👍<span class="like-count" id="likes-${post.id}">${post.likes}</span></button>`
+        ? `<button onclick="event.stopPropagation(); likePost(${post.id})">👍<span class="like-count" id="likes-${post.id}">${post.likes}</span></button>`
         : "";
     let commentSection =
       user.role !== "user" && user.role !== "reactor"
         ? `
-            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment...">
-            <button onclick="addComment(${post.id})">Post</button>
+            <input type="text" id="comment-input-${post.id}" placeholder="Write a comment..." onclick="event.stopPropagation()">
+            <button onclick="event.stopPropagation(); addComment(${post.id})">Post</button>
         `
         : "";
     let deleteButton =
       user.role === "admin" ||
       (user.role === "poster" && post.username === user.username)
-        ? `<button onclick="deletePost(${post.id})">🗑️</button>`
+        ? `<button onclick="event.stopPropagation(); deletePost(${post.id})">🗑️</button>`
         : "";
 
     postElement.innerHTML = `
-            <h3>Posted by: <strong>${post.username}</strong></h3>
-            <h4 style="margin-top: 5px;">${post.title}</h4>
-            <p2>${post.description}</p2>
             ${
               post.image
-                ? `<img src="${post.image}" alt="Post Image" class="post-image">`
-                : ""
+                ? `<img src="${post.image}" alt="${post.title}" class="post-image">`
+                : `<div class="post-no-image"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg></div>`
             }
-
-            <div class="post-actions">
-                ${likeButton}
-                ${
-                  user.role !== "user" && user.role !== "reactor"
-                    ? `<button onclick="commentPost(${post.id})">💬</button>`
-                    : ""
-                }
-                ${deleteButton}
-            </div>
-            <div class="divider"></div>
-            <div class="comments">
-                <h4>Comments</h4>
-                <ul id="comments-${post.id}">
-                    ${post.comments
-                      .map(
-                        (comment) => `
-                        <li>
-                            <strong>${comment.username}:</strong> ${
-                          comment.text
-                        }
-                            ${
-                              comment.username === user.username
-                                ? `<button onclick="deleteComment(${post.id}, ${comment.id})">🗑️</button>`
-                                : ""
-                            }
-                        </li>
-                    `
-                      )
-                      .join("")}
-                </ul>
-                ${commentSection}
+            <div class="post-content">
+                <h4 class="post-title">${post.title}</h4>
+                ${post.author ? `<p class="post-author">by ${post.author}</p>` : ""}
+                <p class="post-description">${post.description}</p>
+                ${post.genre ? `<span class="post-genre">${post.genre}</span>` : ""}
+                ${post.condition ? `<span class="post-badge ${post.condition.toLowerCase()}">${post.condition}</span>` : ""}
+                ${post.availability !== undefined ? `<span class="post-badge ${post.availability ? "available" : "unavailable"}">${post.availability ? "Available" : "Borrowed"}</span>` : ""}
             </div>
         `;
 
@@ -426,3 +439,123 @@ function likePost(postId) {
 
 // Load posts when the page loads
 document.addEventListener("DOMContentLoaded", fetchPosts);
+
+// Toggle comments visibility
+function toggleComments(postId) {
+  const commentsSection = document.getElementById(`comments-section-${postId}`);
+  const divider = commentsSection.previousElementSibling;
+
+  if (commentsSection.style.display === "none") {
+    commentsSection.style.display = "block";
+    divider.style.display = "block";
+  } else {
+    commentsSection.style.display = "none";
+    divider.style.display = "none";
+  }
+}
+
+// Show post detail with rating/review UI
+function showPostDetail(post, user) {
+  const modal = document.createElement("div");
+  modal.className = "post-detail-modal";
+  modal.innerHTML = `
+    <div class="post-detail-content">
+      <button class="close-modal" onclick="this.parentElement.parentElement.remove()">✕</button>
+      <h2>${post.title}</h2>
+      <p class="post-author-detail">By: ${post.username}</p>
+      <p class="post-description-detail">${post.description}</p>
+      ${post.image ? `<img src="${post.image}" alt="Post Image" class="post-image-detail">` : ""}
+      
+      <div class="rating-section">
+        <h3>Rate this post</h3>
+        <div class="star-rating">
+          ${[1, 2, 3, 4, 5]
+            .map(
+              (star) => `
+            <span class="star" data-rating="${star}" onclick="ratePost(${post.id}, ${star})">★</span>
+          `,
+            )
+            .join("")}
+        </div>
+        <p class="rating-display">Rating: ${post.rating || 0}/5</p>
+      </div>
+      
+      <div class="review-section">
+        <h3>Add a Review</h3>
+        <textarea id="review-text-${post.id}" placeholder="Write your review here..." rows="4"></textarea>
+        <button class="btn btn-primary" onclick="submitReview(${post.id})">Submit Review</button>
+        
+        <div class="reviews-list">
+          <h4>Reviews</h4>
+          ${
+            (post.reviews || [])
+              .map(
+                (review) => `
+            <div class="review-item">
+              <strong>${review.username}</strong>
+              <p>${review.text}</p>
+            </div>
+          `,
+              )
+              .join("") || "<p>No reviews yet.</p>"
+          }
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+// Rate a post
+function ratePost(postId, rating) {
+  let posts = JSON.parse(localStorage.getItem("posts")) || [];
+  const postIndex = posts.findIndex((p) => p.id === parseInt(postId));
+
+  if (postIndex !== -1) {
+    posts[postIndex].rating = rating;
+    localStorage.setItem("posts", JSON.stringify(posts));
+
+    // Update UI
+    document.querySelector(".rating-display").textContent =
+      `Rating: ${rating}/5`;
+
+    // Highlight stars
+    document.querySelectorAll(".star").forEach((star, index) => {
+      star.style.color = index < rating ? "gold" : "#666";
+    });
+  }
+}
+
+// Submit review
+async function submitReview(postId) {
+  const user = await getUserData();
+  const reviewText = document
+    .getElementById(`review-text-${postId}`)
+    .value.trim();
+
+  if (!reviewText) {
+    alert("Please write a review");
+    return;
+  }
+
+  let posts = JSON.parse(localStorage.getItem("posts")) || [];
+  const postIndex = posts.findIndex((p) => p.id === parseInt(postId));
+
+  if (postIndex !== -1) {
+    if (!posts[postIndex].reviews) posts[postIndex].reviews = [];
+
+    posts[postIndex].reviews.push({
+      username: user.username,
+      text: reviewText,
+      date: new Date().toISOString(),
+    });
+
+    localStorage.setItem("posts", JSON.stringify(posts));
+    alert("Review submitted!");
+
+    // Close modal and refresh
+    document.querySelector(".post-detail-modal").remove();
+    fetchPosts();
+  }
+}
