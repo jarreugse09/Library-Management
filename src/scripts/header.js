@@ -53,6 +53,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Click handler for dropdown toggle
   settingsToggle.addEventListener("click", toggleDropdown);
 
+  // Prevent dropdown items from closing the dropdown when clicked
+  settingsDropdown.addEventListener("click", (event) => {
+    // Only allow the logout button to trigger its action
+    // All other links should navigate normally
+    if (
+      event.target.id !== "logoutBtn" &&
+      !event.target.closest("#logoutBtn")
+    ) {
+      // Let the link navigate normally, but close the dropdown
+      settingsDropdown.classList.remove("show");
+    }
+  });
+
   // Close when clicking outside
   document.addEventListener("click", (event) => {
     if (

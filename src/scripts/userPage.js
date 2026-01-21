@@ -230,7 +230,7 @@ function showReadBook(book, pageNumber) {
       <div class="rating-stars" data-book-id="${book._id}">
         ${[1, 2, 3, 4, 5]
           .map(
-            (star) => `<span class="star" data-value="${star}">&#9733;</span>`
+            (star) => `<span class="star" data-value="${star}">&#9733;</span>`,
           )
           .join("")}
       </div>
@@ -357,7 +357,7 @@ function showReadBook(book, pageNumber) {
       container.querySelectorAll(".star").forEach((star) => {
         star.classList.toggle(
           "selected",
-          Number(star.getAttribute("data-value")) <= value
+          Number(star.getAttribute("data-value")) <= value,
         );
       });
 
@@ -461,7 +461,7 @@ function showBookDetails(book) {
       <div class="rating-stars" data-book-id="${book._id}">
         ${[1, 2, 3, 4, 5]
           .map(
-            (star) => `<span class="star" data-value="${star}">&#9733;</span>`
+            (star) => `<span class="star" data-value="${star}">&#9733;</span>`,
           )
           .join("")}
       </div>
@@ -578,7 +578,7 @@ function showBookDetails(book) {
       ratingContainer.querySelectorAll(".star").forEach((star) => {
         star.classList.toggle(
           "selected",
-          Number(star.getAttribute("data-value")) <= value
+          Number(star.getAttribute("data-value")) <= value,
         );
       });
 
@@ -623,7 +623,7 @@ async function addToLibrary(book) {
         body: JSON.stringify({
           bookId: book._id,
         }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -647,7 +647,7 @@ async function removeToLibraryFunc(book) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }
+      },
     );
 
     const data = await response.json();
@@ -679,7 +679,7 @@ function searchBooks() {
 
   // Filter books based on the input
   const filtered = booksToSearch.filter((book) =>
-    book.title.toLowerCase().includes(input)
+    book.title.toLowerCase().includes(input),
   );
 
   // Display the filtered books
@@ -727,7 +727,7 @@ async function loadGenres() {
           .filter((book) =>
             Array.isArray(book.genre)
               ? book.genre.includes(genre.name)
-              : book.genre === genre.name
+              : book.genre === genre.name,
           );
 
         displayBooks(filteredBooks, browseBookListEl);
@@ -891,6 +891,8 @@ document.getElementById("currentBookBtn").addEventListener("click", (e) => {
   fetchBookRead();
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
+document.getElementById("logoutBtn").addEventListener("click", async (e) => {
+  e.preventDefault();
+  e.stopPropagation();
   logoutUser();
 });
