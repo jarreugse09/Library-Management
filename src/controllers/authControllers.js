@@ -18,7 +18,7 @@ const createSendToken = (user, statusCode, message, res) => {
 
   const cookieOption = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
     httpOnly: true,
   };
@@ -239,7 +239,7 @@ const updateUserRole = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select(
-      "username role email firstName lastName isVerified createdAt lastLogin"
+      "username role email firstName lastName isVerified createdAt lastLogin",
     );
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
@@ -260,26 +260,26 @@ const protect = catchAsync(async (req, res, next) => {
 
   if (!token)
     return next(
-      new AppError("You are not logged in! Please log in to get access", 401)
+      new AppError("You are not logged in! Please log in to get access", 401),
     );
 
   //2. verify token
   const decoded = await util.promisify(jwt.verify)(
     token,
-    process.env.JWT_SECRET
+    process.env.JWT_SECRET,
   );
 
   //3. if user exists
   const freshUser = await User.findById(decoded.id);
   if (!freshUser)
     return next(
-      new AppError("The user belonging to this token does not exist!", 401)
+      new AppError("The user belonging to this token does not exist!", 401),
     );
 
   //4. if user changed password
   if (freshUser.changedPasswordAfter(decoded.iat)) {
     return next(
-      new AppError("User recently changed password! Please log in again.", 401)
+      new AppError("User recently changed password! Please log in again.", 401),
     );
   }
 
@@ -294,7 +294,7 @@ const isLoggedIn = async (req, res, next) => {
       // 1) verify token
       const decoded = await util.promisify(jwt.verify)(
         req.cookies.jwt,
-        process.env.JWT_SECRET
+        process.env.JWT_SECRET,
       );
 
       // 2) Check if user still exists
@@ -322,7 +322,7 @@ const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
-        new AppError("You do not have permission to perform this action.", 403)
+        new AppError("You do not have permission to perform this action.", 403),
       );
     }
     next();
@@ -341,7 +341,7 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   const resetUrl = `${req.protocol}://${req.get(
-    "host"
+    "host",
   )}/resetPassword?token=${resetToken}`;
 
   const message = `Forgot your password? Submit a PATCH request with your new password and password confirm to ${resetUrl}.\nIf you didn't forget your password, please ignore this email!`;
@@ -362,8 +362,8 @@ const forgotPassword = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         "There was an error sending the email. Try again later!",
-        500
-      )
+        500,
+      ),
     );
   }
 });
@@ -400,44 +400,47 @@ const resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-const updatePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    const { id } = req.params;
-    if (!id) {
-      return res.status(400).json({ message: "Invalid Empty fields" });
-    }
-    // Step 1: Get the user from the database
-    const user = await User.findById(id);
+const updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+  const { id } = req.params;
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Step 2: Check if the current password matches
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect current password" });
-    }
-
-    // Step 3: Hash the new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-
-    // Step 4: Update passwordChangedAt field
-    user.passwordChangedAt = Date.now();
-
-    // Step 5: Save the updated user
-    await user.save({ validateBeforeSave: false });
-
-    // Step 6: Create and send a new JWT
-    createSendToken(user, 200, "Password updated successfully", res);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
+  // Validate inputs
+  if (!currentPassword || !newPassword) {
+    return next(new AppError("Invalid empty fields", 400));
   }
-};
+
+  // Security: Ensure user can only update their own password
+  if (req.user._id.toString() !== id) {
+    return next(new AppError("You can only update your own password", 403));
+  }
+
+  // Step 1: Get the user from the database
+  const user = await User.findById(id);
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  // Step 2: Check if the current password matches
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+  if (!isMatch) {
+    return next(new AppError("Incorrect current password", 401));
+  }
+
+  // Step 3: Hash the new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+
+  // Step 4: Update passwordChangedAt field
+  user.passwordChangedAt = Date.now();
+
+  // Step 5: Save the updated user
+  await user.save({ validateBeforeSave: false });
+
+  // Step 6: Create and send a new JWT
+  createSendToken(user, 200, "Password updated successfully", res);
+});
 
 module.exports = {
   register,
